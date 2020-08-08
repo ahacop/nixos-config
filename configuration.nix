@@ -213,7 +213,6 @@
     + (builtins.readFile dotfiles/bin/git-prompt.sh)
     + (builtins.readFile dotfiles/bin/git-completion.bash);
     shellAliases = {
-      g = "git status";
       vi = "nvim";
       vim = "nvim";
       vimdiff = "nvim -d";
@@ -258,31 +257,30 @@
         pullff = "pull --ff-only";
         st     = "status";
 
-  # Divergence (commits we added and commits remote added)
-  div = "divergence";
+        # Divergence (commits we added and commits remote added)
+        div = "divergence";
 
-  # Goodness (summary of diff lines added/removed/total)
-  gn  = "goodness";
-  gnc = "goodness --cached";
+        # Goodness (summary of diff lines added/removed/total)
+        gn  = "goodness";
+        gnc = "goodness --cached";
 
-  # Fancy logging.
-  #   h  = head
-  #   hp = head with patch
-  #   r  = recent commits, only current branch
-  #   ra = recent commits, all reachable refs
-  #   l  = all commits, only current branch
-  #   la = all commits, all reachable refs
-  head = "!git l -1";
-  h    = "!git head";
-  hp   = "\"!. ~/.githelpers && show_git_head\"";
-  r    = "!git l -30";
-  ra   = "!git r --all";
-  l    = "\"!. ~/.githelpers && pretty_git_log\"";
-  la   = "!git l --all";
-  today = "log --since=midnight --author='ahacop' --oneline";
-  yesterday = "log --since=midnight.yesterday --until=midnight
-  --author='ahacop' --oneline";
-};
+        # Fancy logging.
+        #   h  = head
+        #   hp = head with patch
+        #   r  = recent commits, only current branch
+        #   ra = recent commits, all reachable refs
+        #   l  = all commits, only current branch
+        #   la = all commits, all reachable refs
+        head = "!git l -1";
+        h    = "!git head";
+        hp   = "!. ~/nixos-config/dotfiles/.githelpers && show_git_head";
+        r    = "!git l -30";
+        ra   = "!git r --all";
+        l    = "!. ~/nixos-config/dotfiles/.githelpers && pretty_git_log";
+        la   = "!git l --all";
+        today = "log --since=midnight --author='ahacop' --oneline";
+        yesterday = "log --since=midnight.yesterday --until=midnight --author='ahacop' --oneline";
+      };
     };
 
     programs.neovim = {
