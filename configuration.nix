@@ -13,6 +13,11 @@
   ];
 
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.packageOverrides = pkgs: {
+    nur = import (builtins.fetchTarball "https://github.com/nix-community/NUR/archive/master.tar.gz") {
+      inherit pkgs;
+    };
+  };
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
@@ -281,6 +286,50 @@
         today = "log --since=midnight --author='ahacop' --oneline";
         yesterday = "log --since=midnight.yesterday --until=midnight --author='ahacop' --oneline";
       };
+    };
+
+    programs.firefox = {
+      enable = true;
+      extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+        decentraleyes
+        ublock-origin
+        https-everywhere
+        privacy-badger
+        multi-account-containers
+      ];
+      profiles =
+        let defaultSettings = {
+          "app.update.auto" = false;
+              "browser.startup.homepage" = "about:blank";
+              "browser.ctrlTab.recentlyUsedOrder" = false;
+              #"browser.newtabpage.enabled" = false;
+              #"browser.bookmarks.showMobileBookmarks" = true;
+              #"browser.uidensity" = 1;
+              #"browser.urlbar.update1" = true;
+              #"distribution.searchplugins.defaultLocale" = "en-GB";
+              #"general.useragent.locale" = "en-GB";
+              #"identity.fxaccounts.account.device.name" = config.networking.hostName;
+              "privacy.trackingprotection.enabled" = true;
+              "privacy.trackingprotection.socialtracking.enabled" = true;
+              "privacy.trackingprotection.socialtracking.annotate.enabled" = true;
+              "services.sync.declinedEngines" = "addons,passwords,prefs";
+              "services.sync.engine.addons" = false;
+              "services.sync.engineStatusChanged.addons" = true;
+              "services.sync.engine.passwords" = false;
+              "services.sync.engine.prefs" = false;
+              "services.sync.engineStatusChanged.prefs" = true;
+              #"signon.rememberSignons" = false;
+            };
+        in {
+          home = {
+            id = 0;
+            settings = defaultSettings // {
+              "browser.urlbar.placeholderName" = "DuckDuckGo";
+              #"toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+            };
+            #userChrome = builtins.readFile ../conf.d/userChrome.css;
+          };
+        };
     };
 
     programs.neovim = {
