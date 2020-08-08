@@ -85,6 +85,7 @@
     steam
     tmux
     trayer
+    tree
     wget 
     wirelesstools
     xclip
