@@ -296,6 +296,7 @@
       extensions = with pkgs.nur.repos.rycee.firefox-addons; [
         decentraleyes
         ublock-origin
+        tridactyl
         https-everywhere
         privacy-badger
         multi-account-containers
