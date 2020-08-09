@@ -124,10 +124,8 @@
   powerManagement.enable = true;
   services.locate.enable = true;
 
-  services.redshift = {
-    enable = true;
-    provider = "geoclue2";
-  };
+  location.provider = "geoclue2";
+  services.redshift.enable = true;
 
   # Enable sound.
   sound.enable = true;
