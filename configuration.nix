@@ -75,7 +75,8 @@
     firefox
     ffsend
     fzf
-    git
+    gitAndTools.gitFull
+    gnome3.seahorse
     haskellPackages.xmobar
     kbdlight
     light
@@ -128,6 +129,17 @@
 
   location.provider = "geoclue2";
   services.redshift.enable = true;
+
+  services.gnome3.gnome-keyring.enable = true;
+
+  # FIXME: not sure if all this is really necessary
+  security.pam.services = {
+    gdm.enableGnomeKeyring = true;
+    kdm.enableGnomeKeyring = true;
+    lightdm.enableGnomeKeyring = true;
+    sddm.enableGnomeKeyring = true;
+    slim.enableGnomeKeyring = true;
+  };
 
   # Enable sound.
   sound.enable = true;
@@ -248,6 +260,9 @@
       enable = true;
       userEmail = "ara@hacopian.de";
       userName = "Ara Hacopian";
+      extraConfig = {
+        credential.helper = "libsecret";
+      };
       aliases = {
         aa     = "add --all";
         amend  = "commit --amend";
