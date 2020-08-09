@@ -94,8 +94,6 @@
     wget 
     wirelesstools
     xclip
-    xflux
-    xflux-gui
     xscreensaver
   ];
 
@@ -125,6 +123,11 @@
   programs.light.enable = true;
   powerManagement.enable = true;
   services.locate.enable = true;
+
+  services.redshift = {
+    enable = true;
+    provider = "geoclue2";
+  };
 
   # Enable sound.
   sound.enable = true;
