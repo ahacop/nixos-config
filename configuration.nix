@@ -83,7 +83,6 @@
     mu
     neovim
     networkmanager
-    networkmanagerapplet
     ngrok
     nodejs
     ruby
@@ -92,13 +91,11 @@
     slack
     steam
     tmux
-    trayer
     tree
     vimb
     wget 
     wirelesstools
     xclip
-    xscreensaver
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
