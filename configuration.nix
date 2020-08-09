@@ -121,7 +121,6 @@
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
-  programs.light.enable = true;
   powerManagement.enable = true;
   services.locate.enable = true;
 
@@ -211,6 +210,8 @@
   };
 
   virtualisation.docker.enable = true;
+
+  programs.light.enable = true;
 
   programs.bash = {
     enableCompletion = true;
@@ -519,8 +520,6 @@
           command! -nargs=0 Prettier :CocCommand prettier.formatFile
       '';
     };
-
-
   };
 
   environment.variables.EDITOR = "nvim";
@@ -532,5 +531,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "20.03"; # Did you read the comment?
-
 }
