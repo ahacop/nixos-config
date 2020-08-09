@@ -91,6 +91,7 @@
     tmux
     trayer
     tree
+    vimb
     wget 
     wirelesstools
     xclip
