@@ -109,6 +109,7 @@
     wget 
     wirelesstools
     xclip
+    youtube-dl
 
     (emacsWithPackagesFromUsePackage {
       config = builtins.readFile ./dotfiles/emacs.el;
