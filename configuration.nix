@@ -37,8 +37,15 @@
   };
 
 
-  networking.networkmanager.enable = true;
-  networking.hostName = "mopsliebe"; # Define your hostname.
+  networking = {
+    hostName = "mopsliebe"; # Define your hostname.
+    wireless.iwd.enable = true;
+    networkmanager = {
+      enable = true;
+      wifi.backend = "iwd";
+    };
+  };
+
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # The global useDHCP flag is deprecated, therefore explicitly set to false here.
