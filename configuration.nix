@@ -19,6 +19,12 @@
     };
   };
 
+  nixpkgs.overlays = [
+    (import (builtins.fetchTarball {
+      url = https://github.com/nix-community/emacs-overlay/archive/master.tar.gz;
+    }))
+  ];
+
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -96,6 +102,28 @@
     wget 
     wirelesstools
     xclip
+
+    (emacsWithPackagesFromUsePackage {
+      config = builtins.readFile ./dotfiles/emacs.el;
+
+      # Package is optional, defaults to pkgs.emacs
+      package = pkgs.emacsUnstable;
+
+      # By default emacsWithPackagesFromUsePackage will only pull in packages with `:ensure t`.
+      # Setting alwaysEnsure to true emulates `use-package-always-ensure` and pulls in all use-package references.
+      alwaysEnsure = true;
+
+      # Optionally provide extra packages not in the configuration file
+      #extraEmacsPackages = epkgs: [
+      #  epkgs.cask
+      #];
+      # Optionally override derivations
+      #override = epkgs: epkgs // {
+      #  weechat = epkgs.melpaPackages.weechat.overrideAttrs(old: {
+      #    patches = [ ./weechat-el.patch ];
+      #  });
+      #};
+    })
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -253,6 +281,7 @@
 
   home-manager.useGlobalPkgs = true;
   home-manager.users.ahacop = { pkgs, ... }: {
+    home.file.".emacs".source = ./dotfiles/emacs.el;
     programs.git = {
       enable = true;
       userEmail = "ara@hacopian.de";
