@@ -288,6 +288,7 @@
       userName = "Ara Hacopian";
       extraConfig = {
         credential.helper = "libsecret";
+        github.user = "ahacop";
       };
       aliases = {
         aa     = "add --all";
