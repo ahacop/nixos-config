@@ -282,6 +282,7 @@
   home-manager.useGlobalPkgs = true;
   home-manager.users.ahacop = { pkgs, ... }: {
     home.file.".emacs".source = ./dotfiles/emacs.el;
+    home.file.".githelpers".source = ./dotfiles/githelpers;
     programs.git = {
       enable = true;
       userEmail = "ara@hacopian.de";
@@ -325,10 +326,10 @@
         #   la = all commits, all reachable refs
         head = "!git l -1";
         h    = "!git head";
-        hp   = "!. ~/nixos-config/dotfiles/.githelpers && show_git_head";
+        hp   = "!. ~/.githelpers && show_git_head";
         r    = "!git l -30";
         ra   = "!git r --all";
-        l    = "!. ~/nixos-config/dotfiles/.githelpers && pretty_git_log";
+        l    = "!. ~/.githelpers && pretty_git_log";
         la   = "!git l --all";
         today = "log --since=midnight --author='ahacop' --oneline";
         yesterday = "log --since=midnight.yesterday --until=midnight --author='ahacop' --oneline";
