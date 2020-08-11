@@ -283,6 +283,10 @@
   home-manager.users.ahacop = { pkgs, ... }: {
     home.file.".emacs".source = ./dotfiles/emacs.el;
     home.file.".githelpers".source = ./dotfiles/githelpers;
+    home.file.".gitignore.global".source = ./dotfiles/gitignore.global;
+    home.file.".gemrc".source = ./dotfiles/gemrc;
+    home.file.".tmux.conf".source = ./dotfiles/tmux.conf;
+    home.file.".ctags".source = ./dotfiles/ctags;
     programs.git = {
       enable = true;
       userEmail = "ara@hacopian.de";

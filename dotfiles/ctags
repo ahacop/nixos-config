@@ -1,0 +1,2 @@
+--regex-ruby=/^[ \t]*scope[ \t]*:([a-zA-Z0-9_]+)/\1/
+--exclude=node_modules
