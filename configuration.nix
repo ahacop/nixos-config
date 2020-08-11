@@ -104,6 +104,7 @@
     slack
     steam
     tmux
+    transmission-gtk
     tree
     vimb
     wget 
