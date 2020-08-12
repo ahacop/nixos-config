@@ -296,6 +296,9 @@
     home.file.".gemrc".source = ./dotfiles/gemrc;
     home.file.".tmux.conf".source = ./dotfiles/tmux.conf;
     home.file.".ctags".source = ./dotfiles/ctags;
+    home.file.".xmobarrc".source = ./dotfiles/xmobarrc;
+    home.file.".xmonad/xmonad.hs".source = ./dotfiles/xmonad.hs;
+    #home.file.".xmonad/xmonad.hs".onChange = "xmonad -recompile";
     programs.git = {
       enable = true;
       userEmail = "ara@hacopian.de";
