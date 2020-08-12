@@ -75,19 +75,24 @@
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
 
-
   fonts = {
     fontconfig.defaultFonts.monospace = ["Inconsolata"];
     enableFontDir = true;
     enableGhostscriptFonts = true;
     fonts = with pkgs; [
+      font-awesome
+      joypixels
+      libertine
       noto-fonts-emoji
       dejavu_fonts
       inconsolata
     ];
   };
 
-  environment.variables.EDITOR = "nvim";
+  environment.variables = {
+    EDITOR = "nvim";
+    XDG_CURRENT_DESKTOP = "Unity";
+  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -96,7 +101,6 @@
     bat
     ctags
     darktable
-    dmenu
     docker-compose
     dropbox-cli
     dust
@@ -104,13 +108,12 @@
     exa
     exercism
     fd
-    firefox
+    firefox-wayland
     ffsend
     fzf
     gitAndTools.gitFull
     gnome3.seahorse
     graphviz
-    haskellPackages.xmobar
     isync
     kondo
     mpv
@@ -131,6 +134,7 @@
     vimb
     wget
     wirelesstools
+    wofi
     xclip
     youtube-dl
 
@@ -180,7 +184,10 @@
   services = {
     printing.enable = true;
     locate.enable = true;
-    redshift.enable = true;
+    redshift = {
+      enable = true;
+      package = pkgs.redshift-wlr;
+    };
     gnome3.gnome-keyring.enable = true;
     blueman.enable = true;
 
@@ -200,17 +207,8 @@
         disableWhileTyping = true;
         accelSpeed = "0.001";
       };
-      windowManager.xmonad = {
-        enable = true;
-        enableContribAndExtras = true;
-        extraPackages = haskellPackages: [
-          haskellPackages.xmonad-contrib
-          haskellPackages.xmonad-extras
-          haskellPackages.xmonad
-        ];
-      };
       displayManager = {
-        defaultSession = "none+xmonad";
+        defaultSession = "sway";
         autoLogin = {
           enable = true;
           user = "ahacop";
@@ -220,6 +218,21 @@
         };
       };
     };
+  };
+
+  nixpkgs.config.pulseaudio = true;
+  programs.sway = {
+    enable = true;
+    extraPackages = with pkgs; [
+      kanshi # autorandr
+      mako # notification daemon
+      (waybar.override {
+        pulseSupport = true;
+      })
+      swayidle
+      swaylock # lockscreen
+      xwayland # for legacy apps
+    ];
   };
 
   # FIXME: not sure if all this is really necessary
@@ -273,7 +286,7 @@
     ahacop = {
       isNormalUser = true;
       description = "Ara Hacopian";
-      extraGroups = [ "video" "docker" "disk" "audio" "wheel" "networkmanager" ];
+      extraGroups = [ "sway" "video" "docker" "disk" "audio" "wheel" "networkmanager" ];
     };
   };
 
@@ -323,10 +336,10 @@
     home.file.".gemrc".source = ./dotfiles/gemrc;
     home.file.".tmux.conf".source = ./dotfiles/tmux.conf;
     home.file.".ctags".source = ./dotfiles/ctags;
-    home.file.".xmobarrc".source = ./dotfiles/xmobarrc;
-    home.file.".xmonad/xmonad.hs".source = ./dotfiles/xmonad.hs;
     home.file.".mbsyncrc".source = ./dotfiles/mbsyncrc;
-    #home.file.".xmonad/xmonad.hs".onChange = "xmonad -recompile";
+    home.file.".config/sway/config".source = ./dotfiles/sway.config;
+    home.file.".config/waybar/config".source = ./dotfiles/waybar.config;
+    home.file.".config/waybar/style.css".source = ./dotfiles/waybar.css;
 
     programs.git = {
       enable = true;
