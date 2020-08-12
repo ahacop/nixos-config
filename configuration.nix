@@ -356,11 +356,12 @@
       enable = true;
       extensions = with pkgs.nur.repos.rycee.firefox-addons; [
         decentraleyes
-        ublock-origin
-        tridactyl
+        facebook-container
         https-everywhere
-        privacy-badger
         multi-account-containers
+        privacy-badger
+        tridactyl
+        ublock-origin
       ];
       profiles =
         let defaultSettings = {
