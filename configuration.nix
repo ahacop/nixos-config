@@ -39,7 +39,9 @@
 
   networking = {
     hostName = "mopsliebe"; # Define your hostname.
+
     wireless.iwd.enable = true;
+
     networkmanager = {
       enable = true;
       wifi.backend = "iwd";
@@ -156,15 +158,54 @@
   # networking.firewall.enable = false;
 
   # Enable CUPS to print documents.
-  services.printing.enable = true;
 
   powerManagement.enable = true;
-  services.locate.enable = true;
-
   location.provider = "geoclue2";
-  services.redshift.enable = true;
 
-  services.gnome3.gnome-keyring.enable = true;
+  services = {
+    printing.enable = true;
+    locate.enable = true;
+    redshift.enable = true;
+    gnome3.gnome-keyring.enable = true;
+    blueman.enable = true;
+
+    postgresql = {
+      enable = true;
+      package = pkgs.postgresql_12;
+    };
+
+    xserver = {
+      enable = true;
+      layout = "us";
+      xkbOptions = "ctrl:nocaps";
+      libinput = {
+        enable = true;
+        tapping = true;
+        clickMethod = "clickfinger";
+        disableWhileTyping = true;
+        accelSpeed = "0.001";
+      };
+      windowManager.xmonad = {
+        enable = true;
+        enableContribAndExtras = true;
+        extraPackages = haskellPackages: [
+          haskellPackages.xmonad-contrib
+          haskellPackages.xmonad-extras
+          haskellPackages.xmonad
+        ];
+      };
+      displayManager = {
+        defaultSession = "none+xmonad";
+        lightdm = {
+          enable = true;
+          autoLogin = {
+            enable = true;
+            user = "ahacop";
+          };
+        };
+      };
+    };
+  };
 
   # FIXME: not sure if all this is really necessary
   security.pam.services = {
@@ -177,59 +218,22 @@
 
   # Enable sound.
   sound.enable = true;
-  hardware.pulseaudio = {
-    enable = true;
-    extraModules = [ pkgs.pulseaudio-modules-bt ];
-    package = pkgs.pulseaudioFull;
-    support32Bit = true;
-  };
 
-  hardware.opengl.driSupport32Bit = true;
-  hardware.opengl.extraPackages32 = with pkgs.pkgsi686Linux; [ libva ];
-
-  hardware.bluetooth = {
-    enable = true;
-  };
-
-  services.blueman.enable = true;
-
-  services.postgresql = {
-    enable = true;
-    package = pkgs.postgresql_12;
-  };
-
-  services.xserver = {
-    enable = true;
-    layout = "us";
-    xkbOptions = "ctrl:nocaps";
-    libinput = {
+  hardware = {
+    pulseaudio = {
       enable = true;
-      tapping = true;
-      clickMethod = "clickfinger";
-      disableWhileTyping = true;
-      accelSpeed = "0.001";
+      extraModules = [ pkgs.pulseaudio-modules-bt ];
+      package = pkgs.pulseaudioFull;
+      support32Bit = true;
     };
-    windowManager.xmonad = {
+
+    opengl.driSupport32Bit = true;
+    opengl.extraPackages32 = with pkgs.pkgsi686Linux; [ libva ];
+
+    bluetooth = {
       enable = true;
-      enableContribAndExtras = true;
-      extraPackages = haskellPackages: [
-        haskellPackages.xmonad-contrib
-        haskellPackages.xmonad-extras
-        haskellPackages.xmonad
-      ];
-    };
-    displayManager = {
-      defaultSession = "none+xmonad";
-      lightdm = {
-        enable = true;
-        autoLogin = {
-          enable = true;
-          user = "ahacop";
-        };
-      };
     };
   };
-
 
   # Enable the X11 windowing system.
   # services.xserver.enable = true;
@@ -259,31 +263,33 @@
 
   virtualisation.docker.enable = true;
 
-  programs.light.enable = true;
+  programs = {
+    light.enable = true;
 
-  programs.bash = {
-    enableCompletion = true;
-    enableLsColors = true;
-    interactiveShellInit = (builtins.readFile dotfiles/bashrc)
-    + (builtins.readFile dotfiles/functions)
-    + (builtins.readFile dotfiles/bin/git-prompt.sh)
-    + (builtins.readFile dotfiles/bin/git-completion.bash);
-    shellAliases = {
-      vi = "nvim";
-      vim = "nvim";
-      vimdiff = "nvim -d";
-      ls = "ls -GF";
-      be = "bundle exec";
-      gc = "git ci -p";
-      gca = "git ci -p --amend";
-      ga = "git aa";
-      gf = "git fetch";
-      gl = "git log";
-      retag = "git ls-files | xargs ctags";
-      pd = "pushd";
-      gv = "open_modified_and_untracked_in_vim";
-      gvh = "open_changed_from_head_in_vim";
-      tat = "tmux attach -t `basename $PWD` || tmux new-session -As \"$(basename \"$PWD\" | tr . -)\"";
+    bash = {
+      enableCompletion = true;
+      enableLsColors = true;
+      interactiveShellInit = (builtins.readFile dotfiles/bashrc)
+      + (builtins.readFile dotfiles/functions)
+      + (builtins.readFile dotfiles/bin/git-prompt.sh)
+      + (builtins.readFile dotfiles/bin/git-completion.bash);
+      shellAliases = {
+        vi = "nvim";
+        vim = "nvim";
+        vimdiff = "nvim -d";
+        ls = "ls -GF";
+        be = "bundle exec";
+        gc = "git ci -p";
+        gca = "git ci -p --amend";
+        ga = "git aa";
+        gf = "git fetch";
+        gl = "git log";
+        retag = "git ls-files | xargs ctags";
+        pd = "pushd";
+        gv = "open_modified_and_untracked_in_vim";
+        gvh = "open_changed_from_head_in_vim";
+        tat = "tmux attach -t `basename $PWD` || tmux new-session -As \"$(basename \"$PWD\" | tr . -)\"";
+      };
     };
   };
 
@@ -299,6 +305,7 @@
     home.file.".xmobarrc".source = ./dotfiles/xmobarrc;
     home.file.".xmonad/xmonad.hs".source = ./dotfiles/xmonad.hs;
     #home.file.".xmonad/xmonad.hs".onChange = "xmonad -recompile";
+
     programs.git = {
       enable = true;
       userEmail = "ara@hacopian.de";
