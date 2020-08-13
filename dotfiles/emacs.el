@@ -153,7 +153,7 @@
 (use-package try)
 (use-package which-key :config (which-key-mode))
 (use-package pdf-tools :init (pdf-loader-install))
-(use-package org-pdfview)
+;(use-package org-pdfview)
 
 (use-package nov
   :config (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
