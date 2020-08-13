@@ -263,7 +263,8 @@
   ;                  :fork (:host github :repo "ahacop/elfeed" :branch "add-title-decode-html-for-atom"))
  :hook (elfeed-show-mode . ahacop/make-readable)
  :config
- (setq browse-url-generic-program "open")
+ (setq elfeed-db-directory "~/Dropbox/elfeed-db")
+ (setq browse-url-generic-program "firefox")
  (define-key elfeed-show-mode-map (kbd "&") (kbd "C-u b"))
 
  (require 'cl-lib)

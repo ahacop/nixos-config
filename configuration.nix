@@ -100,6 +100,7 @@
     haskellPackages.xmobar
     kbdlight
     light
+    mpv
     mu
     neovim
     networkmanager
