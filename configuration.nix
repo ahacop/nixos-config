@@ -125,7 +125,6 @@
     skype
     slack
     steam
-    tmux
     transmission-gtk
     tree
     vimb
@@ -285,6 +284,7 @@
   virtualisation.docker.enable = true;
 
   programs = {
+    tmux.enable = true;
     bash = {
       enableCompletion = true;
       enableLsColors = true;
