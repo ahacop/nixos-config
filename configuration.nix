@@ -111,6 +111,7 @@
     gnome3.seahorse
     graphviz
     haskellPackages.xmobar
+    isync
     kondo
     mpv
     mu
@@ -159,11 +160,6 @@
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  #   pinentryFlavor = "gnome3";
-  # };
 
   # List services that you want to enable:
 
@@ -284,6 +280,11 @@
   virtualisation.docker.enable = true;
 
   programs = {
+    gnupg.agent = {
+      enable = true;
+      enableSSHSupport = true;
+      #pinentryFlavor = "curses";
+    };
     tmux.enable = true;
     bash = {
       enableCompletion = true;
@@ -323,6 +324,7 @@
     home.file.".ctags".source = ./dotfiles/ctags;
     home.file.".xmobarrc".source = ./dotfiles/xmobarrc;
     home.file.".xmonad/xmonad.hs".source = ./dotfiles/xmonad.hs;
+    home.file.".mbsyncrc".source = ./dotfiles/mbsyncrc;
     #home.file.".xmonad/xmonad.hs".onChange = "xmonad -recompile";
 
     programs.git = {

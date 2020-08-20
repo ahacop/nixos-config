@@ -1,9 +1,8 @@
  ;; Bootstrap `use-package'
-;(unless (package-installed-p 'use-package)
-;  (package-refresh-contents)
-;  (package-install 'use-package))
 
 (set-fontset-font "fontset-default" 'unicode "Noto Color Emoji" nil 'prepend)
+
+(setq epg-gpg-program "gpg2")
 (setq auth-sources '((:source "~/.authinfo.gpg")))
 (setenv "GPG_AGENT_INFO" nil)
 (setq epa-pinentry-mode 'loopback)
@@ -166,7 +165,7 @@
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
 (use-package smtpmail
- :ensure nil 
+ :ensure nil
  :config
  (setq send-mail-function 'smtpmail-send-it)
  (setq smtpmail-smtp-server "smtp.fastmail.com")

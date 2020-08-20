@@ -1,0 +1,30 @@
+# mbsyncrc based on
+# http://www.ict4g.net/adolfo/notes/2014/12/27/EmacsIMAP.html
+CopyArrivalDate yes
+
+IMAPAccount fastmail
+Host imap.fastmail.com
+SSLType IMAPS
+SSLVersions TLSv1.2
+User arahacopian@fastmail.com
+PassCmd +"echo ${PASSWORD:-$(gpg2 --for-your-eyes-only -qd --no-tty ~/.authinfo.gpg | sed -n 's,^machine imap.fastmail.com .*password \\([^ ]*\\).*,\\1,p')}"
+
+IMAPStore fastmail-remote
+Account fastmail
+
+MaildirStore fastmail-local
+Path ~/Maildir/fastmail/
+Inbox ~/Maildir/fastmail/INBOX
+SubFolders Verbatim
+
+Channel fastmail-all
+Master :fastmail-remote:
+Slave :fastmail-local:
+Patterns INBOX Spam Trash Archive Sent
+Create Both
+Expunge Both
+SyncState *
+Sync All
+
+Group fastmail
+Channel fastmail-all
