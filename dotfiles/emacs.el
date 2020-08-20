@@ -222,7 +222,7 @@
                  ( mu4e-reply-to-address . "ara@tehanu.net")))))
 
 (defun ahacop/mu4e-action-view-in-default-browser (msg)
-  (browse-url-default-macosx-browser (concat "file://" (mu4e~write-body-to-html msg))))
+  (browse-url-firefox (concat "file://" (mu4e~write-body-to-html msg))))
 
 (add-to-list 'mu4e-view-actions '("html in browser" . ahacop/mu4e-action-view-in-default-browser) t)
 
