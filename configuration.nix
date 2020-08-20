@@ -460,7 +460,7 @@
         set smartcase
         set splitbelow
         set splitright
-        set textwidth=72
+        "set textwidth=72
         set title
         set ts=2 sts=2 sw=2 expandtab
         set visualbell
@@ -557,7 +557,7 @@
 
           let g:airline#extensions#ale#enabled = 1
 
-          " Fzf 
+          " Fzf
           nnoremap <leader>ff :GFiles<CR>
           nnoremap <Leader>fb :Buffers<CR>
           nnoremap <Leader>fh :History<CR>
