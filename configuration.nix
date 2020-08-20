@@ -211,12 +211,12 @@
       };
       displayManager = {
         defaultSession = "none+xmonad";
+        autoLogin = {
+          enable = true;
+          user = "ahacop";
+        };
         lightdm = {
           enable = true;
-          autoLogin = {
-            enable = true;
-            user = "ahacop";
-          };
         };
       };
     };
