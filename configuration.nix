@@ -95,35 +95,43 @@
     alacritty
     bat
     ctags
+    darktable
     dmenu
     docker-compose
     dropbox-cli
+    dust
     elixir
+    exa
     exercism
+    fd
     firefox
     ffsend
     fzf
     gitAndTools.gitFull
     gnome3.seahorse
+    graphviz
     haskellPackages.xmobar
     kbdlight
     light
+    kondo
     mpv
     mu
     neovim
     networkmanager
     ngrok
     nodejs
+    procs
     ruby
     signal-desktop
     skim
+    skype
     slack
     steam
     tmux
     transmission-gtk
     tree
     vimb
-    wget 
+    wget
     wirelesstools
     xclip
     youtube-dl
