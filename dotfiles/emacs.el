@@ -1,4 +1,8 @@
  ;; Bootstrap `use-package'
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
 (add-to-list 'default-frame-alist '(font . "Inconsolata-18"))
 
 (set-fontset-font "fontset-default" 'unicode "Noto Color Emoji" nil 'prepend)
@@ -60,17 +64,6 @@
 
 (setq confirm-kill-processes nil)
 
-(use-package prettier-js)
-(add-hook 'js2-mode-hook 'prettier-js-mode)
-(add-hook 'web-mode-hook 'prettier-js-mode)
-(setq prettier-js-args '("--no-semi" "--trailing-comma" "all"))
-
-(use-package minions
-  :config
-  (setq minions-mode-line-lighter "")
-  (setq minions-mode-line-delimiters '("" . ""))
-  (minions-mode 1))
-
 (use-package company
  :hook (after-init . global-company-mode)
  :init
@@ -81,26 +74,6 @@
  (menu-bar-mode 1))
 
 ;(use-package flycheck)
-
-(use-package magit
- :bind ("C-x g" . magit-status)
- :config
- (use-package with-editor)
- (setq git-commit-summary-max-length 50))
-
-(use-package paredit)
-(use-package rainbow-delimiters)
-(setq lispy-mode-hooks
-     '(clojure-mode-hook
-       emacs-lisp-mode-hook
-       lisp-mode-hook
-       scheme-mode-hook))
-
-(dolist (hook lispy-mode-hooks)
- (add-hook hook (lambda ()
-                  (setq show-paren-style 'expression)
-                  (paredit-mode)
-                  (rainbow-delimiters-mode))))
 
 (use-package org
  :hook (org-mode . auto-fill-mode)
@@ -147,21 +120,21 @@
  :config
  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-(use-package org-drill
- :config
- (setq org-drill-hide-item-headings-p t))
+;(use-package org-drill
+; :config
+; (setq org-drill-hide-item-headings-p t))
 
 (use-package try)
 (use-package which-key :config (which-key-mode))
-(use-package pdf-tools :init (pdf-loader-install))
+;(use-package pdf-tools :init (pdf-loader-install))
 ;(use-package org-pdfview)
 
-(use-package nov
-  :config (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
-
-(use-package interleave
- :init
- (setq interleave-org-notes-dir-list '("~/code/org")))
+;(use-package nov
+;  :config (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+;
+;(use-package interleave
+; :init
+; (setq interleave-org-notes-dir-list '("~/code/org")))
 
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
@@ -264,11 +237,8 @@
   ;                  :fork (:host github :repo "ahacop/elfeed" :branch "add-title-decode-html-for-atom"))
  :hook (elfeed-show-mode . ahacop/make-readable)
  :config
- (setq elfeed-db-directory "~/Dropbox/elfeed-db")
  (setq browse-url-generic-program "firefox")
  (define-key elfeed-show-mode-map (kbd "&") (kbd "C-u b"))
-
- (require 'cl-lib)
 
  (define-key elfeed-search-mode-map "h"
    (lambda ()
@@ -281,40 +251,6 @@
    (lambda ()
      (interactive)
      (switch-to-buffer (elfeed-log-buffer))))
-
- (defun prot/elfeed-search-tag-filter ()
-   "Filter `elfeed' by tags using completion.
-
-Arbitrary input is also possible, but you may need to exit the
-minibuffer with `exit-minibuffer' (I bind it to C-j in
-`minibuffer-local-completion-map')."
-   (interactive)
-   (unwind-protect
-       (elfeed-search-clear-filter)
-     ;; NOTE for the `crm-separator' to work with just a space, you
-     ;; need to make SPC self-insert in the minibuffer (the default is
-     ;; to behave like tab-completion).
-     (let* ((crm-separator " ")
-            (elfeed-search-filter-active :live)
-            (db-tags (elfeed-db-get-all-tags))
-            (plus-tags (delete-dups
-                        (mapcar (lambda (x)
-                                  (concat "+" (format "%s" x)))
-                                db-tags)))
-            (minus-tags (delete-dups
-                         (mapcar (lambda (x)
-                                   (concat "-" (format "%s" x)))
-                                 db-tags)))
-            (all-tags (append plus-tags minus-tags))
-            (tags (completing-read-multiple
-                   "Apply tag: "
-                   all-tags nil t))
-            (input (cons elfeed-search-filter tags)))
-       (setq elfeed-search-filter
-             ;; How to unlist properly (remove parentheses)?  Keeping
-             ;; this inelegant form until I find that…
-             (substring (format "%s" input) 1 -1)))
-     (elfeed-search-update :force)))
 
  (define-key elfeed-search-mode-map "t"
    (lambda ()
@@ -367,8 +303,8 @@ minibuffer with `exit-minibuffer' (I bind it to C-j in
  (elfeed-org)
  (setq rmh-elfeed-org-files (list "~/code/org/elfeed.org")))
 
-(when (fboundp 'imagemagick-register-types)
- (imagemagick-register-types))
+;(when (fboundp 'imagemagick-register-types)
+; (imagemagick-register-types))
 
 (global-set-key (kbd "RET") 'newline-and-indent)
 
@@ -376,10 +312,5 @@ minibuffer with `exit-minibuffer' (I bind it to C-j in
 (add-to-list 'org-babel-load-languages '(ruby . t))
 (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
 (add-to-list 'org-babel-tangle-lang-exts '("js" . "js"))
-
-(use-package exec-path-from-shell
- :init
- (when (memq window-system '(mac ns x))
-   (exec-path-from-shell-initialize)))
 
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
