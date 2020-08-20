@@ -417,6 +417,11 @@
             id = 0;
             settings = defaultSettings // {
               "browser.urlbar.placeholderName" = "DuckDuckGo";
+              "browser.urlbar.placeholderName.private" = "DuckDuckGo";
+              "browser.search.hiddenOneOffs" = "Google,Amazon.com,Bing,Wikipedia (en)";
+              "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts.havePinned" = "";
+              "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts.searchEngines" = "";
+              "browser.search.region" = "US";
               #"toolkit.legacyUserProfileCustomizations.stylesheets" = true;
             };
             #userChrome = builtins.readFile ../conf.d/userChrome.css;
