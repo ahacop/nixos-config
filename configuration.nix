@@ -335,6 +335,7 @@
       extraConfig = {
         credential.helper = "libsecret";
         github.user = "ahacop";
+        merge.tool = "vimdiff";
       };
       aliases = {
         aa     = "add --all";
