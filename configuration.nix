@@ -111,8 +111,6 @@
     gnome3.seahorse
     graphviz
     haskellPackages.xmobar
-    kbdlight
-    light
     kondo
     mpv
     mu
@@ -242,6 +240,7 @@
   sound.enable = true;
 
   hardware = {
+    brillo.enable = true;
     pulseaudio = {
       enable = true;
       extraModules = [ pkgs.pulseaudio-modules-bt ];
@@ -286,8 +285,6 @@
   virtualisation.docker.enable = true;
 
   programs = {
-    light.enable = true;
-
     bash = {
       enableCompletion = true;
       enableLsColors = true;

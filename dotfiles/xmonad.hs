@@ -20,10 +20,10 @@ myKeys x = M.union (M.fromList (newKeys x)) (keys defaultConfig x)
 
 newKeys conf@(XConfig {XMonad.modMask = modMask}) = 
 	[
-		((0, 0x1008ff06 ), spawn "kbdlight down")
-		, ((0, 0x1008ff05 ), spawn "kbdlight up") 
-		, ((0, 0x1008ff03 ), spawn "light -Us sysfs/backlight/mba6x_backlight 10") 
-		, ((0, 0x1008ff02 ), spawn "light -As sysfs/backlight/mba6x_backlight 10")
+		((0, 0x1008ff06 ), spawn "brillo -k -q -U 2")
+		, ((0, 0x1008ff05 ), spawn "brillo -k -q -A 2")
+		, ((0, 0x1008ff03 ), spawn "brillo -e -q -U 2")
+		, ((0, 0x1008ff02 ), spawn "brillo -e -q -A 2")
 		, ((0, 0x1008ff12 ), spawn "amixer -q sset Master toggle")  
 		, ((0, 0x1008ff11 ), spawn "amixer -q sset Master 5%-") 
 		, ((0, 0x1008ff13 ), spawn "amixer -q sset Master 5%+")
