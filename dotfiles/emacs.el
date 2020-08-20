@@ -1,4 +1,5 @@
  ;; Bootstrap `use-package'
+(add-to-list 'default-frame-alist '(font . "Inconsolata-18"))
 
 (set-fontset-font "fontset-default" 'unicode "Noto Color Emoji" nil 'prepend)
 
