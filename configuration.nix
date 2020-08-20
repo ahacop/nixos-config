@@ -75,9 +75,17 @@
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
 
-  fonts.fonts = with pkgs; [
-    inconsolata
-  ];
+
+  fonts = {
+    fontconfig.defaultFonts.monospace = ["Inconsolata"];
+    enableFontDir = true;
+    enableGhostscriptFonts = true;
+    fonts = with pkgs; [
+      noto-fonts-emoji
+      dejavu_fonts
+      inconsolata
+    ];
+  };
 
   environment.variables.EDITOR = "nvim";
 

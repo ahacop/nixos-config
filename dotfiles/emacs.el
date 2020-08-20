@@ -3,6 +3,7 @@
 ;  (package-refresh-contents)
 ;  (package-install 'use-package))
 
+(set-fontset-font "fontset-default" 'unicode "Noto Color Emoji" nil 'prepend)
 (setq auth-sources '((:source "~/.authinfo.gpg")))
 (setenv "GPG_AGENT_INFO" nil)
 (setq epa-pinentry-mode 'loopback)
