@@ -122,6 +122,7 @@
     networkmanager
     ngrok
     nodejs
+    pavucontrol
     procs
     ruby
     signal-desktop
