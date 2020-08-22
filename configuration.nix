@@ -99,6 +99,7 @@
   environment.systemPackages = with pkgs; [
     alacritty
     bat
+    calibre
     ctags
     darktable
     docker-compose
