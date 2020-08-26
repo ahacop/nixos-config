@@ -120,6 +120,7 @@
     kondo
     mpv
     mu
+    mupdf
     neovim
     networkmanager
     ngrok
@@ -305,7 +306,6 @@
       #pinentryFlavor = "curses";
     };
     tmux.enable = true;
-    evince.enable = true;
     bash = {
       enableCompletion = true;
       enableLsColors = true;
