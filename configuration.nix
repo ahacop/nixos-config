@@ -111,6 +111,7 @@
     fd
     firefox-wayland
     ffsend
+    fuse apfs-fuse
     fzf
     gitAndTools.gitFull
     gnome3.seahorse
