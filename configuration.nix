@@ -135,6 +135,7 @@
     steam
     transmission-gtk
     tree
+    vice
     vimb
     wget
     wirelesstools
