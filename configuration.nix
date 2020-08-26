@@ -416,24 +416,25 @@
       profiles =
         let defaultSettings = {
           "app.update.auto" = false;
-              "browser.startup.homepage" = "about:blank";
               "browser.ctrlTab.recentlyUsedOrder" = false;
-              #"browser.newtabpage.enabled" = false;
+              "browser.startup.homepage" = "about:blank";
+              "media.hardware-video-decoding.force-enabled" = true;
+              "privacy.trackingprotection.enabled" = true;
+              "privacy.trackingprotection.socialtracking.annotate.enabled" = true;
+              "privacy.trackingprotection.socialtracking.enabled" = true;
+              "services.sync.declinedEngines" = "addons,passwords,prefs";
+              "services.sync.engine.addons" = false;
+              "services.sync.engine.passwords" = false;
+              "services.sync.engine.prefs" = false;
+              "services.sync.engineStatusChanged.addons" = true;
+              "services.sync.engineStatusChanged.prefs" = true;
               #"browser.bookmarks.showMobileBookmarks" = true;
+              #"browser.newtabpage.enabled" = false;
               #"browser.uidensity" = 1;
               #"browser.urlbar.update1" = true;
               #"distribution.searchplugins.defaultLocale" = "en-GB";
               #"general.useragent.locale" = "en-GB";
               #"identity.fxaccounts.account.device.name" = config.networking.hostName;
-              "privacy.trackingprotection.enabled" = true;
-              "privacy.trackingprotection.socialtracking.enabled" = true;
-              "privacy.trackingprotection.socialtracking.annotate.enabled" = true;
-              "services.sync.declinedEngines" = "addons,passwords,prefs";
-              "services.sync.engine.addons" = false;
-              "services.sync.engineStatusChanged.addons" = true;
-              "services.sync.engine.passwords" = false;
-              "services.sync.engine.prefs" = false;
-              "services.sync.engineStatusChanged.prefs" = true;
               #"signon.rememberSignons" = false;
             };
         in {
