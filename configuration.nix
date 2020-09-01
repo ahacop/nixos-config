@@ -116,6 +116,9 @@
     gitAndTools.gitFull
     gnome3.seahorse
     graphviz
+    hunspell
+    hunspellDicts.de-de
+    hunspellDicts.en-us-large
     isync
     kondo
     mpv

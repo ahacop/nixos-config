@@ -94,6 +94,21 @@
   :bind (("C-x t C-d" . sdcv-search-input)
          ("C-x t d" . sdcv-search-pointer+)))
 
+(setq flyspell-sort-corrections nil)
+(setq flyspell-issue-message-flag nil)
+
+(with-eval-after-load "ispell"
+  (setq ispell-program-name "hunspell")
+  (setq ispell-dictionary "de_DE,en_US")
+  (ispell-set-spellchecker-params)
+  (ispell-hunspell-add-multi-dic "de_DE,en_US")
+  (setq ispell-personal-dictionary "~/.hunspell_personal"))
+
+;; The personal dictionary file has to exist, otherwise hunspell will
+;; silently not use it.
+;;(unless (file-exists-p ispell-personal-dictionary)
+;;        (write-region "" nil ispell-personal-dictionary nil 0))
+
 (use-package org
  :hook (org-mode . auto-fill-mode)
  :config
