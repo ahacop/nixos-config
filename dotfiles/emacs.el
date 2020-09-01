@@ -75,6 +75,21 @@
 
 ;(use-package flycheck)
 
+(use-package nov
+  :config
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  (setq nov-unzip-program "/run/current-system/sw/bin/unzip")
+
+  (setq nov-text-width 72)
+
+  ;; More flexible filling
+  ;; See https://depp.brause.cc/nov.el/
+  ;(setq nov-text-width t)
+  ;(setq visual-fill-column-center-text t)
+  ;(add-hook 'nov-mode-hook 'visual-line-mode)
+  ;(add-hook 'nov-mode-hook 'visual-fill-column-mode)
+  )
+
 (use-package org
  :hook (org-mode . auto-fill-mode)
  :config

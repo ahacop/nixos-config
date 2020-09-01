@@ -135,6 +135,7 @@
     steam
     transmission-gtk
     tree
+    unzip # nov.el uses this
     vice
     vimb
     wget
