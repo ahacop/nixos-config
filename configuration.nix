@@ -235,6 +235,7 @@
       (waybar.override {
         pulseSupport = true;
       })
+      grim
       swayidle
       swaylock # lockscreen
       xwayland # for legacy apps
