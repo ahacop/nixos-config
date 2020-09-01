@@ -128,6 +128,7 @@
     pavucontrol
     procs
     ruby
+    sdcv # stardict viewer
     signal-desktop
     skim
     skype
@@ -361,6 +362,13 @@
     home.file.".config/sway/config".source = ./dotfiles/sway.config;
     home.file.".config/waybar/config".source = ./dotfiles/waybar.config;
     home.file.".config/waybar/style.css".source = ./dotfiles/waybar.css;
+    home.file.".stardict/dic" = {
+      recursive = true;
+      source = builtins.fetchTarball {
+        url = "https://github.com/ahacop/websters-dict-1913-stardict/raw/main/stardict-dictd-web1913-2.4.2.tgz";
+        sha256 = "0gdp7cifrgjp1xqhmym5zw8708ds8rbgx78mdxy9n67gmklywjf0";
+      };
+  };
 
     programs.git = {
       enable = true;

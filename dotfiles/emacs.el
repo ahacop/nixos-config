@@ -90,6 +90,10 @@
   ;(add-hook 'nov-mode-hook 'visual-fill-column-mode)
   )
 
+(use-package sdcv
+  :bind (("C-x t C-d" . sdcv-search-input)
+         ("C-x t d" . sdcv-search-pointer+)))
+
 (use-package org
  :hook (org-mode . auto-fill-mode)
  :config
