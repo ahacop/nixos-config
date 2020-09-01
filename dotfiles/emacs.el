@@ -112,7 +112,7 @@
  (setq org-capture-templates '(("t" "todo" entry (file+headline "inbox.org" "Inbox")
                                 "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
                                ("p" "Pocket article" entry (file+headline "inbox.org" "Inbox")
-                                "* TODO Read %a\n%?%U\n%a\n" :clock-in t :clock-resume t)
+                                "* TODO Read %a\n%?%U\n" :clock-in t :clock-resume t)
                                ("a" "Appointment" entry (file+headline "inbox.org" "Inbox")
                                 "* APPT %?\nSCHEDULED: %^t\n")
                                ("s" "Subscribe")
