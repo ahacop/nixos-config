@@ -298,7 +298,19 @@
     };
   };
 
-  virtualisation.docker.enable = true;
+  virtualisation = {
+    docker = {
+      enable = true;
+      enableOnBoot = true;
+    };
+
+    oci-containers.containers = {
+      rsshub = {
+        image = "diygod/rsshub";
+        ports = ["1200:1200"];
+      };
+    };
+  };
 
   programs = {
     gnupg.agent = {
