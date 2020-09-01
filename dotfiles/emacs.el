@@ -249,6 +249,9 @@
 
 (use-package helm)
 
+(use-package pdf-tools
+             :config (pdf-tools-install))
+
 (use-package language-detection
   :init
   (defun eww-tag-pre (dom)
