@@ -3,7 +3,9 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(add-to-list 'default-frame-alist '(font . "Inconsolata-18"))
+(set-face-attribute 'default nil :family "Inconsolata" :height 180)
+(set-face-attribute 'fixed-pitch nil :family "Inconsolata")
+(set-face-attribute 'variable-pitch nil :family "Inconsolata")
 
 (set-fontset-font "fontset-default" 'unicode "Noto Color Emoji" nil 'prepend)
 
@@ -49,8 +51,6 @@
 (global-set-key (kbd "M-o") 'other-window)
 (global-set-key (kbd "C-c m") 'mu4e)
 (global-set-key (kbd "C-c e") 'elfeed)
-
-(set-frame-font "Inconsolata 18" nil t)
 
 (blink-cursor-mode 0)
 
@@ -184,8 +184,7 @@
  (setq user-full-name  "Ara Hacopian"))
 
 (defun ahacop/make-readable ()
- (set-face-attribute 'variable-pitch (selected-frame) :font (font-spec :family "Inconsolata" :size 24))
- (setq fill-column 70))
+ (setq fill-column 80))
 
 (use-package mu4e
  :ensure nil
@@ -194,7 +193,7 @@
                            (ahacop/make-readable)
                            (mu4e-view-fill-long-lines)))
  :hook (mu4e-compose-mode-hook . (lambda ()
-                                   (set-fill-column 72)
+                                   (set-fill-column 80)
                                    ))
  :init
  (setq mail-user-agent 'mu4e-user-agent)
