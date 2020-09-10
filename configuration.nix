@@ -99,9 +99,8 @@
   environment.systemPackages = with pkgs; [
     alacritty
     bat
-    calibre
     ctags
-    darktable
+    diskonaut
     docker-compose
     dropbox-cli
     dust
@@ -120,6 +119,7 @@
     hunspellDicts.de-de
     hunspellDicts.en-us-large
     isync
+    killall
     kondo
     mpv
     mu
@@ -129,8 +129,11 @@
     ngrok
     nodejs
     pavucontrol
+    poppler
     procs
-    ruby
+    rclone
+    rsync
+    ruby_2_7
     sdcv # stardict viewer
     signal-desktop
     skim
