@@ -432,6 +432,7 @@
       enable = true;
       package = pkgs.firefox-wayland;
       extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+        pkgs.nur.repos.rycee.firefox-addons."1password-x-password-manager"
         decentraleyes
         facebook-container
         https-everywhere
