@@ -407,11 +407,11 @@
  (push '(instagram elfeed-instagram)
        elfeed-search-face-alist)
 
- (defun elfeed-show-mpv ()
+ (defun elfeed-show-stream-media ()
    (interactive)
-   (start-process "mpv" nil "mpv" "--fs" "--vo=gpu" "--loop-playlist" "Inf" (elfeed-entry-link elfeed-show-entry)))
+   (start-process "cvlc" nil "cvlc" (elfeed-entry-link elfeed-show-entry)))
 
- (define-key elfeed-show-mode-map "m" 'elfeed-show-mpv))
+ (define-key elfeed-show-mode-map "m" 'elfeed-show-stream-media))
 
 (use-package elfeed-org
  :config

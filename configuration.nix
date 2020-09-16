@@ -120,7 +120,6 @@
     isync
     killall
     kondo
-    mpv
     mu
     mupdf
     neovim
@@ -144,6 +143,7 @@
     unzip # nov.el uses this
     vice
     vimb
+    vlc
     wget
     wirelesstools
     wofi
