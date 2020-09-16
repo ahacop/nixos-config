@@ -121,7 +121,6 @@
     killall
     kondo
     mu
-    mupdf
     neovim
     networkmanager
     ngrok
