@@ -353,6 +353,7 @@
  :hook (elfeed-show-mode . ahacop/make-readable)
  :config
  (setq browse-url-generic-program "firefox")
+ (setq elfeed-search-filter "+unread @2-days-ago ")
  (define-key elfeed-show-mode-map (kbd "&") (kbd "C-u b"))
 
  (define-key elfeed-search-mode-map "h"
