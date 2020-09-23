@@ -266,7 +266,7 @@
       extraModules = [ pkgs.pulseaudio-modules-bt ];
       package = pkgs.pulseaudioFull;
       extraConfig = "
-        load-module module-switch-on-connect
+      load-module module-switch-on-connect
       ";
       support32Bit = true;
     };
@@ -372,7 +372,7 @@
         url = "https://github.com/ahacop/websters-dict-1913-stardict/raw/main/stardict-dictd-web1913-2.4.2.tgz";
         sha256 = "0gdp7cifrgjp1xqhmym5zw8708ds8rbgx78mdxy9n67gmklywjf0";
       };
-  };
+    };
 
     programs.git = {
       enable = true;
@@ -444,18 +444,18 @@
       profiles =
         let defaultSettings = {
           "app.update.auto" = false;
-              "browser.ctrlTab.recentlyUsedOrder" = false;
-              "browser.startup.homepage" = "about:blank";
-              "media.hardware-video-decoding.force-enabled" = true;
-              "privacy.trackingprotection.enabled" = true;
-              "privacy.trackingprotection.socialtracking.annotate.enabled" = true;
-              "privacy.trackingprotection.socialtracking.enabled" = true;
-              "services.sync.declinedEngines" = "addons,passwords,prefs";
-              "services.sync.engine.addons" = false;
-              "services.sync.engine.passwords" = false;
-              "services.sync.engine.prefs" = false;
-              "services.sync.engineStatusChanged.addons" = true;
-              "services.sync.engineStatusChanged.prefs" = true;
+          "browser.ctrlTab.recentlyUsedOrder" = false;
+          "browser.startup.homepage" = "about:blank";
+          "media.hardware-video-decoding.force-enabled" = true;
+          "privacy.trackingprotection.enabled" = true;
+          "privacy.trackingprotection.socialtracking.annotate.enabled" = true;
+          "privacy.trackingprotection.socialtracking.enabled" = true;
+          "services.sync.declinedEngines" = "addons,passwords,prefs";
+          "services.sync.engine.addons" = false;
+          "services.sync.engine.passwords" = false;
+          "services.sync.engine.prefs" = false;
+          "services.sync.engineStatusChanged.addons" = true;
+          "services.sync.engineStatusChanged.prefs" = true;
               #"browser.bookmarks.showMobileBookmarks" = true;
               #"browser.newtabpage.enabled" = false;
               #"browser.uidensity" = 1;
@@ -480,56 +480,56 @@
             #userChrome = builtins.readFile ../conf.d/userChrome.css;
           };
         };
-    };
+      };
 
-    programs.neovim = {
-      enable = true;
-      viAlias = true;
-      vimAlias = true;
-      withNodeJs = true;
-      withRuby = true;
-      plugins = with pkgs.vimPlugins; [
-        fzf-vim
-        matchit-zip
-        vim-airline
-        vim-airline-themes
-        vim-colors-solarized
-        vim-endwise
-        vim-eunuch
-        vim-fugitive
-        vim-gutentags
-        vim-polyglot
-        vim-sensible
-        vim-test
-      ];
-      extraConfig = ''
-        let mapleader=','
-        let g:solarized_termcolors=256
+      programs.neovim = {
+        enable = true;
+        viAlias = true;
+        vimAlias = true;
+        withNodeJs = true;
+        withRuby = true;
+        plugins = with pkgs.vimPlugins; [
+          fzf-vim
+          matchit-zip
+          vim-airline
+          vim-airline-themes
+          vim-colors-solarized
+          vim-endwise
+          vim-eunuch
+          vim-fugitive
+          vim-gutentags
+          vim-polyglot
+          vim-sensible
+          vim-test
+        ];
+        extraConfig = ''
+          let mapleader=','
+          let g:solarized_termcolors=256
 
-        set autowrite
-        set fileformats=unix,dos,mac
-        set hlsearch
-        set ignorecase
-        set number
-        set shell=bash
-        set showcmd
-        set showmatch
-        set showmode
-        set smartcase
-        set splitbelow
-        set splitright
-        "set textwidth=72
-        set title
-        set ts=2 sts=2 sw=2 expandtab
-        set visualbell
-        set wildmode=longest,list
-        " vim-solarized settings
-        if has('gui_running')
-        set background=light
-        else
-        set background=dark
-        endif
-        colorscheme solarized
+          set autowrite
+          set fileformats=unix,dos,mac
+          set hlsearch
+          set ignorecase
+          set number
+          set shell=bash
+          set showcmd
+          set showmatch
+          set showmode
+          set smartcase
+          set splitbelow
+          set splitright
+          "set textwidth=72
+          set title
+          set ts=2 sts=2 sw=2 expandtab
+          set visualbell
+          set wildmode=longest,list
+          " vim-solarized settings
+          if has('gui_running')
+          set background=light
+          else
+          set background=dark
+          endif
+          colorscheme solarized
           """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
           " MISC KEY MAPS
           """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -664,27 +664,27 @@
           let g:jsx_ext_required = 1 " syntax highlighting only on .jsx files
 
           command! -nargs=0 Prettier :CocCommand prettier.formatFile
-      '';
+        '';
+      };
     };
-  };
 
-  systemd.user.services.dropbox = {
-    description = "Dropbox";
-    wantedBy = [ "graphical-session.target" ];
-    environment = {
-      QT_PLUGIN_PATH = "/run/current-system/sw/" + pkgs.qt5.qtbase.qtPluginPrefix;
-      QML2_IMPORT_PATH = "/run/current-system/sw/" + pkgs.qt5.qtbase.qtQmlPrefix;
+    systemd.user.services.dropbox = {
+      description = "Dropbox";
+      wantedBy = [ "graphical-session.target" ];
+      environment = {
+        QT_PLUGIN_PATH = "/run/current-system/sw/" + pkgs.qt5.qtbase.qtPluginPrefix;
+        QML2_IMPORT_PATH = "/run/current-system/sw/" + pkgs.qt5.qtbase.qtQmlPrefix;
+      };
+      serviceConfig = {
+        ExecStart = "${pkgs.dropbox.out}/bin/dropbox";
+        ExecReload = "${pkgs.coreutils.out}/bin/kill -HUP $MAINPID";
+        KillMode = "control-group"; # upstream recommends process
+        Restart = "on-failure";
+        PrivateTmp = true;
+        ProtectSystem = "full";
+        Nice = 10;
+      };
     };
-    serviceConfig = {
-      ExecStart = "${pkgs.dropbox.out}/bin/dropbox";
-      ExecReload = "${pkgs.coreutils.out}/bin/kill -HUP $MAINPID";
-      KillMode = "control-group"; # upstream recommends process
-      Restart = "on-failure";
-      PrivateTmp = true;
-      ProtectSystem = "full";
-      Nice = 10;
-    };
-  };
 
 
   # This value determines the NixOS release from which the default
