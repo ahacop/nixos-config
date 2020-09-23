@@ -198,6 +198,7 @@
   location.provider = "geoclue2";
 
   services = {
+    lorri.enable = true;
     printing.enable = true;
     locate.enable = true;
     redshift = {
