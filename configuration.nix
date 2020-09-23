@@ -36,6 +36,10 @@
     };
   };
 
+  nix.extraOptions = ''
+    keep-outputs = true
+    keep-derivations = true
+  '';
 
   networking = {
     hostName = "mopsliebe"; # Define your hostname.
@@ -124,6 +128,7 @@
     neovim
     networkmanager
     ngrok
+    nix-direnv
     nodejs
     pavucontrol
     poppler
@@ -373,6 +378,9 @@
         sha256 = "0gdp7cifrgjp1xqhmym5zw8708ds8rbgx78mdxy9n67gmklywjf0";
       };
     };
+
+    programs.direnv.enable = true;
+    programs.direnv.enableNixDirenvIntegration = true;
 
     programs.git = {
       enable = true;
