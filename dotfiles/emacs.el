@@ -76,7 +76,7 @@
 ;(use-package flycheck)
 
 (use-package nov
-  :config
+  :init
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
   (setq nov-unzip-program "/run/current-system/sw/bin/unzip")
 
@@ -145,14 +145,14 @@
                                ("d" "org-drill german verb" entry (file "~/code/org/german/verbs.org")
                                 "* %^{verb} :drill:\n:PROPERTIES:\n:DRILL_CARD_TYPE: twosided\n:END:\nTranslate this sentence.\n** English\n%^{english}\n** German\n%^{german}\n** Notes\n%?")
                                ))
- :init
- (global-set-key "\C-ca" 'org-agenda)
- (global-set-key "\C-cl" 'org-store-link)
- (global-set-key "\C-cc" 'org-capture))
+ :bind (("C-c a" . org-agenda)
+        ("C-c l" . org-store-link)
+        ("C-c c" . org-capture)))
 
 (use-package org-bullets
- :config
- (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  :after (org-mode)
+  :hook org-mode)
+  ;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 ;(use-package org-drill
 ; :config
@@ -174,7 +174,7 @@
 
 (use-package smtpmail
  :ensure nil
- :config
+ :init
  (setq send-mail-function 'smtpmail-send-it)
  (setq smtpmail-smtp-server "smtp.fastmail.com")
  (setq smtpmail-stream-type 'ssl)
@@ -262,16 +262,14 @@
 (use-package org-mu4e
  :ensure nil
  :load-path "/run/current-system/sw/share/emacs/site-lisp/mu4e/"
- :config
+ :init
  (setq org-mu4e-link-query-in-headers-mode nil))
-
-(use-package helm)
 
 (use-package pdf-tools
              :config (pdf-tools-install))
 
 (use-package language-detection
-  :init
+  :config
   (defun eww-tag-pre (dom)
     (let ((shr-folding-mode 'none)
           (shr-current-font 'default))
@@ -350,77 +348,79 @@
 (use-package elfeed
   ;:straight (elfeed :type git :flavor melpa :host github :repo "skeeto/elfeed"
   ;                  :fork (:host github :repo "ahacop/elfeed" :branch "add-title-decode-html-for-atom"))
- :hook (elfeed-show-mode . ahacop/make-readable)
- :config
- (setq browse-url-generic-program "firefox")
- (setq elfeed-search-filter "+unread @2-days-ago ")
- (define-key elfeed-show-mode-map (kbd "&") (kbd "C-u b"))
+  :hook (elfeed-show-mode . ahacop/make-readable)
+  :bind (:map elfeed-show-mode-map
+         ("&" . ah/elfeed-show-visit)
+         ("m" . ah/elfeed-show-stream-media)
+         :map elfeed-search-mode-map
+         ("h" . ah/elfeed-search-reset-filter)
+         ("l" . ah/elfeed-switch-to-log)
+         ("t" . ah/elfeed-toggle-filter-youtube)
+         ("i" . ah/elfeed-toggle-filter-instagram)
+         ("j" . next-line)
+         ("k" . previous-line))
+  :init
+    (setq elfeed-search-filter "+unread @2-days-ago ")
+  :config
+    (defun ah/elfeed-show-visit ()
+      (interactive)
+      (let ((link (elfeed-entry-link elfeed-show-entry)))
+        (when link
+          (message "Sent to browser: %s" link)
+            (browse-url-firefox link))))
 
- (define-key elfeed-search-mode-map "h"
-   (lambda ()
-     (interactive)
-     (elfeed-search-set-filter (default-value 'elfeed-search-filter))))
+    (defun ah/elfeed-search-reset-filter
+      (interactive)
+      (elfeed-search-set-filter (default-value 'elfeed-search-filter)))
 
- (define-key elfeed-search-mode-map (kbd "j") #'next-line)
- (define-key elfeed-search-mode-map (kbd "k") #'previous-line)
- (define-key elfeed-search-mode-map (kbd "l")
-   (lambda ()
-     (interactive)
-     (switch-to-buffer (elfeed-log-buffer))))
+    (defun ah/elfeed-switch-to-log ()
+      (interactive)
+      (switch-to-buffer (elfeed-log-buffer)))
 
- (define-key elfeed-search-mode-map "t"
-   (lambda ()
-     (interactive)
-     (cl-macrolet ((re (re rep str) `(replace-regexp-in-string ,re ,rep ,str)))
-       (elfeed-search-set-filter
-        (cond
-         ((string-match-p "-youtube" elfeed-search-filter)
-          (re " *-youtube" " +youtube" elfeed-search-filter))
-         ((string-match-p "\\+youtube" elfeed-search-filter)
-          (re " *\\+youtube" " -youtube" elfeed-search-filter))
-         ((concat elfeed-search-filter " -youtube")))))))
+    (defun ah/elfeed-toggle-filter-youtube ()
+      (interactive)
+      (cl-macrolet ((re (re rep str) `(replace-regexp-in-string ,re ,rep ,str)))
+                   (elfeed-search-set-filter
+                     (cond
+                       ((string-match-p "-youtube" elfeed-search-filter)
+                        (re " *-youtube" " +youtube" elfeed-search-filter))
+                       ((string-match-p "\\+youtube" elfeed-search-filter)
+                        (re " *\\+youtube" " -youtube" elfeed-search-filter))
+                       ((concat elfeed-search-filter " -youtube"))))))
 
- (define-key elfeed-search-mode-map "i"
-   (lambda ()
-     (interactive)
-     (cl-macrolet ((re (re rep str) `(replace-regexp-in-string ,re ,rep ,str)))
-       (elfeed-search-set-filter
-        (cond
-         ((string-match-p "-instagram" elfeed-search-filter)
-          (re " *-instagram" " +instagram" elfeed-search-filter))
-         ((string-match-p "\\+instagram" elfeed-search-filter)
-          (re " *\\+instagram" " -instagram" elfeed-search-filter))
-         ((concat elfeed-search-filter " -instagram")))))))
+    (defun ah/elfeed-toggle-filter-instagram ()
+      (interactive)
+      (cl-macrolet ((re (re rep str) `(replace-regexp-in-string ,re ,rep ,str)))
+                   (elfeed-search-set-filter
+                     (cond
+                       ((string-match-p "-instagram" elfeed-search-filter)
+                        (re " *-instagram" " +instagram" elfeed-search-filter))
+                       ((string-match-p "\\+instagram" elfeed-search-filter)
+                        (re " *\\+instagram" " -instagram" elfeed-search-filter))
+                       ((concat elfeed-search-filter " -instagram"))))))
 
- (defface elfeed-youtube
-   '((t :foreground "#f9f"))
-   "Marks YouTube videos in Elfeed."
-   :group 'elfeed)
+    (defface elfeed-youtube
+             '((t :foreground "#f9f"))
+             "Marks YouTube videos in Elfeed."
+             :group 'elfeed)
 
- (push '(youtube elfeed-youtube)
-       elfeed-search-face-alist)
+    (push '(youtube elfeed-youtube) elfeed-search-face-alist)
 
- (defface elfeed-instagram
-   '((t :foreground "#0ff"))
-   "Marks Instagram feeds in Elfeed."
-   :group 'elfeed)
+    (defface elfeed-instagram
+             '((t :foreground "#0ff"))
+             "Marks Instagram feeds in Elfeed."
+             :group 'elfeed)
 
- (push '(instagram elfeed-instagram)
-       elfeed-search-face-alist)
+    (push '(instagram elfeed-instagram) elfeed-search-face-alist)
 
- (defun elfeed-show-stream-media ()
-   (interactive)
-   (start-process "cvlc" nil "cvlc" (elfeed-entry-link elfeed-show-entry)))
-
- (define-key elfeed-show-mode-map "m" 'elfeed-show-stream-media))
+    (defun ah/elfeed-show-stream-media ()
+      (interactive)
+      (start-process "cvlc" nil "cvlc" (elfeed-entry-link elfeed-show-entry)))
+)
 
 (use-package elfeed-org
- :config
- (elfeed-org)
- (setq rmh-elfeed-org-files (list "~/code/org/elfeed.org")))
-
-;(when (fboundp 'imagemagick-register-types)
-; (imagemagick-register-types))
+ :config (elfeed-org)
+ :init (setq rmh-elfeed-org-files (list "~/code/org/elfeed.org")))
 
 (global-set-key (kbd "RET") 'newline-and-indent)
 
