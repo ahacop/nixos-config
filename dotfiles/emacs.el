@@ -433,6 +433,5 @@
   )
 
 (use-package elfeed-org
-  :after (elfeed org-mode)
   :config (elfeed-org)
   :init (setq rmh-elfeed-org-files (list "~/code/org/elfeed.org")))
