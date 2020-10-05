@@ -108,6 +108,7 @@
     alacritty
     bat
     ctags
+    ding
     diskonaut
     docker-compose
     dropbox-cli
