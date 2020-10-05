@@ -84,12 +84,16 @@
     enableFontDir = true;
     enableGhostscriptFonts = true;
     fonts = with pkgs; [
+      dejavu_fonts
       font-awesome
+      gentium
+      inconsolata
+      inriafonts
+      jost
       joypixels
       libertine
+      ibm-plex
       noto-fonts-emoji
-      dejavu_fonts
-      inconsolata
     ];
   };
 
