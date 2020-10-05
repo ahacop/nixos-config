@@ -95,6 +95,9 @@
   ;; (add-hook 'nov-mode-hook 'visual-fill-column-mode)
   )
 
+(use-package org-noter)
+(use-package pocket-reader)
+
 (use-package sdcv
   :bind (("C-x t C-d" . sdcv-search-input)
          ("C-x t d" . sdcv-search-pointer+)))
