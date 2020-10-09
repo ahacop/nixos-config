@@ -81,7 +81,7 @@
 
   fonts = {
     fontconfig.defaultFonts.monospace = ["Inconsolata"];
-    enableFontDir = true;
+    fontDir.enable = true;
     enableGhostscriptFonts = true;
     fonts = with pkgs; [
       dejavu_fonts
