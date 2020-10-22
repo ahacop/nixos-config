@@ -165,7 +165,7 @@
                                 ("s" "Subscribe")
                                 ("sr" "RSS feed" entry (file+headline "elfeed.org" "Feeds")
                                  "* [[%^{Feed URL}][%^{Feed name}]]")
-                                ("si" "Instagram feed" entry (file+headline "elfeed.org" "Instagram") "* [[http://127.0.0.1:1200/instagram/user/%^{Instagram Username}][%^{Feed name}]]")
+                                ("si" "Instagram feed" entry (file+headline "elfeed.org" "Instagram") "* [[http://127.0.0.1:1200/picuki/profile/%^{Instagram Username}][%^{Feed name}]]")
                                 ("sy" "Youtube user" entry (file+headline "elfeed.org" "Youtube") "* [[https://www.youtube.com/feeds/videos.xml?user=^{Youtube Username}][%^{Feed name}]]")
                                 ("sc" "Youtube channel" entry (file+headline "elfeed.org" "Youtube") "* [[https://www.youtube.com/feeds/videos.xml?channel_id=^{Youtube Channel ID}][%^{Feed name}]]")
                                 ("g" "german conversation exercise" entry (file "~/code/org/german_conversations.org")
