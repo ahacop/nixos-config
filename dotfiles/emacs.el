@@ -230,7 +230,8 @@
              ;; we match based on the contact-fields of the message
              :match-func (lambda (msg)
                            (when msg (mu4e-message-contact-field-matches msg :to "ara@hacopian.de")))
-             :vars '((user-mail-address . "ara@hacopian.de")
+             :vars '((mu4e-compose-signature . nil)
+                     (user-mail-address . "ara@hacopian.de")
                      (mu4e-compose-reply-to-address . "ara@hacopian.de")))
 
            ,(make-mu4e-context
@@ -240,7 +241,11 @@
              ;; we match based on the contact-fields of the message
              :match-func (lambda (msg)
                            (when msg (mu4e-message-contact-field-matches msg :to "ara@tehanu.net")))
-             :vars '((user-mail-address . "ara@tehanu.net")
+             :vars '((mu4e-compose-signature .
+                (concat
+                  "Ara Hacopian\n"
+                  "Tehanu UG (haftungsbeschränkt) • Amtsgericht Berlin-Charlottenburg • HRB 201976 B • Geschäftsführer: Herr Ara Hacopian\n"))
+                     (user-mail-address . "ara@tehanu.net")
                      (mu4e-compose-reply-to-address . "ara@tehanu.net")))))
   :init
   (setq mail-user-agent 'mu4e-user-agent)
@@ -252,7 +257,6 @@
   (setq mu4e-attachment-dir "~/Downloads")
   (setq mu4e-change-filenames-when-moving t)
   (setq mu4e-confirm-quit nil)
-  (setq mu4e-compose-signature-auto-include nil)
   (setq mu4e-headers-date-format "%Y-%m-%d %H:%M")
   (setq mu4e-maildir "~/Maildir")
   (setq mu4e-mu-binary "/run/current-system/sw/bin/mu")
