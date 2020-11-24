@@ -115,6 +115,7 @@
     dropbox-cli
     dust
     elixir
+    evince
     exa
     exercism
     fd
