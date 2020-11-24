@@ -106,6 +106,7 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     alacritty
+    appimage-run
     bat
     ctags
     ding
