@@ -436,7 +436,7 @@
 
   (defun ah/elfeed-show-stream-media ()
     (interactive)
-    (start-process "cvlc" nil "cvlc" (elfeed-entry-link elfeed-show-entry)))
+    (start-process "cvlc" nil "cvlc" "--no-video-title-show" (elfeed-entry-link elfeed-show-entry)))
   )
 
 (use-package elfeed-org
