@@ -161,6 +161,7 @@
     wofi
     xclip
     youtube-dl
+    zip
 
     (emacsWithPackagesFromUsePackage {
       config = builtins.readFile ./dotfiles/emacs.el;
