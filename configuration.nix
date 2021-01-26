@@ -226,10 +226,12 @@
       xkbOptions = "ctrl:nocaps";
       libinput = {
         enable = true;
-        tapping = true;
-        clickMethod = "clickfinger";
-        disableWhileTyping = true;
-        accelSpeed = "0.001";
+        touchpad = {
+          tapping = true;
+          clickMethod = "clickfinger";
+          disableWhileTyping = true;
+          accelSpeed = "0.001";
+        };
       };
       displayManager = {
         defaultSession = "sway";
