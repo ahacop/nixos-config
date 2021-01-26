@@ -148,13 +148,11 @@
     skim
     skype
     slack
-    steam
     texlive.combined.scheme-full
     transmission-gtk
     tree
     unzip # nov.el uses this
     vice
-    vimb
     vlc
     wget
     wirelesstools
