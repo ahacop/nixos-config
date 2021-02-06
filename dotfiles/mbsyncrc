@@ -18,8 +18,8 @@ Inbox ~/Maildir/fastmail/INBOX
 SubFolders Verbatim
 
 Channel fastmail-all
-Master :fastmail-remote:
-Slave :fastmail-local:
+Far :fastmail-remote:
+Near :fastmail-local:
 Patterns INBOX Spam Trash Archive Sent
 Create Both
 Expunge Both
