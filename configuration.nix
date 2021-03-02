@@ -111,6 +111,7 @@
     bat
     ctags
     ding
+    discord
     diskonaut
     docker-compose
     dropbox-cli
@@ -124,11 +125,13 @@
     fuse apfs-fuse
     fzf
     gitAndTools.gitFull
+    gitAndTools.gh
     gnome3.seahorse
     graphviz
     hunspell
     hunspellDicts.de-de
     hunspellDicts.en-us-large
+    imv
     isync
     killall
     kondo
@@ -138,10 +141,12 @@
     ngrok
     nix-direnv
     nodejs
+    pandoc
     pavucontrol
     poppler
     procs
     rclone
+    ripgrep
     rsync
     ruby_2_7
     sdcv # stardict viewer
