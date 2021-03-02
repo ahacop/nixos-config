@@ -30,3 +30,4 @@ less_options=(
 export LESS="${less_options[*]}";
 unset less_options;
 export PAGER='less';
+eval "$(direnv hook bash)"
