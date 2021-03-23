@@ -13,6 +13,7 @@ let mapleader=','
 "Plug 'junegunn/fzf.vim'
 "Plug 'tpope/vim-eunuch'
 "Plug 'tpope/vim-sensible'
+"Plug 'tpope/vim-rhubarb'
 "
 "" development
 "Plug 'neoclide/coc.nvim', {'branch': 'release'}
@@ -48,9 +49,9 @@ set wildmode=longest,list
 "colorscheme ayu
 set termguicolors     " enable true colors support
 set background=dark
-colorscheme solarized
+colorscheme solarized8
 if &diff
-    colorscheme solarized
+    colorscheme solarized8
 endif
 
 

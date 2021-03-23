@@ -3,15 +3,21 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, lib, pkgs, ... }:
-
+let
+	home-manager = builtins.fetchGit {
+		url = "https://github.com/rycee/home-manager.git";
+    ref = "release-20.09";
+	};
+in
 {
   imports =
     [ # Include the results of the hardware scan.
-    <nixos-hardware/apple/macbook-air/6>
-    /etc/nixos/hardware-configuration.nix
-    <home-manager/nixos>
+  #  <nixos-hardware/apple/macbook-air/6>
+    ./hardware-configuration.nix
+	    (import "${home-manager}/nixos")
   ];
 
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.joypixels.acceptLicense = true;
   nixpkgs.config.packageOverrides = pkgs: {
@@ -29,12 +35,19 @@
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.grub = {
+	  enable = true;
+	  version = 2;
+	  efiSupport = true;
+	  enableCryptodisk = true;
+	  device = "nodev";
+	  useOSProber = true;
+  };
   boot.initrd.luks.devices = {
-    root = {
-      device = "/dev/disk/by-uuid/11f12cf6-c837-438b-8818-dc4ddb87aa2d";
-      allowDiscards = true;
-
-    };
+	  crypted = {
+		  device = "/dev/disk/by-uuid/bea140ba-ec15-4fc3-9f42-533593226858";
+		  preLVM = true;
+	  };
   };
 
   nix.extraOptions = ''
@@ -43,7 +56,7 @@
   '';
 
   networking = {
-    hostName = "mopsliebe"; # Define your hostname.
+    hostName = "mopsliebe2"; # Define your hostname.
 
     wireless.iwd.enable = true;
 
@@ -53,8 +66,10 @@
     };
 
     firewall = {
-      allowedTCPPorts = [ 17500 ];
-      allowedUDPPorts = [ 17500 ];
+      enable = true;
+      allowPing = false;
+      allowedTCPPorts = [ 17500 2022 ];
+      allowedUDPPorts = [ 17500 2022 ];
     };
   };
 
@@ -82,7 +97,7 @@
 
   fonts = {
     fontconfig.defaultFonts.monospace = ["Inconsolata"];
-    fontDir.enable = true;
+    #fontDir.enable = true;
     enableGhostscriptFonts = true;
     fonts = with pkgs; [
       dejavu_fonts
@@ -122,6 +137,7 @@
     exercism
     fd
     ffsend
+    firefox-wayland
     fuse apfs-fuse
     fzf
     gitAndTools.gitFull
@@ -141,6 +157,8 @@
     ngrok
     nix-direnv
     nodejs
+    obs-studio obs-wlrobs
+    os-prober
     pandoc
     pavucontrol
     poppler
@@ -235,18 +253,24 @@
 
     xserver = {
       enable = true;
+      videoDrivers = ["nouveau"];
       layout = "us";
       xkbOptions = "ctrl:nocaps";
-      libinput = {
-        enable = true;
-        touchpad = {
-          tapping = true;
-          clickMethod = "clickfinger";
-          disableWhileTyping = true;
-          accelSpeed = "0.001";
-        };
-      };
+ #     libinput = {
+ #       enable = true;
+        #touchpad = {
+        #  tapping = true;
+        #  clickMethod = "clickfinger";
+        #  disableWhileTyping = true;
+        #  accelSpeed = "0.001";
+        #};
+ #     };
+      #desktopManager.gnome3.enable = true;
       displayManager = {
+      #  gdm = {
+      #    enable = true;
+      #    nvidiaWayland = true;
+      #  };
         defaultSession = "sway";
         autoLogin = {
           enable = true;
@@ -258,6 +282,10 @@
       };
     };
   };
+
+  #hardware.nvidia = {
+  #  modesetting.enable = true;
+  #};
 
   nixpkgs.config.pulseaudio = true;
   programs.sway = {
@@ -461,59 +489,59 @@
       };
     };
 
-    programs.firefox = {
-      enable = true;
-      package = pkgs.firefox-wayland;
-      extensions = with pkgs.nur.repos.rycee.firefox-addons; [
-        pkgs.nur.repos.rycee.firefox-addons."1password-x-password-manager"
-        decentraleyes
-        facebook-container
-        https-everywhere
-        multi-account-containers
-        privacy-badger
-        tridactyl
-        ublock-origin
-      ];
-      profiles =
-        let defaultSettings = {
-          "app.update.auto" = false;
-          "browser.ctrlTab.recentlyUsedOrder" = false;
-          "browser.startup.homepage" = "about:blank";
-          "media.hardware-video-decoding.force-enabled" = true;
-          "privacy.trackingprotection.enabled" = true;
-          "privacy.trackingprotection.socialtracking.annotate.enabled" = true;
-          "privacy.trackingprotection.socialtracking.enabled" = true;
-          "services.sync.declinedEngines" = "addons,passwords,prefs";
-          "services.sync.engine.addons" = false;
-          "services.sync.engine.passwords" = false;
-          "services.sync.engine.prefs" = false;
-          "services.sync.engineStatusChanged.addons" = true;
-          "services.sync.engineStatusChanged.prefs" = true;
-              #"browser.bookmarks.showMobileBookmarks" = true;
-              #"browser.newtabpage.enabled" = false;
-              #"browser.uidensity" = 1;
-              #"browser.urlbar.update1" = true;
-              #"distribution.searchplugins.defaultLocale" = "en-GB";
-              #"general.useragent.locale" = "en-GB";
-              #"identity.fxaccounts.account.device.name" = config.networking.hostName;
-              #"signon.rememberSignons" = false;
-            };
-        in {
-          home = {
-            id = 0;
-            settings = defaultSettings // {
-              "browser.urlbar.placeholderName" = "DuckDuckGo";
-              "browser.urlbar.placeholderName.private" = "DuckDuckGo";
-              "browser.search.hiddenOneOffs" = "Google,Amazon.com,Bing,Wikipedia (en)";
-              "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts.havePinned" = "";
-              "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts.searchEngines" = "";
-              "browser.search.region" = "US";
-              #"toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-            };
-            #userChrome = builtins.readFile ../conf.d/userChrome.css;
-          };
-        };
-      };
+    #programs.firefox = {
+    #  enable = true;
+    #  package = pkgs.firefox-wayland;
+    #  extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+    #    pkgs.nur.repos.rycee.firefox-addons."1password-x-password-manager"
+    #    decentraleyes
+    #    facebook-container
+    #    https-everywhere
+    #    multi-account-containers
+    #    privacy-badger
+    #    tridactyl
+    #    ublock-origin
+    #  ];
+    #  profiles =
+    #    let defaultSettings = {
+    #      "app.update.auto" = false;
+    #      "browser.ctrlTab.recentlyUsedOrder" = false;
+    #      "browser.startup.homepage" = "about:blank";
+    #      "media.hardware-video-decoding.force-enabled" = true;
+    #      "privacy.trackingprotection.enabled" = true;
+    #      "privacy.trackingprotection.socialtracking.annotate.enabled" = true;
+    #      "privacy.trackingprotection.socialtracking.enabled" = true;
+    #      "services.sync.declinedEngines" = "addons,passwords,prefs";
+    #      "services.sync.engine.addons" = false;
+    #      "services.sync.engine.passwords" = false;
+    #      "services.sync.engine.prefs" = false;
+    #      "services.sync.engineStatusChanged.addons" = true;
+    #      "services.sync.engineStatusChanged.prefs" = true;
+    #          #"browser.bookmarks.showMobileBookmarks" = true;
+    #          #"browser.newtabpage.enabled" = false;
+    #          #"browser.uidensity" = 1;
+    #          #"browser.urlbar.update1" = true;
+    #          #"distribution.searchplugins.defaultLocale" = "en-GB";
+    #          #"general.useragent.locale" = "en-GB";
+    #          #"identity.fxaccounts.account.device.name" = config.networking.hostName;
+    #          #"signon.rememberSignons" = false;
+    #        };
+    #    in {
+    #      home = {
+    #        id = 0;
+    #        settings = defaultSettings // {
+    #          "browser.urlbar.placeholderName" = "DuckDuckGo";
+    #          "browser.urlbar.placeholderName.private" = "DuckDuckGo";
+    #          "browser.search.hiddenOneOffs" = "Google,Amazon.com,Bing,Wikipedia (en)";
+    #          "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts.havePinned" = "";
+    #          "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts.searchEngines" = "";
+    #          "browser.search.region" = "US";
+    #          #"toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+    #        };
+    #        #userChrome = builtins.readFile ../conf.d/userChrome.css;
+    #      };
+    #    };
+    #  };
 
       programs.neovim = {
         enable = true;
