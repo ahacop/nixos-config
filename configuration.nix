@@ -6,7 +6,7 @@
 let
 	home-manager = builtins.fetchGit {
 		url = "https://github.com/rycee/home-manager.git";
-    ref = "release-20.09";
+		ref = "release-20.09";
 	};
 in
 {
@@ -17,7 +17,13 @@ in
 	    (import "${home-manager}/nixos")
   ];
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  services.emacs.package = pkgs.emacsUnstable;
+  nixpkgs.overlays = [
+    (import (builtins.fetchTarball {
+      url = https://github.com/nix-community/emacs-overlay/archive/master.tar.gz;
+    }))
+  ];
+
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.joypixels.acceptLicense = true;
   nixpkgs.config.packageOverrides = pkgs: {
@@ -26,22 +32,23 @@ in
     };
   };
 
-  nixpkgs.overlays = [
-    (import (builtins.fetchTarball {
-      url = https://github.com/nix-community/emacs-overlay/archive/master.tar.gz;
-    }))
-  ];
+  #nix.extraOptions = ''
+  #  keep-outputs = true
+  #  keep-derivations = true
+  #'';
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.grub = {
-	  enable = true;
-	  version = 2;
-	  efiSupport = true;
-	  enableCryptodisk = true;
-	  device = "nodev";
-	  useOSProber = true;
+    enable = true;
+    version = 2;
+    efiSupport = true;
+    enableCryptodisk = true;
+    device = "nodev";
+    useOSProber = true;
+    #configurationLimit = 5;
   };
   boot.initrd.luks.devices = {
 	  crypted = {
@@ -49,11 +56,6 @@ in
 		  preLVM = true;
 	  };
   };
-
-  nix.extraOptions = ''
-    keep-outputs = true
-    keep-derivations = true
-  '';
 
   networking = {
     hostName = "mopsliebe2"; # Define your hostname.
@@ -125,6 +127,7 @@ in
     appimage-run
     bat
     ctags
+    dconf2nix
     ding
     discord
     diskonaut
@@ -137,7 +140,7 @@ in
     exercism
     fd
     ffsend
-    firefox-wayland
+    firefox
     fuse apfs-fuse
     fzf
     gitAndTools.gitFull
@@ -148,11 +151,11 @@ in
     hunspellDicts.de-de
     hunspellDicts.en-us-large
     imv
+    inkscape
     isync
     killall
     kondo
     mu
-    neovim
     networkmanager
     ngrok
     nix-direnv
@@ -166,12 +169,13 @@ in
     rclone
     ripgrep
     rsync
-    ruby_2_7
+    ruby_3_0
     sdcv # stardict viewer
     signal-desktop
     skim
     skype
     slack
+    tdesktop
     texlive.combined.scheme-full
     transmission-gtk
     tree
@@ -184,12 +188,13 @@ in
     xclip
     youtube-dl
     zip
+    zoom-us
 
     (emacsWithPackagesFromUsePackage {
       config = builtins.readFile ./dotfiles/emacs.el;
 
       # Package is optional, defaults to pkgs.emacs
-      package = pkgs.emacsUnstable;
+      #package = pkgs.emacsUnstable;
 
       # By default emacsWithPackagesFromUsePackage will only pull in packages with `:ensure t`.
       # Setting alwaysEnsure to true emulates `use-package-always-ensure` and pulls in all use-package references.
@@ -200,11 +205,19 @@ in
       #  epkgs.cask
       #];
       # Optionally override derivations
-      #override = epkgs: epkgs // {
-      #  weechat = epkgs.melpaPackages.weechat.overrideAttrs(old: {
-      #    patches = [ ./weechat-el.patch ];
-      #  });
-      #};
+      override = epkgs: epkgs // {
+        modus-themes = epkgs.melpaPackages.modus-themes.overrideAttrs (attrs: {
+          src = fetchFromGitLab {
+            owner = "protesilaos";
+            repo = "modus-themes";
+            rev = "1.3.0";
+            sha256 = "0dw33kvs6k1a933d64fnrckzhs12d8m03a31cwblm39vmirgmf6y";
+          };
+          meta = attrs.meta // {
+            broken = false;
+          };
+        });
+      };
     })
   ];
 
@@ -229,7 +242,7 @@ in
   location.provider = "geoclue2";
 
   services = {
-    lorri.enable = true;
+    #lorri.enable = true;
     printing.enable = true;
     locate.enable = true;
     redshift = {
@@ -252,35 +265,18 @@ in
     };
 
     xserver = {
+      autorun = false;
       enable = true;
       videoDrivers = ["nouveau"];
       layout = "us";
       xkbOptions = "ctrl:nocaps";
- #     libinput = {
- #       enable = true;
-        #touchpad = {
-        #  tapping = true;
-        #  clickMethod = "clickfinger";
-        #  disableWhileTyping = true;
-        #  accelSpeed = "0.001";
-        #};
- #     };
-      #desktopManager.gnome3.enable = true;
-      displayManager = {
-      #  gdm = {
-      #    enable = true;
-      #    nvidiaWayland = true;
-      #  };
-        defaultSession = "sway";
-        autoLogin = {
-          enable = true;
-          user = "ahacop";
-        };
-        lightdm = {
-          enable = true;
-        };
+      desktopManager.gnome3.enable = true;
+      displayManager.lightdm = {
+        enable = true;
       };
     };
+    #dbus.packages = [ pkgs.gnome3.dconf ];
+    #udev.packages = [ pkgs.gnome3.gnome-settings-daemon ];
   };
 
   #hardware.nvidia = {
@@ -288,20 +284,20 @@ in
   #};
 
   nixpkgs.config.pulseaudio = true;
-  programs.sway = {
-    enable = true;
-    extraPackages = with pkgs; [
-      kanshi # autorandr
-      mako # notification daemon
-      (waybar.override {
-        pulseSupport = true;
-      })
-      grim
-      swayidle
-      swaylock # lockscreen
-      xwayland # for legacy apps
-    ];
-  };
+  #programs.sway = {
+  #  enable = false;
+  #  extraPackages = with pkgs; [
+  #    kanshi # autorandr
+  #    mako # notification daemon
+  #    (waybar.override {
+  #      pulseSupport = true;
+  #    })
+  #    grim
+  #    swayidle
+  #    swaylock # lockscreen
+  #    xwayland # for legacy apps
+  #  ];
+  #};
 
   # FIXME: not sure if all this is really necessary
   security.pam.services = {
@@ -335,23 +331,7 @@ in
     };
   };
 
-  # Enable the X11 windowing system.
-  # services.xserver.enable = true;
-  # services.xserver.layout = "us";
-  # services.xserver.xkbOptions = "eurosign:e";
-
-  # Enable touchpad support.
-  # services.xserver.libinput.enable = true;
-
-  # Enable the KDE Desktop Environment.
-  # services.xserver.displayManager.sddm.enable = true;
-  # services.xserver.desktopManager.plasma5.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  # users.users.jane = {
-  #   isNormalUser = true;
-  #   extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-  # };
+  services.udev.packages = with pkgs; [ gnome3.gnome-settings-daemon ];
 
   users.users = {
     ahacop = {
@@ -412,6 +392,8 @@ in
 
   home-manager.useGlobalPkgs = true;
   home-manager.users.ahacop = { pkgs, ... }: {
+    imports = [ ./dconf.nix ];
+
     home.file.".emacs".source = ./dotfiles/emacs.el;
     home.file.".githelpers".source = ./dotfiles/githelpers;
     home.file.".gitignore.global".source = ./dotfiles/gitignore.global;

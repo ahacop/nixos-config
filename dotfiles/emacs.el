@@ -3,6 +3,8 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
+(setq use-package-always-ensure t)
+
 (use-package better-defaults
   :config
   (set-face-attribute 'default nil :family "Inconsolata" :height 180)
@@ -60,13 +62,15 @@
 
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 
-(use-package modus-vivendi-theme
+(use-package modus-themes
   :init
-  (setq modus-vivendi-theme-distinct-org-blocks t)
-  (setq modus-vivendi-theme-rainbow-headings t)
-  (setq modus-vivendi-theme-bold-constructs t)
+  (setq modus-themes-distinct-org-blocks t)
+  (setq modus-themes-rainbow-headings t)
+  (setq modus-themes-bold-constructs t)
+  (modus-themes-load-themes)
   :config
-  (load-theme 'modus-vivendi t))
+  (modus-themes-load-vivendi)
+  :bind ("<f5>" . modus-themes-toggle))
 
 (use-package company
   :hook (after-init . global-company-mode)
