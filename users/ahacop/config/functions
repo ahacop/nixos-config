@@ -1,0 +1,124 @@
+# Use Git’s colored diff when available
+if hash git &>/dev/null ; then
+  diff() {
+    git diff --no-index --color-words "$@"
+  }
+fi
+
+# `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
+# the `.git` directory, listing directories first. The output gets piped into
+# `less` with options to preserve color and line numbers, unless the output is
+# small enough for one screen.
+tre() {
+  tree -aC -I '.git' --dirsfirst "$@" | less -FRNX
+}
+
+# Get colors in manual pages
+man() {
+  env \
+    LESS_TERMCAP_mb="$(printf '\e[1;31m')" \
+    LESS_TERMCAP_md="$(printf '\e[1;31m')" \
+    LESS_TERMCAP_me="$(printf '\e[0m')" \
+    LESS_TERMCAP_se="$(printf '\e[0m')" \
+    LESS_TERMCAP_so="$(printf '\e[1;44;33m')" \
+    LESS_TERMCAP_ue="$(printf '\e[0m')" \
+    LESS_TERMCAP_us="$(printf '\e[1;32m')" \
+    man "$@"
+}
+
+# check if uri is up
+isup() {
+  local uri=$1
+
+  if curl -s --head  --request GET "$uri" | grep "200 OK" > /dev/null ; then
+    echo "$uri is down"
+  else
+    echo "$uri is up"
+  fi
+}
+
+# Determine size of a file or total size of a directory
+fs() {
+  if du -b /dev/null > /dev/null 2>&1; then
+    local arg=-sbh
+  else
+    local arg=-sh
+  fi
+  # shellcheck disable=SC2199
+  if [[ -n "$@" ]]; then
+    du $arg -- "$@"
+  else
+    du $arg -- .[^.]* *
+  fi
+}
+
+# Create a data URL from a file
+dataurl() {
+  local mimeType
+  mimeType=$(file -b --mime-type "$1")
+  if [[ $mimeType == text/* ]]; then
+    mimeType="${mimeType};charset=utf-8"
+  fi
+  echo "data:${mimeType};base64,$(openssl base64 -in "$1" | tr -d '\n')"
+}
+
+# UTF-8-encode a string of Unicode symbols
+escape() {
+  local args
+  args=( $(printf "%s" "$*" | xxd -p -c1 -u) )
+  printf "\\\x%s" "${args[@]}"
+  # print a newline unless we’re piping the output to another program
+  if [ -t 1 ]; then
+    echo ""; # newline
+  fi
+}
+
+# Decode \x{ABCD}-style Unicode escape sequences
+unidecode() {
+  perl -e "binmode(STDOUT, ':utf8'); print \"$*\""
+  # print a newline unless we’re piping the output to another program
+  if [ -t 1 ]; then
+    echo ""; # newline
+  fi
+}
+
+g() {
+  if [[ $# > 0 ]]; then
+    git $@
+  else
+    git status
+  fi
+}
+
+modified_and_untracked_files() {
+  git ls-files . --exclude-standard --others --modified
+}
+
+open_modified_and_untracked_in_vim() {
+  vim -p $(modified_and_untracked_files)
+}
+
+changed_from_head() {
+  git diff-tree --no-commit-id --name-only -r HEAD $1
+}
+
+open_changed_from_head_in_vim() {
+  vim -p $(changed_from_head "$1")
+}
+
+# Switch projects
+p() {
+  proj=$(find ~/code -maxdepth 2 \( -type l -o -type d \) -not -name ".*" | fzf)
+  if [[ -n "$proj" ]]; then
+    cd $proj
+  fi
+}
+
+# $ reencode_pdf (screen|ebook|printer|prepress) input.pdf output.pdf
+reencode_pdf() {
+  gs -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/$1 -sOutputFile=$3 $2
+}
+
+remove_gb_wm() {
+  convert -gravity SouthEast -region 160x35 -morphology dilate disk +noise Uniform $1 $2
+}
