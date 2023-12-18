@@ -70,6 +70,7 @@ in {
         watch
         firefox
         zsh-powerlevel10k
+        tig
       ]
       ++ (lib.optionals isDarwin [
         # This is automatically setup on Linux
