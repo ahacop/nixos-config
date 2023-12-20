@@ -71,6 +71,9 @@ in {
         firefox
         zsh-powerlevel10k
         tig
+        awscli2
+        k9s
+        kubectl
       ]
       ++ (lib.optionals isDarwin [
         # This is automatically setup on Linux
