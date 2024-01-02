@@ -62,6 +62,7 @@ in {
       [
         asciinema
         bat
+        tldr
         fd
         htop
         jq
