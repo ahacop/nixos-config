@@ -232,8 +232,9 @@ in {
           editor = "nvim";
         };
         credential.helper = "store"; # want to make this more secure
-        init.defaultBranch = "main";
         github.user = "ahacop";
+        init.defaultBranch = "main";
+        merge.tool = "nvimdiff";
         push.default = "tracking";
         rebase.autoStash = true;
       };
