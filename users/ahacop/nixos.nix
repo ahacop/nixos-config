@@ -2,6 +2,8 @@
   # Add ~/.local/bin to PATH
   environment.localBinInPath = true;
 
+  documentation.dev.enable = true;
+
   users.users.ahacop = {
     isNormalUser = true;
     home = "/home/ahacop";
