@@ -19,6 +19,7 @@ in {
         g = "git";
         gvm = "vi -p $(git diff master --name-only)";
         gst = "git status";
+        create_ruby_dev = "nix flake init --template github:the-nix-way/dev-templates#ruby";
         fpass = "faktory_server_password";
         strip = "sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g;s,\r$,,g'";
         gos = "git diff-tree --no-commit-id --name-only -r";
