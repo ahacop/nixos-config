@@ -39,8 +39,11 @@ in
         home-manager = {
           useGlobalPkgs = true;
           useUserPackages = true;
-          users.${user} = import userHMConfig {
-            inherit inputs;
+          users.${user} = {
+            imports = [
+              userHMConfig
+              inputs.nixvim.homeManagerModules.nixvim
+            ];
           };
         };
       }

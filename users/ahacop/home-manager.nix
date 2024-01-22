@@ -1,63 +1,59 @@
-_: {
-  lib,
-  pkgs,
-  ...
-}: let
+{ lib, pkgs, ... }:
+let
   inherit (pkgs.stdenv) isDarwin;
   inherit (pkgs.stdenv) isLinux;
 in {
   xdg.enable = true;
-  xdg.configFile = {
-    "i3/config".text = builtins.readFile ./i3;
-  };
+  xdg.configFile = { "i3/config".text = builtins.readFile ./i3; };
   home = {
     stateVersion = "23.11";
 
-    shellAliases =
-      {
-        clean-boot-generations = "sudo /run/current-system/bin/switch-to-configuration boot";
-        g = "git";
-        gvm = "vi -p $(git diff master --name-only)";
-        gst = "git status";
-        create_ruby_dev = "nix flake init --template github:the-nix-way/dev-templates#ruby";
-        fpass = "faktory_server_password";
-        strip = "sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g;s,\r$,,g'";
-        gos = "git diff-tree --no-commit-id --name-only -r";
-        vi = "nvim";
-        vim = "nvim";
-        vimdiff = "nvim -d";
-        ls = "ls -GF";
-        be = "bundle exec";
-        gc = "git ci -p";
-        gca = "git ci -p --amend";
-        ga = "git aa";
-        gf = "git fetch";
-        gl = "git log";
-        retag = "git ls-files | xargs ctags";
-        gv = "open_modified_and_untracked_in_vim";
-        gvh = "open_changed_from_head_in_vim";
-        gvv = "vi -p $(git diff master --name-only)";
-        tat = "tmux attach -t `basename $PWD` || tmux new-session -As \"$(basename \"$PWD\" | tr . -)\"";
-        germ = "dict -d fd-deu-eng";
-        memsql_staging_tunnel = "ssh -L 9000:0.0.0.0:9000 -N -v bm-staging-memsql";
-        memsql_production_tunnel = "ssh -L 9000:0.0.0.0:9000 -N -v bm-production-memsql";
-        memsql_studio_production_tunnel = "ssh -L 8080:0.0.0.0:8080 -N -v bm-production-memsql";
-        showtodos = "git grep -l TODO | xargs -n1 git blame --show-email -f | grep TODO  | sed -E 's/[[:blank:]]+/ /g' | sort -k 4";
-        show-git-remote-authors = "git for-each-ref --format=' %(authorname) %09 %(refname)' --sort=authorname | grep remote";
-        k = "kubectl";
-      }
-      // (
-        if isLinux
-        then {
-          pbcopy = "xclip";
-          pbpaste = "xclip -o";
-        }
-        else {}
-      );
+    shellAliases = {
+      clean-boot-generations =
+        "sudo /run/current-system/bin/switch-to-configuration boot";
+      g = "git";
+      gvm = "vi -p $(git diff master --name-only)";
+      gst = "git status";
+      create_ruby_dev =
+        "nix flake init --template github:the-nix-way/dev-templates#ruby";
+      fpass = "faktory_server_password";
+      strip = "sed $'s,x1b\\[[0-9;]*[a-zA-Z],,g;s,\r$,,g'";
+      gos = "git diff-tree --no-commit-id --name-only -r";
+      vi = "nvim";
+      vim = "nvim";
+      vimdiff = "nvim -d";
+      ls = "ls -GF";
+      be = "bundle exec";
+      gc = "git ci -p";
+      gca = "git ci -p --amend";
+      ga = "git aa";
+      gf = "git fetch";
+      gl = "git log";
+      retag = "git ls-files | xargs ctags";
+      gv = "open_modified_and_untracked_in_vim";
+      gvh = "open_changed_from_head_in_vim";
+      gvv = "vi -p $(git diff master --name-only)";
+      tat = ''
+        tmux attach -t `basename $PWD` || tmux new-session -As "$(basename "$PWD" | tr . -)"'';
+      germ = "dict -d fd-deu-eng";
+      memsql_staging_tunnel =
+        "ssh -L 9000:0.0.0.0:9000 -N -v bm-staging-memsql";
+      memsql_production_tunnel =
+        "ssh -L 9000:0.0.0.0:9000 -N -v bm-production-memsql";
+      memsql_studio_production_tunnel =
+        "ssh -L 8080:0.0.0.0:8080 -N -v bm-production-memsql";
+      showtodos =
+        "git grep -l TODO | xargs -n1 git blame --show-email -f | grep TODO  | sed -E 's/[[:blank:]]+/ /g' | sort -k 4";
+      show-git-remote-authors =
+        "git for-each-ref --format=' %(authorname) %09 %(refname)' --sort=authorname | grep remote";
+      k = "kubectl";
+    } // (if isLinux then {
+      pbcopy = "xclip";
+      pbpaste = "xclip -o";
+    } else
+      { });
 
-    file = {
-      ".ssh/config".source = ./config/sshconfig;
-    };
+    file = { ".ssh/config".source = ./config/sshconfig; };
 
     packages = with pkgs;
       [
@@ -76,18 +72,12 @@ in {
         awscli2
         k9s
         kubectl
-      ]
-      ++ (lib.optionals isDarwin [
+      ] ++ (lib.optionals isDarwin [
         # This is automatically setup on Linux
         cachix
         # tailscale
       ])
-      ++ (lib.optionals isLinux [
-        rofi
-        valgrind
-        zathura
-        xfce.xfce4-terminal
-      ]);
+      ++ (lib.optionals isLinux [ rofi valgrind zathura xfce.xfce4-terminal ]);
 
     #---------------------------------------------------------------------
     # Env vars and dotfiles
@@ -110,20 +100,130 @@ in {
     };
   };
   programs = {
+    nixvim = {
+      enable = true;
+
+      colorschemes.gruvbox.enable = true;
+      globals = { mapleader = " "; };
+
+      options = {
+        autoindent = true;
+        expandtab = true;
+        ignorecase = true;
+        incsearch = true;
+        number = true;
+        relativenumber = true;
+        shiftwidth = 2;
+        smartcase = true;
+        spell = true;
+        signcolumn = "yes";
+      };
+
+      plugins = {
+        which-key.enable = true;
+        treesitter.enable = true;
+        tmux-navigator.enable = true;
+        markdown-preview.enable = true;
+        lspsaga.enable = true;
+        telescope = {
+          enable = true;
+          keymaps = {
+            "<leader>ff" = {
+              action = "find_files";
+              desc = "Telescope find files";
+            };
+            "<leader>fg" = {
+              action = "live_grep";
+              desc = "Telescope live_grep";
+            };
+            "<leader>fb" = {
+              action = "buffers";
+              desc = "Telescope buffers";
+            };
+            "<leader>fh" = {
+              action = "help_tags";
+              desc = "Telescope help_tags";
+            };
+            "<leader>fvcw" = {
+              action = "git_commits";
+              desc = "Telescope git_commits";
+            };
+            "<leader>fvcb" = {
+              action = "git_bcommits";
+              desc = "Telescope git_bcommits";
+            };
+            "<leader>fvb" = {
+              action = "git_branches";
+              desc = "Telescope git_branches";
+            };
+            "<leader>fvs" = {
+              action = "git_status";
+              desc = "Telescope git_status";
+            };
+            "<leader>fvx" = {
+              action = "git_stash";
+              desc = "Telescope git_stash";
+            };
+          };
+        };
+        lsp-format.enable = true;
+        lsp.enable = true;
+        lsp = {
+          servers = {
+            bashls.enable = true;
+            cssls.enable = true;
+            dockerls.enable = true;
+            eslint.enable = true;
+            html.enable = true;
+            jsonls.enable = true;
+            lua-ls.enable = true;
+            nil_ls.enable = true;
+            solargraph.enable = true;
+            tailwindcss.enable = true;
+            terraformls.enable = true;
+            yamlls.enable = true;
+          };
+        };
+
+        gitblame.enable = false;
+        fugitive.enable = true;
+        copilot-lua.enable = true;
+        endwise.enable = true;
+        nvim-lightbulb.enable = true;
+        gitsigns.enable = true;
+        auto-session.enable = true;
+        comment-nvim.enable = true;
+        nvim-cmp = {
+          enable = true;
+          autoEnableSources = true;
+          sources =
+            [ { name = "nvim_lsp"; } { name = "path"; } { name = "buffer"; } ];
+        };
+        lualine.enable = true;
+        none-ls = {
+          enable = true;
+          enableLspFormat = true;
+          sources = {
+            code_actions.statix.enable = true;
+            diagnostics.statix.enable = true;
+            formatting.nixfmt.enable = true;
+          };
+        };
+      };
+    };
+
     fzf = {
       enable = true;
       enableBashIntegration = true;
       enableZshIntegration = true;
       enableFishIntegration = true;
-      tmux = {
-        enableShellIntegration = true;
-      };
+      tmux = { enableShellIntegration = true; };
     };
     zsh = {
       enable = true;
       defaultKeymap = "emacs";
       autocd = false;
-      cdpath = ["~/.local/share/src"];
+      cdpath = [ "~/.local/share/src" ];
       plugins = [
         {
           name = "powerlevel10k";
@@ -139,22 +239,13 @@ in {
       initExtra = builtins.readFile ./config/functions;
     };
 
-    fish = {
-      enable = true;
-    };
-
-    neovim = {
-      enable = true;
-      viAlias = true;
-      vimAlias = true;
-      vimdiffAlias = true;
-    };
+    fish = { enable = true; };
 
     gpg.enable = !isDarwin;
 
     bash = {
       enable = true;
-      historyControl = ["ignoredups" "ignorespace"];
+      historyControl = [ "ignoredups" "ignorespace" ];
     };
 
     direnv = {
@@ -167,9 +258,7 @@ in {
       enable = true;
       gitCredentialHelper = {
         enable = true;
-        hosts = [
-          "https://github.com"
-        ];
+        hosts = [ "https://github.com" ];
       };
     };
 
@@ -183,8 +272,10 @@ in {
         signByDefault = true;
       };
       aliases = {
-        cleanup = "!git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 -r git branch -d";
-        prettylog = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(r) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative";
+        cleanup =
+          "!git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 -r git branch -d";
+        prettylog =
+          "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(r) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative";
         root = "rev-parse --show-toplevel";
         aa = "add --all";
         amend = "commit --amend";
@@ -223,7 +314,8 @@ in {
         l = "!. ~/.githelpers && pretty_git_log";
         la = "!git l --all";
         today = "log --since=midnight --author='ahacop' --oneline";
-        yesterday = "log --since=midnight.yesterday --until=midnight --author='ahacop' --oneline";
+        yesterday =
+          "log --since=midnight.yesterday --until=midnight --author='ahacop' --oneline";
       };
       extraConfig = {
         branch.autosetuprebase = "always";
@@ -340,9 +432,7 @@ in {
     alacritty = {
       enable = true;
       settings = {
-        cursor = {
-          style = "Block";
-        };
+        cursor = { style = "Block"; };
 
         window = {
           opacity = 1.0;
@@ -402,9 +492,7 @@ in {
       };
     };
 
-    kitty = {
-      enable = true;
-    };
+    kitty = { enable = true; };
 
     i3status = {
       enable = isLinux;
@@ -432,7 +520,5 @@ in {
     defaultCacheTtl = 31536000;
     maxCacheTtl = 31536000;
   };
-  services.ssh-agent = {
-    enable = true;
-  };
+  services.ssh-agent = { enable = true; };
 }
