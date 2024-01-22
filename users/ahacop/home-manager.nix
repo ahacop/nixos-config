@@ -106,6 +106,13 @@ in {
       colorschemes.gruvbox.enable = true;
       globals = { mapleader = " "; };
 
+      keymaps = [{
+        action = "<cmd>noh<CR>";
+        key = "<CR>";
+        mode = "n";
+        options = { desc = "Clear highlighted search"; };
+      }];
+
       options = {
         autoindent = true;
         expandtab = true;
