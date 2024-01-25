@@ -156,6 +156,7 @@
       unzip
       wget
       xclip
+      xsel
       yt-dlp
       zip
       man-pages
