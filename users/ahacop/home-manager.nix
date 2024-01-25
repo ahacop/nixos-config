@@ -115,6 +115,7 @@ in {
 
       options = {
         autoindent = true;
+        clipboard = "unnamedplus";
         expandtab = true;
         ignorecase = true;
         incsearch = true;
