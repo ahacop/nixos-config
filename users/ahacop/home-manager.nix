@@ -106,12 +106,39 @@ in {
       colorschemes.gruvbox.enable = true;
       globals = { mapleader = " "; };
 
-      keymaps = [{
-        action = "<cmd>noh<CR>";
-        key = "<CR>";
-        mode = "n";
-        options = { desc = "Clear highlighted search"; };
-      }];
+      keymaps = [
+        {
+          action = "<cmd>noh<CR>";
+          key = "<CR>";
+          mode = "n";
+          options = { desc = "Clear highlighted search"; };
+        }
+        {
+          action = "<cmd>TestFile<CR>";
+          key = "<leader>tf";
+          mode = "n";
+          options = { desc = "TestFile"; };
+        }
+        {
+          action = "<cmd>TestNearest<CR>";
+          key = "<leader>tt";
+          mode = "n";
+          options = { desc = "TestNearest"; };
+        }
+        {
+          action = "<cmd>TestSuite<CR>";
+          key = "<leader>ts";
+          mode = "n";
+          options = { desc = "TestSuite"; };
+        }
+        {
+          action = "<cmd>TestVisit<CR>";
+          key = "<leader>tv";
+          mode = "n";
+          options = { desc = "TestVisit"; };
+        }
+
+      ];
 
       options = {
         autoindent = true;
@@ -218,6 +245,8 @@ in {
           };
         };
       };
+
+      extraPlugins = with pkgs.vimPlugins; [ vim-test ];
     };
 
     fzf = {
