@@ -246,7 +246,7 @@ in {
         };
       };
 
-      extraPlugins = with pkgs.vimPlugins; [ vim-test ];
+      extraPlugins = with pkgs.vimPlugins; [ vim-test direnv-vim ];
     };
 
     fzf = {
