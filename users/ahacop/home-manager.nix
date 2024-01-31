@@ -368,7 +368,10 @@ in {
         github.user = "ahacop";
         init.defaultBranch = "main";
         merge.tool = "nvimdiff";
-        push.default = "tracking";
+        push = {
+          default = "tracking";
+          autoSetupRemote = true;
+        };
         rebase.autoStash = true;
       };
     };
