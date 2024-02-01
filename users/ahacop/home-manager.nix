@@ -11,7 +11,6 @@ in {
     shellAliases = {
       clean-boot-generations =
         "sudo /run/current-system/bin/switch-to-configuration boot";
-      g = "git";
       gvm = "vi -p $(git diff master --name-only)";
       gst = "git status";
       create_ruby_dev =
