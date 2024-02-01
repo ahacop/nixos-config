@@ -11,7 +11,7 @@ in {
     shellAliases = {
       clean-boot-generations =
         "sudo /run/current-system/bin/switch-to-configuration boot";
-      gvm = "vi -p $(git diff master --name-only)";
+      gvm = "vi -p $(git diff main --name-only)";
       gst = "git status";
       create_ruby_dev =
         "nix flake init --template github:the-nix-way/dev-templates#ruby";
@@ -31,7 +31,7 @@ in {
       retag = "git ls-files | xargs ctags";
       gv = "open_modified_and_untracked_in_vim";
       gvh = "open_changed_from_head_in_vim";
-      gvv = "vi -p $(git diff master --name-only)";
+      gvv = "vi -p $(git diff main --name-only)";
       tat = ''
         tmux attach -t `basename $PWD` || tmux new-session -As "$(basename "$PWD" | tr . -)"'';
       germ = "dict -d fd-deu-eng";
