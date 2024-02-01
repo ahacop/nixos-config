@@ -330,7 +330,6 @@ in {
         ff = "merge --ff-only";
         lg = "log -p";
         noff = "merge --no-ff";
-        pom = "push origin master";
         pullff = "pull --ff-only";
         st = "status";
         div = "divergence";
