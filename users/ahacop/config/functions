@@ -94,7 +94,7 @@ modified_and_untracked_files() {
 
 # Opens modified and untracked files in Vim
 open_modified_and_untracked_in_vim() {
-  vim -p $(modified_and_untracked_files)
+  nvim -p $(modified_and_untracked_files)
 }
 
 # Lists files changed from the head
@@ -104,7 +104,7 @@ changed_from_head() {
 
 # Opens files changed from the head in Vim
 open_changed_from_head_in_vim() {
-  vim -p $(changed_from_head "$1")
+  nvim -p $(changed_from_head "$1")
 }
 
 # Switch projects
