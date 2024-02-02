@@ -113,22 +113,40 @@ in {
           options = { desc = "Clear highlighted search"; };
         }
         {
-          action = "<cmd>TestFile<CR>";
+          action = "<cmd>TestFile HEADLESS=0<CR>";
           key = "<leader>tf";
           mode = "n";
           options = { desc = "TestFile"; };
         }
         {
-          action = "<cmd>TestNearest<CR>";
+          action = "<cmd>TestNearest HEADLESS=0<CR>";
           key = "<leader>tt";
           mode = "n";
           options = { desc = "TestNearest"; };
         }
         {
-          action = "<cmd>TestSuite<CR>";
+          action = "<cmd>TestSuite HEADLESS=0<CR>";
           key = "<leader>ts";
           mode = "n";
           options = { desc = "TestSuite"; };
+        }
+        {
+          action = "<cmd>TestFile HEADLESS=1<CR>";
+          key = "<leader>thf";
+          mode = "n";
+          options = { desc = "TestFile (HEADLESS=1)"; };
+        }
+        {
+          action = "<cmd>TestNearest HEADLESS=1<CR>";
+          key = "<leader>tht";
+          mode = "n";
+          options = { desc = "TestNearest HEADLESS=1"; };
+        }
+        {
+          action = "<cmd>TestSuite HEADLESS=1<CR>";
+          key = "<leader>ths";
+          mode = "n";
+          options = { desc = "TestSuite HEADLESS=1"; };
         }
         {
           action = "<cmd>TestVisit<CR>";
