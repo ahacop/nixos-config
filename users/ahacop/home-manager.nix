@@ -57,21 +57,21 @@ in {
     packages = with pkgs;
       [
         asciinema
+        awscli2
         bat
-        tldr
         fd
+        firefox
         htop
         jq
-        ripgrep
-        tree
-        watch
-        firefox
-        silicon
-        zsh-powerlevel10k
-        tig
-        awscli2
         k9s
         kubectl
+        ripgrep
+        silicon
+        tig
+        tldr
+        tree
+        watch
+        zsh-powerlevel10k
       ] ++ (lib.optionals isDarwin [
         # This is automatically setup on Linux
         cachix
