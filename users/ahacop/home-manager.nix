@@ -66,6 +66,7 @@ in {
         tree
         watch
         firefox
+        silicon
         zsh-powerlevel10k
         tig
         awscli2
