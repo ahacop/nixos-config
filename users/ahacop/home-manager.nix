@@ -56,6 +56,7 @@ in {
 
     packages = with pkgs;
       [
+        _1password
         asciinema
         awscli2
         bat
