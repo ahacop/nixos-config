@@ -109,7 +109,7 @@ open_changed_from_head_in_vim() {
 
 # Switch projects
 p() {
-  proj=$(find ~/code -maxdepth 2 \( -type l -o -type d \) -not -name ".*" | fzf)
+  proj=$(find ~/code -maxdepth 2 \( -type l -o -type d \) -not -name ".*" | sk)
   if [[ -n $proj ]]; then
     cd "$proj"
   fi

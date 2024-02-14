@@ -271,13 +271,11 @@ in {
       extraPlugins = with pkgs.vimPlugins; [ vim-test direnv-vim ];
     };
 
-    fzf = {
+    skim = {
       enable = true;
-      enableBashIntegration = true;
       enableZshIntegration = true;
-      enableFishIntegration = true;
-      tmux = { enableShellIntegration = true; };
     };
+
     zsh = {
       enable = true;
       defaultKeymap = "emacs";
