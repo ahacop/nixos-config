@@ -321,6 +321,7 @@ in {
 
     git = {
       enable = true;
+      difftastic = { enable = true; };
       userName = "Ara Hacopian";
       userEmail = "ara@hacopian.de";
       lfs.enable = true;
@@ -374,21 +375,38 @@ in {
           "log --since=midnight.yesterday --until=midnight --author='ahacop' --oneline";
       };
       extraConfig = {
-        branch.autosetuprebase = "always";
+        branch = {
+          autosetuprebase = "always";
+          sort = "committerdate";
+        };
+        blame.ignoreRevsFile = ".git-blame-ignore-revs";
+        commit.verbose = true;
         color.ui = true;
         core = {
           askPass = ""; # needs to be empty to use terminal for ask pass
           editor = "nvim";
         };
         credential.helper = "store"; # want to make this more secure
+        diff = {
+          colorMoved = "default";
+          algorithm = "histogram";
+        };
         github.user = "ahacop";
         init.defaultBranch = "main";
-        merge.tool = "nvimdiff";
+        merge = {
+          conflictStyle = "zdiff3";
+          tool = "nvimdiff";
+        };
+        pull = { ff-only = true; };
         push = {
           default = "tracking";
           autoSetupRemote = true;
         };
-        rebase.autoStash = true;
+        rebase = {
+          autoSquash = true;
+          autoStash = true;
+        };
+        rerere.enabled = true;
       };
     };
 
