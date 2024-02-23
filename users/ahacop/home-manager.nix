@@ -243,7 +243,9 @@ in {
         };
 
         gitblame.enable = false;
-        fugitive.enable = true;
+        fugitive.enable = false;
+        neogit.enable = true;
+        diffview.enable = true;
         copilot-lua.enable = true;
         endwise.enable = true;
         nvim-lightbulb.enable = true;
