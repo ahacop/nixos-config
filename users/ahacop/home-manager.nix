@@ -270,6 +270,18 @@ in {
         };
       };
 
+      autoCmd = [{
+        event = [ "FileType" ];
+        pattern = [ "gitcommit" ];
+        callback = {
+          __raw = ''
+            function()
+              vim.opt.colorcolumn = "72"
+            end
+          '';
+        };
+      }];
+
       extraPlugins = with pkgs.vimPlugins; [ vim-test direnv-vim ];
     };
 
