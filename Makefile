@@ -17,6 +17,10 @@ SSH_OPTIONS=-o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o Strict
 # We need to do some OS switching below.
 UNAME := $(shell uname)
 
+clean:
+	sudo nix-env -p /nix/var/nix/profiles/system --delete-generations old
+	nix-collect-garbage -d
+
 switch:
 ifeq ($(UNAME), Darwin)
 	nix build --extra-experimental-features nix-command --extra-experimental-features flakes ".#darwinConfigurations.${NIXNAME}.system"
