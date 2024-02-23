@@ -1,9 +1,4 @@
-{
-  pkgs,
-  lib,
-  currentSystemName,
-  ...
-}: {
+{ pkgs, lib, currentSystemName, ... }: {
   boot = {
     # Be careful updating this.
     kernelPackages = pkgs.linuxPackages_latest;
@@ -63,9 +58,7 @@
   virtualisation.docker.enable = true;
 
   # Select internationalisation properties.
-  i18n = {
-    defaultLocale = "en_US.UTF-8";
-  };
+  i18n = { defaultLocale = "en_US.UTF-8"; };
   services = {
     # setup windowing environment
     xserver = {
@@ -89,9 +82,7 @@
         '';
       };
 
-      windowManager = {
-        i3.enable = true;
-      };
+      windowManager = { i3.enable = true; };
     };
 
     # Enable the OpenSSH daemon.
@@ -106,7 +97,7 @@
   users.mutableUsers = true;
 
   fonts = {
-    fontconfig.defaultFonts.monospace = ["Inconsolata"];
+    fontconfig.defaultFonts.monospace = [ "Inconsolata" ];
     fontDir.enable = true;
     enableGhostscriptFonts = true;
 
@@ -167,8 +158,7 @@
       (writeShellScriptBin "xrandr-auto" ''
         xrandr --output Virtual-1 --auto
       '')
-    ]
-    ++ lib.optionals (currentSystemName == "vm-aarch64") [
+    ] ++ lib.optionals (currentSystemName == "vm-aarch64") [
       # This is needed for the vmware user tools clipboard to work.
       # You can test if you don't need this by deleting this and seeing
       # if the clipboard sill works.
@@ -178,9 +168,7 @@
   programs = {
     zsh.enable = true;
     fish.enable = true;
-    ssh = {
-      startAgent = true;
-    };
+    ssh = { startAgent = true; };
   };
 
   # This value determines the NixOS release from which the default
