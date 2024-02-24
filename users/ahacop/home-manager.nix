@@ -274,6 +274,7 @@ in {
         gitsigns.enable = true;
         auto-session.enable = true;
         comment-nvim.enable = true;
+        cmp-nvim-lsp.enable = true;
         nvim-cmp = {
           enable = true;
           autoEnableSources = true;
