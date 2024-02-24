@@ -108,6 +108,24 @@ in {
       globals = { mapleader = " "; };
 
       extraConfigVim = ''
+        " Clear the search buffer when hitting return
+        function! MapCR()
+          if &buftype ==# 'quickfix'
+            execute "unmap <cr>"
+          else
+            execute "nnoremap <cr> :nohlsearch<cr>"
+          endif
+        endfunction
+        call MapCR()
+
+        augroup vimrcEx
+          " Clear all autocmds in the group
+          autocmd!
+          autocmd! CmdwinEnter * :unmap <cr>
+          autocmd! CmdwinLeave * :call MapCR()
+          autocmd BufEnter * :call MapCR()
+        augroup END
+
         cnoremap %% <C-R>=expand('%:h').'/'<cr>
       '';
 
