@@ -107,6 +107,10 @@ in {
       colorschemes.gruvbox.enable = true;
       globals = { mapleader = " "; };
 
+      extraConfigVim = ''
+        cnoremap %% <C-R>=expand('%:h').'/'<cr>
+      '';
+
       keymaps = [
         {
           action = "<cmd>noh<CR>";
