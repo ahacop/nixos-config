@@ -268,13 +268,18 @@ in {
         fugitive.enable = false;
         neogit.enable = true;
         diffview.enable = true;
-        copilot-lua.enable = true;
         endwise.enable = true;
         nvim-lightbulb.enable = true;
         gitsigns.enable = true;
         auto-session.enable = true;
         comment-nvim.enable = true;
         cmp-nvim-lsp.enable = true;
+        copilot-cmp.enable = true;
+        copilot-lua = {
+          enable = true;
+          panel.enabled = false;
+          suggestion.enabled = false;
+        };
         nvim-cmp = {
           enable = true;
           mapping = {
@@ -301,8 +306,12 @@ in {
             "<CR>" = "cmp.mapping.confirm({ select = true })";
           };
           autoEnableSources = true;
-          sources =
-            [ { name = "nvim_lsp"; } { name = "path"; } { name = "buffer"; } ];
+          sources = [
+            { name = "copilot"; }
+            { name = "nvim_lsp"; }
+            { name = "buffer"; }
+            { name = "path"; }
+          ];
         };
         lualine.enable = true;
         none-ls = {
