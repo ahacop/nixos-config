@@ -196,6 +196,7 @@ in {
       };
 
       plugins = {
+        undotree.enable = true;
         which-key.enable = true;
         treesitter.enable = true;
         tmux-navigator.enable = true;
