@@ -32,8 +32,6 @@ in {
       gv = "open_modified_and_untracked_in_vim";
       gvh = "open_changed_from_head_in_vim";
       gvv = "vi -p $(git diff main --name-only)";
-      tat = ''
-        tmux attach -t `basename $PWD` || tmux new-session -As "$(basename "$PWD" | tr . -)"'';
       germ = "dict -d fd-deu-eng";
       memsql_staging_tunnel =
         "ssh -L 9000:0.0.0.0:9000 -N -v bm-staging-memsql";
