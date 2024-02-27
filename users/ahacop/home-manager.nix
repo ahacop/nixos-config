@@ -485,21 +485,11 @@ in {
         sensible
         yank
         prefix-highlight
+        resurrect
         {
           plugin = power-theme;
           extraConfig = ''
             set -g @tmux_power_theme 'gold'
-          '';
-        }
-        {
-          plugin = resurrect; # Used by tmux-continuum
-
-          # Use XDG data directory
-          # https://github.com/tmux-plugins/tmux-resurrect/issues/348
-          extraConfig = ''
-            set -g @resurrect-dir '$HOME/.cache/tmux/resurrect'
-            set -g @resurrect-capture-pane-contents 'on'
-            set -g @resurrect-pane-contents-area 'visible'
           '';
         }
         {
