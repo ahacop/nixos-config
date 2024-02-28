@@ -106,33 +106,31 @@ in {
       globals = { mapleader = " "; };
 
       extraConfigVim = ''
-        " Clear the search buffer when hitting return
-        function! MapCR()
-          if &buftype ==# 'quickfix'
-            execute "unmap <cr>"
-          else
-            execute "nnoremap <cr> :nohlsearch<cr>"
-          endif
-        endfunction
-        call MapCR()
-
-        augroup vimrcEx
-          " Clear all autocmds in the group
-          autocmd!
-          autocmd! CmdwinEnter * :unmap <cr>
-          autocmd! CmdwinLeave * :call MapCR()
-          autocmd BufEnter * :call MapCR()
-        augroup END
-
         cnoremap %% <C-R>=expand('%:h').'/'<cr>
       '';
 
       keymaps = [
         {
-          action = "<cmd>noh<CR>";
+          action.__raw = ''
+            function()
+              -- if there is an active search highlight and we are not in the quickfix
+              local shouldClearHighlight = vim.api.nvim_buf_get_option(0, 'buftype') ~= 'quickfix' and vim.v.hlsearch ~= 0
+
+              if shouldClearHighlight then
+                -- Clear highlight
+                vim.cmd('nohlsearch')
+              else
+                -- Perform the default <CR> action
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<CR>', true, true, true), 'n', true)
+              end
+            end
+          '';
           key = "<CR>";
           mode = "n";
-          options = { desc = "Clear highlighted search"; };
+          options = {
+            silent = true;
+            desc = "Clear highlighted search";
+          };
         }
         {
           action = "<cmd>TestFile HEADLESS=0<CR>";
