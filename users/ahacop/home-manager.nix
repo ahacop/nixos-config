@@ -277,38 +277,9 @@ in {
           panel.enabled = false;
           suggestion.enabled = false;
         };
-        nvim-cmp = {
+        cmp = {
           enable = true;
-          mapping = {
-            "<C-d>" = "cmp.mapping.scroll_docs(-4)";
-            "<C-f>" = "cmp.mapping.scroll_docs(4)";
-            "<C-Space>" = "cmp.mapping.complete()";
-            "<C-e>" = "cmp.mapping.close()";
-            "<Tab>" = {
-              modes = [ "i" "s" ];
-              action = "cmp.mapping.select_next_item()";
-            };
-            "<C-n>" = {
-              modes = [ "i" "s" ];
-              action = "cmp.mapping.select_next_item()";
-            };
-            "<C-p>" = {
-              modes = [ "i" "s" ];
-              action = "cmp.mapping.select_prev_item()";
-            };
-            "<S-Tab>" = {
-              modes = [ "i" "s" ];
-              action = "cmp.mapping.select_prev_item()";
-            };
-            "<CR>" = "cmp.mapping.confirm({ select = true })";
-          };
           autoEnableSources = true;
-          sources = [
-            { name = "copilot"; }
-            { name = "nvim_lsp"; }
-            { name = "buffer"; }
-            { name = "path"; }
-          ];
         };
         lualine.enable = true;
         none-ls = {
