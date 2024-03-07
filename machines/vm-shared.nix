@@ -95,7 +95,7 @@
   users.mutableUsers = true;
 
   fonts = {
-    fontconfig.defaultFonts.monospace = [ "Inconsolata" ];
+    fontconfig.defaultFonts.monospace = [ "Intel One Mono" ];
     fontDir.enable = true;
     enableGhostscriptFonts = true;
 
@@ -105,6 +105,7 @@
       fira-code
       font-awesome
       ibm-plex
+      intel-one-mono
       inconsolata
       jetbrains-mono
       joypixels
