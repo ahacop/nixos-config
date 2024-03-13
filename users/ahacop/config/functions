@@ -99,12 +99,12 @@ open_modified_and_untracked_in_vim() {
 
 # Lists files changed from the head
 changed_from_head() {
-  git diff-tree --no-commit-id --name-only -r HEAD "$1"
+  git diff-tree --no-commit-id --name-only -r HEAD
 }
 
 # Opens files changed from the head in Vim
 open_changed_from_head_in_vim() {
-  nvim -p $(changed_from_head "$1")
+  nvim -p $(changed_from_head)
 }
 
 # Switch projects
