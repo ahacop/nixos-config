@@ -253,7 +253,7 @@ in {
             nil_ls.enable = true;
             solargraph = {
               enable = true;
-              package = pkgs.rubyPackages_3_2.solargraph;
+              package = pkgs.rubyPackages_3_3.solargraph;
             };
             tailwindcss.enable = true;
             terraformls.enable = true;
