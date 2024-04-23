@@ -70,7 +70,6 @@
       };
 
       displayManager = {
-        defaultSession = "none+i3";
         lightdm.enable = true;
 
         # AARCH64: For now, on Apple Silicon, we must manually set the
@@ -83,6 +82,7 @@
       windowManager = { i3.enable = true; };
     };
 
+    displayManager = { defaultSession = "none+i3"; };
     # Enable the OpenSSH daemon.
     openssh = {
       enable = true;

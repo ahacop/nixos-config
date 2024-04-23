@@ -203,39 +203,39 @@ in {
           keymaps = {
             "<leader>ff" = {
               action = "find_files";
-              desc = "Telescope find files";
+              options = { desc = "Telescope find files"; };
             };
             "<leader>fg" = {
               action = "live_grep";
-              desc = "Telescope live_grep";
+              options = { desc = "Telescope live_grep"; };
             };
             "<leader>fb" = {
               action = "buffers";
-              desc = "Telescope buffers";
+              options = { desc = "Telescope buffers"; };
             };
             "<leader>fh" = {
               action = "help_tags";
-              desc = "Telescope help_tags";
+              options = { desc = "Telescope help_tags"; };
             };
             "<leader>fvcw" = {
               action = "git_commits";
-              desc = "Telescope git_commits";
+              options = { desc = "Telescope git_commits"; };
             };
             "<leader>fvcb" = {
               action = "git_bcommits";
-              desc = "Telescope git_bcommits";
+              options = { desc = "Telescope git_bcommits"; };
             };
             "<leader>fvb" = {
               action = "git_branches";
-              desc = "Telescope git_branches";
+              options = { desc = "Telescope git_branches"; };
             };
             "<leader>fvs" = {
               action = "git_status";
-              desc = "Telescope git_status";
+              options = { desc = "Telescope git_status"; };
             };
             "<leader>fvx" = {
               action = "git_stash";
-              desc = "Telescope git_stash";
+              options = { desc = "Telescope git_stash"; };
             };
           };
         };
@@ -269,7 +269,7 @@ in {
         nvim-lightbulb.enable = true;
         gitsigns.enable = true;
         auto-session.enable = true;
-        comment-nvim.enable = true;
+        comment.enable = true;
         cmp-nvim-lsp.enable = true;
         copilot-cmp.enable = true;
         copilot-lua = {
