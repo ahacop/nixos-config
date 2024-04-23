@@ -21,6 +21,9 @@ clean:
 	sudo nix-env -p /nix/var/nix/profiles/system --delete-generations old
 	nix-collect-garbage -d
 
+optimize:
+	nix-store --optimize
+
 switch:
 ifeq ($(UNAME), Darwin)
 	nix build --extra-experimental-features nix-command --extra-experimental-features flakes ".#darwinConfigurations.${NIXNAME}.system"
