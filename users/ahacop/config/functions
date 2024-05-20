@@ -13,6 +13,11 @@ tre() {
   tree -aC -I '.git' --dirsfirst "$@" | less -FRNX
 }
 
+create_dev_flake() {
+  local template=$1
+  nix flake init --template "github:the-nix-way/dev-templates#$template"
+}
+
 # Get colors in manual pages
 man() {
   env \
