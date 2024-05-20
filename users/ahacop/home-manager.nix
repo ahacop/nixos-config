@@ -250,10 +250,6 @@ in {
             jsonls.enable = true;
             lua-ls.enable = true;
             nil_ls.enable = true;
-            solargraph = {
-              enable = true;
-              package = pkgs.rubyPackages_3_3.solargraph;
-            };
             tailwindcss.enable = true;
             terraformls.enable = true;
             yamlls.enable = true;
