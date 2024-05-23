@@ -140,6 +140,7 @@
       neofetch
       nix-output-monitor
       nh
+      nvd
       pandoc
       pinentry
       ripgrep
