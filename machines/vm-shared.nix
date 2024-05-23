@@ -138,6 +138,7 @@
       jq
       killall
       neofetch
+      nix-output-monitor
       nh
       pandoc
       pinentry
