@@ -34,7 +34,7 @@
 
   networking = {
     # Define your hostname.
-    hostName = "dev";
+    hostName = currentSystemName;
 
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
     # Per-interface useDHCP will be mandatory in the future, so this generated config
@@ -115,6 +115,8 @@
     ];
   };
 
+  environment.sessionVariables = { FLAKE = "/home/ahacop/nixos-config"; };
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs;
@@ -136,6 +138,7 @@
       jq
       killall
       neofetch
+      nh
       pandoc
       pinentry
       ripgrep
