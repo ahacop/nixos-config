@@ -2,7 +2,7 @@
 NIXADDR ?= unset
 NIXPORT ?= 22
 NIXUSER ?= ahacop
-HDDEV ?= /dev/vda
+HDDEV ?= /dev/nvme0n1
 
 # Get the path to this Makefile and directory
 MAKEFILE_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
@@ -52,9 +52,9 @@ vm/bootstrap0:
 		parted $(HDDEV) -- mkpart ESP fat32 1MB 512MB; \
 		parted $(HDDEV) -- set 3 esp on; \
 		sleep 1; \
-		mkfs.ext4 -L nixos $(HDDEV)1; \
-		mkswap -L swap $(HDDEV)2; \
-		mkfs.fat -F 32 -n boot $(HDDEV)3; \
+		mkfs.ext4 -L nixos $(HDDEV)p1; \
+		mkswap -L swap $(HDDEV)p2; \
+		mkfs.fat -F 32 -n boot $(HDDEV)p3; \
 		sleep 1; \
 		mount /dev/disk/by-label/nixos /mnt; \
 		mkdir -p /mnt/boot; \
