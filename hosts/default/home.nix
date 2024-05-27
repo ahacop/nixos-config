@@ -342,12 +342,6 @@
         prefix-highlight
         sensible
         yank
-        {
-          plugin = power-theme;
-          extraConfig = ''
-            set -g @tmux_power_theme 'default'
-          '';
-        }
       ];
 
       extraConfig = ''
