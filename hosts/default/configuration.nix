@@ -10,7 +10,7 @@
 }: {
   stylix = {
     image = config.lib.stylix.pixel "base01";
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/solarized-dark.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-soft.yaml";
 
     cursor = {
       size = 64;
