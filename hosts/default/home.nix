@@ -196,7 +196,8 @@
         cursor = {style = "Block";};
 
         window = {
-          opacity = 1.0;
+          decorations = "None";
+          dynamic_title = true;
           padding = {
             x = 24;
             y = 24;
