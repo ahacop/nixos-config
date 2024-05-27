@@ -6,6 +6,175 @@
   ...
 }: {
   programs = {
+    nixvim = {
+      enable = true;
+      defaultEditor = true;
+      viAlias = true;
+      vimAlias = true;
+
+      globals = {mapleader = " ";};
+
+      extraConfigVim = ''
+        cnoremap %% <C-R>=expand('%:h').'/'<cr>
+      '';
+
+      keymaps = [
+        {
+          action.__raw = ''
+            function()
+              -- if there is an active search highlight and we are not in the quickfix
+              local shouldClearHighlight = vim.api.nvim_buf_get_option(0, 'buftype') ~= 'quickfix' and vim.v.hlsearch ~= 0
+
+              if shouldClearHighlight then
+                -- Clear highlight
+                vim.cmd('nohlsearch')
+              else
+                -- Perform the default <CR> action
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<CR>', true, true, true), 'n', true)
+              end
+            end
+          '';
+          key = "<CR>";
+          mode = "n";
+          options = {
+            silent = true;
+            desc = "Clear highlighted search";
+          };
+        }
+        {
+          action = "<cmd>TestFile HEADLESS=0<CR>";
+          key = "<leader>tf";
+          mode = "n";
+          options = {desc = "TestFile";};
+        }
+        {
+          action = "<cmd>TestNearest HEADLESS=0<CR>";
+          key = "<leader>tt";
+          mode = "n";
+          options = {desc = "TestNearest";};
+        }
+        {
+          action = "<cmd>TestSuite HEADLESS=0<CR>";
+          key = "<leader>ts";
+          mode = "n";
+          options = {desc = "TestSuite";};
+        }
+        {
+          action = "<cmd>TestFile HEADLESS=1<CR>";
+          key = "<leader>thf";
+          mode = "n";
+          options = {desc = "TestFile (HEADLESS=1)";};
+        }
+        {
+          action = "<cmd>TestNearest HEADLESS=1<CR>";
+          key = "<leader>tht";
+          mode = "n";
+          options = {desc = "TestNearest HEADLESS=1";};
+        }
+        {
+          action = "<cmd>TestSuite HEADLESS=1<CR>";
+          key = "<leader>ths";
+          mode = "n";
+          options = {desc = "TestSuite HEADLESS=1";};
+        }
+        {
+          action = "<cmd>TestVisit<CR>";
+          key = "<leader>tv";
+          mode = "n";
+          options = {desc = "TestVisit";};
+        }
+      ];
+
+      opts = {
+        autoindent = true;
+        clipboard = "unnamedplus";
+        expandtab = true;
+        ignorecase = true;
+        incsearch = true;
+        number = true;
+        relativenumber = true;
+        shiftwidth = 2;
+        signcolumn = "yes";
+        smartcase = true;
+        spell = true;
+      };
+
+      plugins = {
+        undotree.enable = true;
+        which-key.enable = true;
+        treesitter.enable = true;
+        markdown-preview.enable = true;
+        telescope = {
+          enable = true;
+          keymaps = {
+            "<leader>ff" = {
+              action = "find_files";
+              options = {desc = "Telescope find files";};
+            };
+            "<leader>fg" = {
+              action = "live_grep";
+              options = {desc = "Telescope live_grep";};
+            };
+            "<leader>fb" = {
+              action = "buffers";
+              options = {desc = "Telescope buffers";};
+            };
+            "<leader>fh" = {
+              action = "help_tags";
+              options = {desc = "Telescope help_tags";};
+            };
+            "<leader>fvcw" = {
+              action = "git_commits";
+              options = {desc = "Telescope git_commits";};
+            };
+            "<leader>fvcb" = {
+              action = "git_bcommits";
+              options = {desc = "Telescope git_bcommits";};
+            };
+            "<leader>fvb" = {
+              action = "git_branches";
+              options = {desc = "Telescope git_branches";};
+            };
+            "<leader>fvs" = {
+              action = "git_status";
+              options = {desc = "Telescope git_status";};
+            };
+            "<leader>fvx" = {
+              action = "git_stash";
+              options = {desc = "Telescope git_stash";};
+            };
+          };
+        };
+
+        gitblame.enable = true;
+        fugitive.enable = true;
+        neogit.enable = false;
+        diffview.enable = true;
+        endwise.enable = true;
+        nvim-lightbulb.enable = true;
+        gitsigns.enable = true;
+        auto-session.enable = false;
+        comment.enable = true;
+        lualine.enable = true;
+      };
+
+      autoCmd = [
+        {
+          event = ["FileType"];
+          pattern = ["gitcommit"];
+          callback = {
+            __raw = ''
+              function()
+                vim.opt.colorcolumn = "72"
+              end
+            '';
+          };
+        }
+      ];
+
+      extraPlugins = with pkgs.vimPlugins; [vim-test direnv-vim];
+    };
+
     zoxide = {
       enable = true;
       enableZshIntegration = true;

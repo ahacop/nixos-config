@@ -10,6 +10,11 @@
     };
 
     stylix.url = "github:danth/stylix";
+
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -34,7 +39,12 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              users.ahacop = import ./hosts/default/home.nix;
+              users.ahacop = {
+                imports = [
+                  ./hosts/default/home.nix
+                  inputs.nixvim.homeManagerModules.nixvim
+                ];
+              };
             };
           }
         ];
