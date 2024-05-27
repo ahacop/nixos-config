@@ -202,6 +202,12 @@
         bind-key C-x last-window
       '';
     };
+
+    wezterm = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+
     alacritty = {
       enable = true;
       settings = {
