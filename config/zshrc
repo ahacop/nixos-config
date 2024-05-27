@@ -1,25 +1,10 @@
-# Load vcs_info
-autoload -Uz vcs_info
+if ! ssh-add -l > /dev/null 2>&1; then
+    echo "No SSH identities found. Adding key..."
+    ssh-add
 
-zstyle ':vcs_info:git:*' check-for-changes true
-zstyle ':vcs_info:git:*' unstagedstr 'U'
-zstyle ':vcs_info:git:*' stagedstr 'S'
-zstyle ':vcs_info:git:*' formats '[%b]%a%u%c%m'
-zstyle ':vcs_info:git:*' actionformats '[%b]%a%u%c%m'
-zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
-
-+vi-git-untracked() {
-  if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
-     git status --porcelain | grep -m 1 '^??' &>/dev/null
-  then
-    hook_com[misc]='T'
-  fi
-}
-
-# Customize the prompt
-setopt prompt_subst
-
-# Precommand to update vcs_info
-precmd() { vcs_info }
-
-PROMPT='%1~ %F{blue}${vcs_info_msg_0_}%f %# '
+    if [ $? -eq 0 ]; then
+        echo "SSH key added successfully."
+    else
+        echo "Failed to add SSH key."
+    fi
+fi

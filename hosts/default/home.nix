@@ -48,6 +48,8 @@
         strip = "sed $'s,x1b\\[[0-9;]*[a-zA-Z],,g;s,\r$,,g'";
       };
       initExtra = ''
+        ${builtins.readFile ./../../config/zshrc}
+
         ${builtins.readFile ./../../config/functions}
       '';
     };
