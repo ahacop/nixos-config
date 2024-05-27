@@ -8,6 +8,41 @@
   pkgs,
   ...
 }: {
+  stylix = {
+    image = config.lib.stylix.pixel "base01";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+
+    cursor = {
+      size = 64;
+    };
+
+    fonts = {
+      serif = {
+        package = pkgs.dejavu_fonts;
+        name = "DejaVu Serif";
+      };
+
+      sansSerif = {
+        package = pkgs.dejavu_fonts;
+        name = "DejaVu Sans";
+      };
+
+      monospace = {
+        package = pkgs.intel-one-mono;
+        name = "Intel One Mono";
+      };
+
+      emoji = {
+        package = pkgs.noto-fonts-emoji;
+        name = "Noto Color Emoji";
+      };
+
+      sizes = {
+        terminal = 24;
+      };
+    };
+  };
+
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix

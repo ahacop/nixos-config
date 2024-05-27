@@ -8,6 +8,8 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    stylix.url = "github:danth/stylix";
   };
 
   outputs = {
@@ -25,6 +27,7 @@
           inherit user;
         };
         modules = [
+          inputs.stylix.nixosModules.stylix
           ./hosts/default/configuration.nix
           home-manager.nixosModules.default
           {

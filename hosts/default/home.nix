@@ -167,14 +167,6 @@
             y = 24;
           };
         };
-
-        font = {
-          normal = {
-            family = "MesloLGS NF";
-            style = "Regular";
-          };
-          size = 20;
-        };
       };
     };
 
