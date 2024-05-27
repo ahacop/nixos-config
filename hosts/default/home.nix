@@ -198,8 +198,82 @@
       settings = {
         add_newline = false;
         line_break.disabled = true;
+
+        aws.disabled = true;
+        battery.disabled = true;
+        c.disabled = true;
+        cmake.disabled = true;
+        cobol.disabled = true;
+        conda.disabled = true;
+        crystal.disabled = true;
+        daml.disabled = true;
+        dart.disabled = true;
+        deno.disabled = true;
+        direnv.disabled = true;
+        docker_context.disabled = true;
+        dotnet.disabled = true;
+        elixir.disabled = true;
+        elm.disabled = true;
+        env_var.disabled = true;
+        erlang.disabled = true;
+        fennel.disabled = true;
+        fossil_branch.disabled = true;
+        fossil_metrics.disabled = true;
+        gcloud.disabled = true;
+        gleam.disabled = true;
+        golang.disabled = true;
+        gradle.disabled = true;
+        guix_shell.disabled = true;
+        haskell.disabled = true;
+        haxe.disabled = true;
+        helm.disabled = true;
+        hg_branch.disabled = true;
+        java.disabled = true;
+        jobs.disabled = true;
+        julia.disabled = true;
+        kotlin.disabled = true;
+        kubernetes.disabled = true;
+        localip.disabled = true;
+        lua.disabled = true;
+        memory_usage.disabled = true;
+        meson.disabled = true;
+        nats.disabled = true;
+        nim.disabled = true;
+        nix_shell.disabled = true;
+        nodejs.disabled = true;
+        ocaml.disabled = true;
+        openstack.disabled = true;
+        opa.disabled = true;
+        os.disabled = true;
+        perl.disabled = true;
+        php.disabled = true;
+        pijul_channel.disabled = true;
+        pulumi.disabled = true;
+        purescript.disabled = true;
+        python.disabled = true;
+        quarto.disabled = true;
+        raku.disabled = true;
+        red.disabled = true;
+        rlang.disabled = true;
+        ruby.disabled = true;
+        rust.disabled = true;
+        scala.disabled = true;
+        shlvl.disabled = true;
+        singularity.disabled = true;
+        solidity.disabled = true;
+        spack.disabled = true;
+        sudo.disabled = true;
+        swift.disabled = true;
+        terraform.disabled = true;
+        time.disabled = true;
+        typst.disabled = true;
+        vagrant.disabled = true;
+        vcsh.disabled = true;
+        vlang.disabled = true;
+        zig.disabled = true;
       };
     };
+
     zsh = {
       enable = true;
       defaultKeymap = "emacs";
@@ -361,6 +435,7 @@
 
         bind '"' split-window -v -c "#{pane_current_path}"
         bind % split-window -h -c "#{pane_current_path}"
+        bind-key c new-window -c '#{pane_current_path}'
 
         bind-key C-x last-window
       '';
