@@ -6,6 +6,18 @@
   ...
 }: {
   programs = {
+    zoxide = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+
+    eza = {
+      enable = true;
+      enableZshIntegration = true;
+      icons = true;
+      git = true;
+    };
+
     skim = {
       enable = true;
       enableZshIntegration = true;
