@@ -1,0 +1,250 @@
+#+title: Emacs Configuration
+#+PROPERTY: header-args:emacs-lisp :tangle yes
+
+#+begin_src emacs-lisp
+(use-package gcmh
+  :ensure t
+  :diminish
+  :init (setq gc-cons-threshold (* 80 1024 1024))
+  :hook (emacs-startup . gcmh-mode))
+
+; (use-package on
+;   :ensure t)
+
+(use-package gnutls
+  :defer t
+  :custom
+  (gnutls-verify-error t))
+
+(use-package no-littering
+  :ensure t
+  :init
+  (setq no-littering-etc-directory "~/.cache/emacs/etc/"
+        no-littering-var-directory "~/.cache/emacs/var/")
+  (when (fboundp 'startup-redirect-eln-cache)
+    (startup-redirect-eln-cache
+     (convert-standard-filename
+      (expand-file-name  "eln-cache/" no-littering-var-directory)))))
+
+(use-package diminish :ensure t)
+
+(use-package simple
+  :custom
+  (save-interprogram-paste-before-kill t)
+  (kill-do-not-save-duplicates t))
+
+(use-package bookmark
+  :custom
+  (bookmark-save-flag 1))
+
+(setopt confirm-kill-emacs nil)
+
+(use-package display-line-numbers
+  :custom
+  (display-line-numbers-widen t)
+  :hook
+  ((prog-mode conf-mode) . display-line-numbers-mode))
+
+(use-package hl-line
+  :hook (on-first-buffer . global-hl-line-mode))
+
+(use-package persist-state
+  :ensure t
+  :hook
+  (on-first-input . persist-state-mode))
+
+(setopt create-lockfiles nil)
+
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(fset 'yes-or-no-p 'y-or-n-p) ; y and n instead of yes and no everywhere else
+
+(use-package autorevert
+  :diminish auto-revert-mode
+  :hook (on-first-buffer . global-auto-revert-mode)
+  :custom
+  (global-auto-revert-non-file-buffers t))
+
+  (use-package toc-org
+    :ensure t
+    :after org
+    :hook (org-mode . toc-org-mode))
+
+  (use-package org
+    :pin org
+    :hook (org-mode . auto-fill-mode)
+    :bind (("C-c a" . org-agenda)
+           ("C-c l" . org-store-link)
+           ("C-c c" . org-capture))
+    :config
+    (setq org-directory "~/code/org")
+    (setq org-refile-use-outline-path t)
+    (setq org-outline-path-complete-in-steps nil)
+    (setq org-refile-targets '(("elfeed.org" :maxlevel . 2)
+                               (org-agenda-files :maxlevel . 1)))
+    (setq org-default-notes-file (concat org-directory "/inbox.org"))
+    (setq org-export-html-postamble nil)
+    (setq org-hide-leading-stars t)
+    (setq org-startup-folded (quote overview))
+    (setq org-startup-indented t)
+    (setq org-agenda-start-on-weekday nil)
+    (setq org-agenda-files (list "~/code/org"))
+    (setq org-src-fontify-natively t)
+    (setq org-src-tab-acts-natively t)
+    (setq org-src-window-setup 'current-window)
+    (setq org-log-done 'time)
+    (setq org-capture-templates '(("t" "todo" entry (file+headline "inbox.org" "Inbox")
+                                   "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
+                                  ("p" "Pocket article" entry (file+headline "inbox.org" "Inbox")
+                                   "* TODO Read %a\n%?%U\n" :clock-in t :clock-resume t)
+                                  ("a" "Appointment" entry (file+headline "inbox.org" "Inbox")
+                                   "* APPT %?\nSCHEDULED: %^t\n")
+                                  ("s" "Subscribe")
+                                  ("sr" "RSS feed" entry (file+headline "elfeed.org" "Feeds")
+                                   "* [[%^{Feed URL}][%^{Feed name}]]")
+                                  ("si" "Instagram feed" entry (file+headline "elfeed.org" "Instagram") "* [[http://127.0.0.1:1200/picuki/profile/%^{Instagram Username}][%^{Feed name}]]")
+                                  ("sy" "Youtube user" entry (file+headline "elfeed.org" "Youtube") "* [[https://www.youtube.com/feeds/videos.xml?user=%^{Youtube Username}][%^{Feed name}]]")
+                                  ("sc" "Youtube channel" entry (file+headline "elfeed.org" "Youtube") "* [[https://www.youtube.com/feeds/videos.xml?channel_id=%^{Youtube Channel ID}][%^{Feed name}]]")
+                                  ("g" "german conversation exercise" entry (file "~/code/org/german_conversations.org")
+                                   "* %t\n** Conversation\n*** English\n%?\n*** German\n** Review\n*** Google Translation\n** Notes\n")
+                                  ))
+    )
+
+(use-package ox-hugo
+  :ensure t
+  :after org)
+
+(use-package saveplace
+  :hook (on-first-buffer . save-place-mode))
+
+(use-package rfc-mode
+  :ensure t
+  :defer t)
+
+(use-package envrc
+  :ensure t
+  :hook (on-first-file . envrc-global-mode))
+
+(use-package nov
+  :ensure t
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  (setq nov-text-width 72)
+  )
+
+  (use-package eww
+    :defer t
+    :bind (:map eww-mode-map
+                ("o" . olivetti-mode)
+                ("r" . ah/eww-readable))
+    :init
+    (setq shr-use-colors nil)
+    (setq shr-use-fonts nil)
+    (setq shr-max-image-proportion 0.6)
+    (setq shr-image-animate nil)
+    (setq shr-width nil)
+    (setq shr-discard-aria-hidden t)
+    (setq shr-cookie-policy nil))
+  (menu-bar-mode -1)
+
+(use-package sdcv
+  :ensure t
+  :bind (("C-x t C-d" . sdcv-search-input)
+         ("C-x t d" . sdcv-search-pointer+)))
+
+; (use-package nov-xwidget
+;   :ensure t
+;   :demand t
+;   :after nov
+;   :config
+;   (define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
+;   (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
+
+(use-package nix-mode
+  :ensure t
+  :defer t
+  :hook
+  (nix-mode . subword-mode))
+
+(use-package web-mode
+  :ensure t
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-code-indent-offset 2))
+
+(use-package dumb-jump
+  :ensure t
+  :config
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+  :custom
+  (dumb-jump-force-searcher 'rg))
+
+(use-package eglot :defer t)
+
+(use-package htmlize
+  :ensure t
+  :after ox-html)
+
+(use-package dired
+  :defer
+  :custom
+  (dired-auto-revert-buffer t))
+
+(use-package simple
+  :hook
+  (on-first-buffer . column-number-mode))
+
+(use-package scroll-bar
+  :config
+  (scroll-bar-mode -1))
+
+(use-package tool-bar
+  :config
+  (tool-bar-mode -1))
+
+(use-package mode-line-bell
+  :ensure
+  :hook (on-first-input . mode-line-bell-mode))
+
+(use-package modus-themes
+  :ensure t
+  :config
+  (load-theme 'modus-operandi :no-confirm))
+
+(use-package "startup"
+  :custom
+  (inhibit-startup-screen t)
+  (initial-major-mode 'fundamental-mode)
+  (initial-scratch-message nil))
+
+(setopt use-dialog-box nil)
+
+(use-package pixel-scroll
+  :hook
+  (on-first-buffer . pixel-scroll-precision-mode))
+
+(use-package zoom
+  :ensure t
+  :custom
+  `(zoom-size ,(let ((phi (- (/ (+ 1 (sqrt 5)) 2) 1)))
+                (cons phi phi))))
+
+(use-package which-key
+  :ensure t
+  :hook (on-first-input . which-key-mode)
+  :diminish
+  :custom
+  (which-key-show-early-on-C-h t)
+  (which-key-idle-delay most-positive-fixnum)
+  (which-key-idle-secondary-delay 1e-9))
+
+  (use-package tree-sitter
+    :config
+    (global-tree-sitter-mode)
+    (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+    )
+(use-package all-the-icons)
+(setq display-time-format "%l:%M %p %b %y"
+    display-time-default-load-average nil)
+(use-package org-bullets
+ :after (org-mode)
+ :hook org-mode)
+#+end_src
