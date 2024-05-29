@@ -1,12 +1,18 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-{ config, lib, inputs, pkgs, ... }: {
+{
+  config,
+  lib,
+  inputs,
+  pkgs,
+  ...
+}: {
   stylix = {
     image = config.lib.stylix.pixel "base01";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-soft.yaml";
 
-    cursor = { size = 64; };
+    cursor = {size = 64;};
 
     fonts = {
       serif = {
@@ -29,7 +35,7 @@
         name = "Noto Color Emoji";
       };
 
-      sizes = { terminal = 24; };
+      sizes = {terminal = 24;};
     };
   };
 
@@ -46,7 +52,7 @@
   users.users.ahacop = {
     isNormalUser = true;
     home = "/home/ahacop";
-    extraGroups = [ "docker" "wheel" ];
+    extraGroups = ["docker" "wheel"];
     shell = pkgs.zsh;
     initialPassword = "password";
     openssh.authorizedKeys.keys = [
@@ -78,7 +84,7 @@
     '';
 
     settings = {
-      substituters = [ "https://nix-community.cachix.org" ];
+      substituters = ["https://nix-community.cachix.org"];
       trusted-public-keys = [
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       ];
@@ -120,7 +126,7 @@
   # };
 
   # Enable the X11 windowing system.
-  i18n = { defaultLocale = "en_US.UTF-8"; };
+  i18n = {defaultLocale = "en_US.UTF-8";};
   services = {
     # setup windowing environment
     displayManager.defaultSession = "none+i3";
@@ -139,7 +145,7 @@
         '';
       };
 
-      windowManager.i3 = { enable = true; };
+      windowManager.i3 = {enable = true;};
     };
 
     # Enable the OpenSSH daemon.
@@ -154,7 +160,7 @@
   users.mutableUsers = true;
 
   fonts = {
-    fontconfig.defaultFonts.monospace = [ "Intel One Mono" ];
+    fontconfig.defaultFonts.monospace = ["Intel One Mono"];
     fontDir.enable = true;
     enableGhostscriptFonts = true;
 
@@ -175,7 +181,7 @@
   };
 
   environment = {
-    sessionVariables = { FLAKE = "/home/ahacop/nixos-config"; };
+    sessionVariables = {FLAKE = "/home/ahacop/nixos-config";};
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget
@@ -294,20 +300,20 @@
 
   programs = {
     zsh.enable = true;
-    ssh = { startAgent = true; };
+    ssh = {startAgent = true;};
   };
 
   # Setup qemu so we can run x86_64 binaries
-  boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
+  boot.binfmt.emulatedSystems = ["x86_64-linux"];
 
   # Disable the default module and import our override. We have
   # customizations to make this work on aarch64.
-  disabledModules = [ "virtualisation/vmware-guest.nix" ];
+  disabledModules = ["virtualisation/vmware-guest.nix"];
 
   # Interface is this on M1
   networking.interfaces.ens160.useDHCP = true;
   nixpkgs = {
-    overlays = [ inputs.emacs-overlay.overlays.default ];
+    overlays = [inputs.emacs-overlay.overlays.default];
     config = {
       # Lots of stuff that uses aarch64 that claims doesn't work, but actually works.
       allowUnfree = true;

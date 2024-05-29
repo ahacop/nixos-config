@@ -7,10 +7,46 @@
 }: {
   programs = {
     nixvim = {
+      extraConfigLua = ''
+        local util = require 'lspconfig.util'
+
+        require'lspconfig'.ruby_lsp.setup{
+          cmd = { 'bundle', 'exec', 'ruby-lsp' },
+          filetypes = { 'ruby' },
+          root_dir = util.root_pattern('Gemfile', '.git'),
+          init_options = {
+            formatter = 'auto',
+          },
+          single_file_support = true,
+        }
+
+        -- local _border = "rounded"
+
+        -- vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+        --   vim.lsp.handlers.hover, {
+        --     border = _border
+        --   }
+        -- )
+
+        -- vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
+        --   vim.lsp.handlers.signature_help, {
+        --     border = _border
+        --   }
+        -- )
+
+        -- vim.diagnostic.config{
+        --   float={border=_border}
+        -- };
+
+        -- require('lspconfig.ui.windows').default_options = {
+        --   border = _border
+        -- }
+      '';
       enable = true;
       defaultEditor = true;
       viAlias = true;
       vimAlias = true;
+      withRuby = false;
 
       globals = {mapleader = " ";};
 
@@ -83,6 +119,51 @@
           mode = "n";
           options = {desc = "TestVisit";};
         }
+        {
+          mode = ["n" "v"];
+          key = "<leader>gh";
+          action = "gitsigns";
+          options = {
+            silent = true;
+            desc = "+hunks";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>ghb";
+          action = ":Gitsigns blame_line<CR>";
+          options = {
+            silent = true;
+            desc = "Blame line";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>ghd";
+          action = ":Gitsigns diffthis<CR>";
+          options = {
+            silent = true;
+            desc = "Diff This";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>ghR";
+          action = ":Gitsigns reset_buffer<CR>";
+          options = {
+            silent = true;
+            desc = "Reset Buffer";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>ghS";
+          action = ":Gitsigns stage_buffer<CR>";
+          options = {
+            silent = true;
+            desc = "Stage Buffer";
+          };
+        }
       ];
 
       opts = {
@@ -100,9 +181,105 @@
       };
 
       plugins = {
+        cmp = {
+          enable = true;
+          settings = {
+            autoEnableSources = true;
+            # experimental = {ghost_text = true;};
+            performance = {
+              debounce = 60;
+              fetchingTimeout = 200;
+              maxViewEntries = 30;
+            };
+            # formatting = {fields = ["kind" "abbr" "menu"];};
+            window = {
+              completion = {border = "solid";};
+              documentation = {border = "solid";};
+            };
+            sources = [
+              {name = "nvim_lsp";}
+              {name = "buffer";}
+              {name = "path";}
+              {
+                name = "cmdline";
+                option = {
+                  ignore_cmds = [
+                    "Man"
+                    "!"
+                  ];
+                };
+              }
+            ];
+
+            mapping = {
+              "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
+              "<C-j>" = "cmp.mapping.select_next_item()";
+              "<C-k>" = "cmp.mapping.select_prev_item()";
+              "<C-e>" = "cmp.mapping.abort()";
+              "<C-b>" = "cmp.mapping.scroll_docs(-4)";
+              "<C-f>" = "cmp.mapping.scroll_docs(4)";
+              "<C-Space>" = "cmp.mapping.complete()";
+              "<CR>" = "cmp.mapping.confirm({ select = true })";
+              "<S-CR>" = "cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true })";
+            };
+          };
+        };
+        gitlinker = {
+          enable = true;
+          callbacks = {"github.com" = "get_github_type_url";};
+        };
+        lspkind = {
+          enable = false;
+          symbolMap = {Copilot = "";};
+          extraOptions = {
+            maxwidth = 50;
+            ellipsis_char = "...";
+          };
+        };
+        gitsigns = {
+          enable = true;
+          settings = {
+            trouble = true;
+            current_line_blame = false;
+            signs = {
+              add = {text = "│";};
+              change = {text = "│";};
+              delete = {text = "_";};
+              topdelete = {text = "‾";};
+              changedelete = {text = "~";};
+              untracked = {text = "│";};
+            };
+          };
+        };
+        conform-nvim = {
+          enable = true;
+          formatOnSave = {
+            lspFallback = true;
+            timeoutMs = 500;
+          };
+          notifyOnError = true;
+          formattersByFt = {
+            html = [["prettierd" "prettier"]];
+            css = [["prettierd" "prettier"]];
+            javascript = [["prettierd" "prettier"]];
+            lua = ["stylua"];
+            nix = ["alejandra"];
+            markdown = [["prettierd" "prettier"]];
+            yaml = ["yamllint" "yamlfmt"];
+          };
+        };
         undotree.enable = true;
         which-key.enable = true;
-        treesitter.enable = true;
+        treesitter = {
+          enable = true;
+          nixGrammars = true;
+          indent = false;
+        };
+        treesitter-context = {
+          enable = true;
+          settings = {max_lines = 2;};
+        };
+        rainbow-delimiters.enable = true;
         markdown-preview.enable = true;
         telescope = {
           enable = true;
@@ -146,16 +323,97 @@
           };
         };
 
-        gitblame.enable = true;
         fugitive.enable = true;
         neogit.enable = false;
         diffview.enable = true;
         endwise.enable = true;
         nvim-lightbulb.enable = true;
-        gitsigns.enable = true;
         auto-session.enable = false;
         comment.enable = true;
         lualine.enable = true;
+        bufferline.enable = true;
+
+        lsp = {
+          enable = true;
+          servers = {
+            bashls.enable = true;
+            elixirls.enable = true;
+            gleam.enable = true;
+            # gopls.enable = true;
+            # nixd.enable = true;
+            ruff-lsp.enable = true;
+            eslint = {enable = true;};
+            html = {enable = true;};
+            lua-ls = {enable = true;};
+            nil_ls = {enable = true;};
+            marksman = {enable = true;};
+            terraformls = {enable = true;};
+            tsserver = {enable = false;};
+            yamlls = {
+              enable = true;
+            };
+          };
+          keymaps.lspBuf = {
+            "gd" = "definition";
+            "gD" = "references";
+            "gy" = "type_definition";
+            "gi" = "implementation";
+            "K" = "hover";
+          };
+        };
+        lsp-lines = {
+          enable = true;
+          currentLine = true;
+        };
+        rust-tools.enable = true;
+        trouble.enable = true;
+        fidget = {
+          enable = true;
+          progress = {
+            suppressOnInsert = true;
+            ignoreDoneAlready = true;
+            pollRate = 0.5;
+          };
+        };
+
+        git-worktree = {
+          enable = true;
+          enableTelescope = true;
+        };
+
+        lsp-format.enable = true;
+
+        none-ls = {
+          enable = true;
+          enableLspFormat = true;
+          updateInInsert = false;
+          sources = {
+            code_actions = {
+              gitsigns.enable = true;
+              statix.enable = true;
+            };
+            diagnostics = {
+              statix.enable = true;
+              yamllint.enable = true;
+              # golangci_lint.enable = true;
+            };
+            formatting = {
+              alejandra.enable = true;
+              prettier = {
+                enable = true;
+                disableTsServerFormatter = true;
+              };
+              stylua.enable = true;
+              yamlfmt.enable = true;
+              gleam_format.enable = true;
+              # gofmt.enable = true;
+              # goimports.enable = true;
+              markdownlint.enable = true;
+              shellharden.enable = true;
+              shfmt.enable = true;
+            };
+          };
+        };
       };
 
       autoCmd = [
@@ -412,11 +670,7 @@
       enable = true;
       prefix = "C-x";
       mouse = true;
-      plugins = with pkgs.tmuxPlugins; [
-        prefix-highlight
-        sensible
-        yank
-      ];
+      plugins = with pkgs.tmuxPlugins; [prefix-highlight sensible yank];
 
       extraConfig = ''
         # Start windows and panes at 1, not 0
@@ -511,8 +765,6 @@
       tree
       rofi
     ];
-    sessionVariables = {
-      PAGER = "less -FirSwX";
-    };
+    sessionVariables = {PAGER = "less -FirSwX";};
   };
 }
