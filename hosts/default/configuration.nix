@@ -151,40 +151,6 @@
 
       windowManager.i3 = {
         enable = true;
-        configFile = pkgs.writeText "i3-config" ''
-          # Set the terminal emulator
-          set $term alacritty
-
-          # Set mod key to the Windows key
-          set $mod Mod4
-
-          # Launch terminal
-          bindsym $mod+Return exec $term
-
-          # Kill focused window
-          bindsym $mod+Shift+q kill
-
-          # Start dmenu (a program launcher)
-          bindsym $mod+d exec dmenu_run
-
-          # Change focus
-          bindsym $mod+j focus left
-          bindsym $mod+k focus down
-          bindsym $mod+l focus up
-          bindsym $mod+semicolon focus right
-
-          # Move focused window
-          bindsym $mod+Shift+j move left
-          bindsym $mod+Shift+k move down
-          bindsym $mod+Shift+l move up
-          bindsym $mod+Shift+semicolon move right
-
-          # Reload the configuration file
-          bindsym $mod+Shift+c reload
-
-          # Exit i3
-          bindsym $mod+Shift+e exit
-        '';
       };
     };
 
