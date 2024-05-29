@@ -204,10 +204,17 @@
   :ensure
   :hook (on-first-input . mode-line-bell-mode))
 
-(use-package modus-themes
+; (use-package modus-themes
+;   :ensure t
+;   :config
+;   (load-theme 'modus-operandi :no-confirm))
+
+;; Install and configure the Gruvbox theme
+(use-package gruvbox-theme
   :ensure t
   :config
-  (load-theme 'modus-operandi :no-confirm))
+  ;; Load Gruvbox theme
+  (load-theme 'gruvbox-dark-soft t))
 
 (use-package "startup"
   :custom
