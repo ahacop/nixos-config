@@ -7,41 +7,6 @@
 }: {
   programs = {
     nixvim = {
-      extraConfigLua = ''
-        local util = require 'lspconfig.util'
-
-        require'lspconfig'.ruby_lsp.setup{
-          cmd = { 'bundle', 'exec', 'ruby-lsp' },
-          filetypes = { 'ruby' },
-          root_dir = util.root_pattern('Gemfile', '.git'),
-          init_options = {
-            formatter = 'auto',
-          },
-          single_file_support = true,
-        }
-
-        -- local _border = "rounded"
-
-        -- vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
-        --   vim.lsp.handlers.hover, {
-        --     border = _border
-        --   }
-        -- )
-
-        -- vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
-        --   vim.lsp.handlers.signature_help, {
-        --     border = _border
-        --   }
-        -- )
-
-        -- vim.diagnostic.config{
-        --   float={border=_border}
-        -- };
-
-        -- require('lspconfig.ui.windows').default_options = {
-        --   border = _border
-        -- }
-      '';
       enable = true;
       defaultEditor = true;
       viAlias = true;
@@ -342,6 +307,7 @@
             # gopls.enable = true;
             # nixd.enable = true;
             ruff-lsp.enable = true;
+            ruby-lsp.enable = true;
             eslint = {enable = true;};
             html = {enable = true;};
             lua-ls = {enable = true;};
