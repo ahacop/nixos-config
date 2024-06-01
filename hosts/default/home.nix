@@ -301,23 +301,23 @@
         lsp = {
           enable = true;
           servers = {
-            bashls.enable = true;
-            elixirls.enable = true;
-            gleam.enable = true;
             # gopls.enable = true;
             # nixd.enable = true;
-            ruff-lsp.enable = true;
-            ruby-lsp.enable = true;
+            bashls.enable = true;
+            cssls.enable = true;
+            elixirls.enable = true;
             eslint = {enable = true;};
+            gleam.enable = true;
             html = {enable = true;};
             lua-ls = {enable = true;};
-            nil_ls = {enable = true;};
             marksman = {enable = true;};
+            nil_ls = {enable = true;};
+            ruby-lsp.enable = true;
+            ruff-lsp.enable = true;
+            tailwindcss.enable = true;
             terraformls = {enable = true;};
             tsserver = {enable = false;};
-            yamlls = {
-              enable = true;
-            };
+            yamlls = {enable = true;};
           };
           keymaps.lspBuf = {
             "gd" = "definition";
