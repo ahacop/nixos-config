@@ -3,13 +3,9 @@
 
 #+begin_src emacs-lisp
 (use-package gcmh
-  :ensure t
   :diminish
   :init (setq gc-cons-threshold (* 80 1024 1024))
   :hook (emacs-startup . gcmh-mode))
-
-; (use-package on
-;   :ensure t)
 
 (use-package gnutls
   :defer t
@@ -17,7 +13,6 @@
   (gnutls-verify-error t))
 
 (use-package no-littering
-  :ensure t
   :init
   (setq no-littering-etc-directory "~/.cache/emacs/etc/"
         no-littering-var-directory "~/.cache/emacs/var/")
@@ -26,7 +21,7 @@
      (convert-standard-filename
       (expand-file-name  "eln-cache/" no-littering-var-directory)))))
 
-(use-package diminish :ensure t)
+(use-package diminish)
 
 (use-package simple
   :custom
@@ -49,7 +44,6 @@
   :hook (on-first-buffer . global-hl-line-mode))
 
 (use-package persist-state
-  :ensure t
   :hook
   (on-first-input . persist-state-mode))
 
@@ -64,19 +58,17 @@
   :custom
   (global-auto-revert-non-file-buffers t))
 
-  (use-package toc-org
-    :ensure t
-    :after org
-    :hook (org-mode . toc-org-mode))
+(use-package toc-org
+  :after org
+  :hook (org-mode . toc-org-mode))
 
   (use-package org
-    :pin org
     :hook (org-mode . auto-fill-mode)
-    :bind (("C-c a" . org-agenda)
-           ("C-c l" . org-store-link)
-           ("C-c c" . org-capture))
+    ;:bind (("C-c a" . org-agenda)
+    ;       ("C-c l" . org-store-link)
+    ;       ("C-c c" . org-capture))
     :config
-    (setq org-directory "~/code/org")
+    (setq org-directory "/host/org")
     (setq org-refile-use-outline-path t)
     (setq org-outline-path-complete-in-steps nil)
     (setq org-refile-targets '(("elfeed.org" :maxlevel . 2)
@@ -110,25 +102,20 @@
     )
 
 (use-package ox-hugo
-  :ensure t
   :after org)
 
 (use-package saveplace
   :hook (on-first-buffer . save-place-mode))
 
 (use-package rfc-mode
-  :ensure t
   :defer t)
 
-(use-package envrc
-  :ensure t
-  :hook (on-first-file . envrc-global-mode))
+;(use-package envrc
+;  :hook (on-first-file . envrc-global-mode))
 
 (use-package nov
-  :ensure t
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-  (setq nov-text-width 72)
-  )
+  (setq nov-text-width 72))
 
   (use-package eww
     :defer t
@@ -146,32 +133,21 @@
   (menu-bar-mode -1)
 
 (use-package sdcv
-  :ensure t
-  :bind (("C-x t C-d" . sdcv-search-input)
-         ("C-x t d" . sdcv-search-pointer+)))
-
-; (use-package nov-xwidget
-;   :ensure t
-;   :demand t
-;   :after nov
-;   :config
-;   (define-key nov-mode-map (kbd "o") 'nov-xwidget-view)
-;   (add-hook 'nov-mode-hook 'nov-xwidget-inject-all-files))
+  ;:bind (("C-x t C-d" . sdcv-search-input)
+  ;       ("C-x t d" . sdcv-search-pointer+))
+  )
 
 (use-package nix-mode
-  :ensure t
   :defer t
   :hook
   (nix-mode . subword-mode))
 
 (use-package web-mode
-  :ensure t
   :custom
   (web-mode-markup-indent-offset 2)
   (web-mode-code-indent-offset 2))
 
 (use-package dumb-jump
-  :ensure t
   :config
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
   :custom
@@ -180,7 +156,6 @@
 (use-package eglot :defer t)
 
 (use-package htmlize
-  :ensure t
   :after ox-html)
 
 (use-package dired
@@ -201,20 +176,7 @@
   (tool-bar-mode -1))
 
 (use-package mode-line-bell
-  :ensure
   :hook (on-first-input . mode-line-bell-mode))
-
-; (use-package modus-themes
-;   :ensure t
-;   :config
-;   (load-theme 'modus-operandi :no-confirm))
-
-;; Install and configure the Gruvbox theme
-(use-package gruvbox-theme
-  :ensure t
-  :config
-  ;; Load Gruvbox theme
-  (load-theme 'gruvbox-dark-soft t))
 
 (use-package "startup"
   :custom
@@ -229,28 +191,24 @@
   (on-first-buffer . pixel-scroll-precision-mode))
 
 (use-package zoom
-  :ensure t
   :custom
   `(zoom-size ,(let ((phi (- (/ (+ 1 (sqrt 5)) 2) 1)))
                 (cons phi phi))))
 
 (use-package which-key
-  :ensure t
-  :hook (on-first-input . which-key-mode)
-  :diminish
-  :custom
-  (which-key-show-early-on-C-h t)
-  (which-key-idle-delay most-positive-fixnum)
-  (which-key-idle-secondary-delay 1e-9))
+  :init
+  (setq which-key-idle-delay 0.5)                ;; Set the delay before which-key popup appears
+  (setq which-key-popup-type 'minibuffer)        ;; Display which-key in the minibuffer
+  (setq which-key-side-window-location 'right)   ;; Optional: Show side-window on the right
+  (setq which-key-allow-imprecise-window-fit t)  ;; Optional: Show which-key in a larger font
+  :config
+  (which-key-mode))
 
-  (use-package tree-sitter
-    :config
-    (global-tree-sitter-mode)
-    (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
-    )
 (use-package all-the-icons)
+
 (setq display-time-format "%l:%M %p %b %y"
     display-time-default-load-average nil)
+
 (use-package org-bullets
  :after (org-mode)
  :hook org-mode)
