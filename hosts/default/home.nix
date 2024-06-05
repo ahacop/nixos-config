@@ -159,42 +159,6 @@
           options = {desc = "TestVisit";};
         }
         {
-          action = "<cmd>BufferLinePick<CR>";
-          key = "<leader>bp";
-          mode = "n";
-          options = {desc = "BufferLinePick";};
-        }
-        {
-          action = "<cmd>BufferLineCycleNext<CR>";
-          key = "gt";
-          mode = "n";
-          options = {desc = "BufferLineCycleNext";};
-        }
-        {
-          action = "<cmd>BufferLineCyclePrev<CR>";
-          key = "gT";
-          mode = "n";
-          options = {desc = "BufferLineCyclePrev";};
-        }
-        {
-          action = "<cmd>BufferLineCycleNext<CR>";
-          key = "<leader>bf";
-          mode = "n";
-          options = {desc = "BufferLineCycleNext";};
-        }
-        {
-          action = "<cmd>BufferLineCyclePrev<CR>";
-          key = "<leader>bb";
-          mode = "n";
-          options = {desc = "BufferLineCyclePrev";};
-        }
-        {
-          action = "<cmd>BufferLineCloseOthers<CR>";
-          key = "<leader>bco";
-          mode = "n";
-          options = {desc = "BufferLineCloseOthers";};
-        }
-        {
           mode = ["n" "v"];
           key = "<leader>gh";
           action = "gitsigns";
@@ -406,10 +370,6 @@
         auto-session.enable = false;
         comment.enable = true;
         lualine.enable = true;
-        bufferline = {
-          enable = true;
-          diagnostics = "nvim_lsp";
-        };
 
         lsp = {
           enable = true;
