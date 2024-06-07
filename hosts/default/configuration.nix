@@ -80,6 +80,10 @@
     base0E = "aa5500";
     base0F = "aa5500";
   };
+  ibmVGA = {
+    package = pkgs.ultimate-oldschool-pc-font-pack;
+    name = "PxPlus IBM VGA 9x14";
+  };
 in {
   stylix = {
     image = config.lib.stylix.pixel "base01";
@@ -243,13 +247,15 @@ in {
       fira-code
       font-awesome
       ibm-plex
-      intel-one-mono
       inconsolata
+      intel-one-mono
       jetbrains-mono
       joypixels
+      meslo-lgs-nf
       noto-fonts
       noto-fonts-emoji
-      meslo-lgs-nf
+      terminus-nerdfont
+      ultimate-oldschool-pc-font-pack
     ];
   };
 
