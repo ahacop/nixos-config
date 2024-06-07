@@ -237,7 +237,6 @@ in {
   users.mutableUsers = true;
 
   fonts = {
-    fontconfig.defaultFonts.monospace = ["Intel One Mono"];
     fontDir.enable = true;
     enableGhostscriptFonts = true;
 
