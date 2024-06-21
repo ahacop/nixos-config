@@ -86,6 +86,7 @@
   };
 in {
   stylix = {
+    enable = true;
     image = config.lib.stylix.pixel "base00";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-soft.yaml";
 
