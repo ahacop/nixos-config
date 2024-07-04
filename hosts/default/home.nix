@@ -87,6 +87,8 @@
       vimAlias = true;
       withRuby = false;
 
+      diagnostics.virtual_lines.only_current_line = true;
+
       globals = {mapleader = " ";};
 
       extraConfigVim = ''
@@ -402,7 +404,6 @@
         };
         lsp-lines = {
           enable = true;
-          currentLine = true;
         };
         rust-tools.enable = true;
         trouble.enable = true;
@@ -425,7 +426,7 @@
         none-ls = {
           enable = true;
           enableLspFormat = true;
-          updateInInsert = false;
+          settings.update_in_insert = false;
           sources = {
             code_actions = {
               gitsigns.enable = true;
