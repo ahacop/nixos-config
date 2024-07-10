@@ -793,6 +793,7 @@
       asciinema
       awscli2
       bat
+      devenv
       fd
       firefox
       fzf
