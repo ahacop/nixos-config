@@ -387,7 +387,10 @@
             lua-ls = {enable = true;};
             marksman = {enable = true;};
             nil-ls = {enable = true;};
-            ruby-lsp.enable = true;
+            ruby-lsp = {
+              enable = true;
+              package = pkgs.rubyPackages_3_3.ruby-lsp;
+            };
             ruff-lsp.enable = true;
             tailwindcss.enable = true;
             terraformls = {enable = true;};
