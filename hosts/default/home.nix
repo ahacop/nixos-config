@@ -389,7 +389,7 @@
             nil-ls = {enable = true;};
             ruby-lsp = {
               enable = true;
-              package = pkgs.rubyPackages_3_3.ruby-lsp;
+              package = null;
             };
             ruff-lsp.enable = true;
             tailwindcss.enable = true;
