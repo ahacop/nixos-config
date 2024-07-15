@@ -315,6 +315,7 @@
           enable = true;
           nixGrammars = true;
           settings.indent.enable = false;
+          folding = false;
         };
         treesitter-context = {
           enable = true;
