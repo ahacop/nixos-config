@@ -594,8 +594,7 @@
         gst = "git status";
         gv = "open_modified_and_untracked_in_vim";
         gvh = "open_changed_from_head_in_vim";
-        gvm = "vi -p $(git diff main --name-only)";
-        gvv = "vi -p $(git diff main --name-only)";
+        gvv = "edit_diff_files_in_vim";
         ls = "ls -GF";
         pbcopy = "xclip";
         pbpaste = "xclip -o";

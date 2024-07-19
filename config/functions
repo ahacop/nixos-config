@@ -129,3 +129,13 @@ reencode_pdf() {
 remove_gb_wm() {
   convert -gravity SouthEast -region 160x35 -morphology dilate disk +noise Uniform "$1" "$2"
 }
+
+function edit_diff_files_in_vim() {
+    [[ -z "$1" ]] && echo "Usage: git_vim_open_commit <commit-sha>" && return 1
+    
+    local files=($(git diff-tree --no-commit-id --name-only -r "$1"))
+    
+    [[ ${#files[@]} -eq 0 ]] && echo "No files found in commit $1" && return 1
+    
+    vim -p "${files[@]}"
+}
