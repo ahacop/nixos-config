@@ -497,7 +497,9 @@
     starship = {
       enable = true;
       enableZshIntegration = true;
+
       settings = {
+        command_timeout = 500;
         add_newline = false;
         line_break.disabled = true;
 
