@@ -57,7 +57,6 @@ bindsym $mod+d split h
 bindsym $mod+Shift+d split v
 
 bindsym $mod+n exec emacs
-bindsym $mod+f exec firefox
 
 # kill focused window
 bindsym $mod+w kill
