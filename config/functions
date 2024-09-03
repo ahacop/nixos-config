@@ -112,13 +112,34 @@ open_changed_from_head_in_vim() {
   nvim -p $(changed_from_head)
 }
 
-# Switch projects
 p() {
-  proj=$(find ~/code -maxdepth 2 \( -type l -o -type d \) -not -name ".*" | sk)
-  if [[ -n $proj ]]; then
-    cd "$proj"
-  fi
+  local base_dir=${1:-~/code}
+  base_dir=$(realpath "$base_dir")  # Ensure we have the full path
+  local proj
+
+  echo $base_dir
+  while true; do
+    proj=$(find "$base_dir" -maxdepth 2 \( -type l -o -type d \) |
+           sed "s|^$base_dir/||" |
+           sk |
+           sed "s|^|$base_dir/|")
+    if [ -n "$proj" ]; then
+      cd "$proj"
+      break
+    fi
+  done
 }
+
+# Tab completion function remains the same
+_p_completion() {
+  local base_dir=${1:-~/code}
+  local projects
+  projects=($(find "$base_dir" -maxdepth 2 \( -type l -o -type d \) | sed "s|^$base_dir/||"))
+  _describe 'projects' projects
+}
+
+# Register the completion function
+compdef _p_completion p
 
 # Re-encode PDF
 reencode_pdf() {
