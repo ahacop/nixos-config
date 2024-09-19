@@ -294,19 +294,21 @@
         };
         conform-nvim = {
           enable = true;
-          formatOnSave = {
-            lspFallback = true;
-            timeoutMs = 500;
-          };
-          notifyOnError = true;
-          formattersByFt = {
-            html = [["prettierd" "prettier"]];
-            css = [["prettierd" "prettier"]];
-            javascript = [["prettierd" "prettier"]];
-            lua = ["stylua"];
-            nix = ["alejandra"];
-            markdown = [["prettierd" "prettier"]];
-            yaml = ["yamllint" "yamlfmt"];
+          settings = {
+            format_on_save = {
+              lsp_format = "fallback";
+              timeout_ms = 500;
+            };
+            notify_on_error = true;
+            formatters_by_ft = {
+              html = [["prettierd" "prettier"]];
+              css = [["prettierd" "prettier"]];
+              javascript = [["prettierd" "prettier"]];
+              lua = ["stylua"];
+              nix = ["alejandra"];
+              markdown = [["prettierd" "prettier"]];
+              yaml = ["yamllint" "yamlfmt"];
+            };
           };
         };
         undotree.enable = true;
