@@ -791,6 +791,9 @@
     file = {
       ".githelpers".source = ./../../config/githelpers;
       ".ssh/config".source = ./../../config/sshconfig;
+      ".tigrc".text = ''
+        bind generic Y !sh -c 'commit=%(commit); echo $commit | /run/current-system/sw/bin/xclip -selection clipboard & echo $commit | /run/current-system/sw/bin/tmux load-buffer -'
+      '';
     };
 
     stateVersion = "24.05";
