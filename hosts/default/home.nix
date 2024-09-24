@@ -222,6 +222,7 @@
       };
 
       plugins = {
+        web-devicons.enable = true;
         cmp = {
           enable = true;
           settings = {
