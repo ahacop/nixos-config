@@ -294,7 +294,7 @@
           };
         };
         conform-nvim = {
-          enable = true;
+          enable = false;
           settings = {
             format_on_save = {
               lsp_format = "fallback";
