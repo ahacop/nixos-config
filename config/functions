@@ -1,3 +1,30 @@
+function git_pick_from_log() {
+  # Check if the number of commits is provided
+  if [ -z "$1" ]; then
+    echo "Usage: git_pick_from_log <number_of_commits> [branch]"
+    return 1
+  fi
+
+  local num_commits="$1"
+  local branch="${2:-HEAD}"
+  local temp_file=$(mktemp)
+
+  # Get the git log for the specified number of commits from the branch and write it to the temp file
+  git log --oneline -n "$num_commits" "$branch" > "$temp_file"
+
+  # Open the log in the user's default editor for them to edit
+  ${EDITOR:-vi} "$temp_file"
+
+  # After the user saves and exits, extract the SHAs
+  local shas=$(awk '{print $1}' "$temp_file" | tac | tr '\n' ' ' | sed 's/ $//')
+
+  # Remove the temporary file
+  rm "$temp_file"
+
+  # Output the SHAs in a single line, ready for cherry-pick
+  echo "$shas"
+}
+
 # Use Git’s colored diff when available
 if (( $+commands[git] )); then
   diff() {
