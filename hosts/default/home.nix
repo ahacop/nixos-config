@@ -477,7 +477,16 @@
         }
       ];
 
-      extraPlugins = with pkgs.vimPlugins; [vim-test direnv-vim];
+      extraPlugins = with pkgs.vimPlugins; [
+        (pkgs.fetchFromGitHub {
+          owner = "CrystalDime";
+          repo = "epub.nvim";
+          rev = "main";
+          sha256 = "16w8j16wkdqp9x05krqyvkmmiga0mkj5v1yf5s3kvzj58kw1xaiv";
+        })
+        vim-test
+        direnv-vim
+      ];
     };
 
     zoxide = {
