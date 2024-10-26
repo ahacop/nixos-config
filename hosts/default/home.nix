@@ -811,11 +811,11 @@
       htop
       jq
       ripgrep
+      rofi
       silicon
       tig
       tldr
       tree
-      rofi
     ];
     sessionVariables = {PAGER = "less -FirSwX";};
   };
