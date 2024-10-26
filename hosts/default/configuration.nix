@@ -296,7 +296,7 @@ in {
       pandoc
       pinentry
       ripgrep
-      rxvt_unicode
+      rxvt-unicode-unwrapped
       sqlite
       tmux
       unrar
