@@ -805,6 +805,7 @@
       awscli2
       bat
       devenv
+      duckdb
       fd
       firefox
       fzf
