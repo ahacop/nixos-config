@@ -388,17 +388,17 @@
             eslint = {enable = true;};
             gleam.enable = true;
             html = {enable = true;};
-            lua-ls = {enable = true;};
+            lua_ls = {enable = true;};
             marksman = {enable = true;};
-            nil-ls = {enable = true;};
-            ruby-lsp = {
+            nil_ls = {enable = true;};
+            ruby_lsp = {
               enable = true;
               package = null;
             };
-            ruff-lsp.enable = true;
+            ruff_lsp.enable = true;
             tailwindcss.enable = true;
             terraformls = {enable = true;};
-            tsserver = {enable = false;};
+            ts_ls = {enable = false;};
             yamlls = {enable = true;};
           };
           keymaps.lspBuf = {
