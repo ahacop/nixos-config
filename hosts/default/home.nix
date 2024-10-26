@@ -412,7 +412,7 @@
         lsp-lines = {
           enable = true;
         };
-        rust-tools.enable = true;
+        rustaceanvim.enable = true;
         trouble.enable = true;
         fidget = {
           enable = true;
