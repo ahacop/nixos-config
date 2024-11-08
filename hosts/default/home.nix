@@ -800,7 +800,7 @@
     stateVersion = "24.05";
 
     packages = with pkgs; [
-      _1password
+      _1password-cli
       asciinema
       awscli2
       bat
