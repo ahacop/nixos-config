@@ -395,7 +395,6 @@
               enable = true;
               package = null;
             };
-            ruff_lsp.enable = true;
             tailwindcss.enable = true;
             terraformls = {enable = true;};
             ts_ls = {enable = false;};
