@@ -254,7 +254,7 @@ in {
       meslo-lgs-nf
       noto-fonts
       noto-fonts-emoji
-      terminus-nerdfont
+      nerd-fonts.terminess-ttf
       ultimate-oldschool-pc-font-pack
     ];
   };
