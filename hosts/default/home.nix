@@ -701,7 +701,7 @@
 
     git = {
       enable = true;
-      difftastic = {enable = true;};
+      difftastic = {enable = false;};
       userName = "Ara Hacopian";
       userEmail = "ara@hacopian.de";
       lfs.enable = true;
