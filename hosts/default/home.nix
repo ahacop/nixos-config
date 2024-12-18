@@ -205,6 +205,12 @@
             desc = "Stage Buffer";
           };
         }
+        {
+          action = "<cmd>DBUI<CR>";
+          key = "<leader>db";
+          mode = "n";
+          options = {desc = "Run DadBod";};
+        }
       ];
 
       opts = {
@@ -222,9 +228,20 @@
       };
 
       plugins = {
+        vim-dadbod.enable = true;
+        vim-dadbod-completion.enable = true;
+        vim-dadbod-ui.enable = true;
         web-devicons.enable = true;
         cmp = {
           enable = true;
+          filetype = {
+            sql = {
+              sources = [
+                {name = "vim-dadbod-completion";}
+                {name = "buffer";}
+              ];
+            };
+          };
           settings = {
             autoEnableSources = true;
             # experimental = {ghost_text = true;};
