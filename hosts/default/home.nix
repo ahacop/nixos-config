@@ -462,7 +462,25 @@
         };
       };
 
+      autoGroups = {
+        custom_term_open = {
+          clear = true;
+        };
+      };
+
       autoCmd = [
+        {
+          event = ["TermOpen"];
+          group = "custom_term_open";
+          callback = {
+            __raw = ''
+              function()
+                vim.opt.number = false
+                vim.opt.relativenumber = false
+              end
+            '';
+          };
+        }
         {
           event = ["FileType"];
           pattern = ["gitcommit"];
