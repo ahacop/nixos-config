@@ -493,6 +493,7 @@
             diagnostics = {
               statix.enable = true;
               yamllint.enable = true;
+              hadolint.enable = true;
               # golangci_lint.enable = true;
             };
             formatting = {
