@@ -860,6 +860,7 @@
     homeDirectory = "/home/ahacop";
 
     file = {
+      ".config/aider-chat/config.yaml".source = ./../../config/aider-chat-config.yaml;
       ".githelpers".source = ./../../config/githelpers;
       ".ssh/config".source = ./../../config/sshconfig;
       ".tigrc".text = ''
