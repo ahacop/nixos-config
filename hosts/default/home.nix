@@ -547,7 +547,7 @@
         }
       ];
 
-      extraPlugins = with pkgs.vimPlugins; [vim-test direnv-vim];
+      extraPlugins = with pkgs.vimPlugins; [vim-test direnv-vim aider-nvim];
     };
 
     zoxide = {
@@ -871,6 +871,7 @@
 
     packages = with pkgs; [
       _1password-cli
+      aider-chat
       asciinema
       awscli2
       bat
