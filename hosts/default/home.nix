@@ -684,6 +684,7 @@
         gv = "open_modified_and_untracked_in_vim";
         gvh = "open_changed_from_head_in_vim";
         gvv = "edit_diff_files_in_vim";
+        i3b = "list-i3-keybindings | fzf";
         ls = "ls -GF";
         pbcopy = "xclip";
         pbpaste = "xclip -o";
