@@ -5,6 +5,8 @@
   pkgs,
   ...
 }: {
+  stylix.targets.ghostty.enable = false;
+
   programs = {
     emacs = {
       enable = true;
@@ -77,6 +79,16 @@
         #     patches = [./weechat-el.patch];
         #   });
         # };
+      };
+    };
+
+    ghostty = {
+      enable = true;
+      enableZshIntegration = true;
+      settings = {
+        font-family = "Intel One Mono";
+        font-size = 24;
+        theme = "GruvboxDark";
       };
     };
 
