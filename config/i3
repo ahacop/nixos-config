@@ -53,10 +53,9 @@ bindsym $mod+o exec rofi -show run
 # start a terminal
 set $term ghostty
 bindsym $mod+Return exec $term
-bindsym $mod+d split h
-bindsym $mod+Shift+d split v
 
 bindsym $mod+n exec emacs
+bindsym $mod+Shift+f exec /etc/profiles/per-user/ahacop/bin/firefox
 
 # kill focused window
 bindsym $mod+w kill
@@ -74,7 +73,7 @@ bindsym $mod+Shift+k move up
 bindsym $mod+Shift+l move right
 
 # enter fullscreen mode for the focused container
-bindsym $mod+Shift+f fullscreen toggle
+bindsym $mod+Shift+g fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
 bindsym $mod+Shift+s layout stacking
