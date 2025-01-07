@@ -831,22 +831,6 @@
       enableZshIntegration = true;
     };
 
-    alacritty = {
-      enable = true;
-      settings = {
-        cursor = {style = "Block";};
-
-        window = {
-          decorations = "None";
-          dynamic_title = true;
-          padding = {
-            x = 24;
-            y = 24;
-          };
-        };
-      };
-    };
-
     i3status = {
       enable = true;
 
