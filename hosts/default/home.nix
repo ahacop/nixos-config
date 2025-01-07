@@ -86,6 +86,7 @@
       enable = true;
       enableZshIntegration = true;
       settings = {
+        cursor-style = "block";
         font-family = "Intel One Mono";
         font-size = 24;
         theme = "GruvboxDark";
