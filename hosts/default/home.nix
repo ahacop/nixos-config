@@ -358,25 +358,6 @@
             };
           };
         };
-        conform-nvim = {
-          enable = false;
-          settings = {
-            format_on_save = {
-              lsp_format = "fallback";
-              timeout_ms = 500;
-            };
-            notify_on_error = true;
-            formatters_by_ft = {
-              html = [["prettierd" "prettier"]];
-              css = [["prettierd" "prettier"]];
-              javascript = [["prettierd" "prettier"]];
-              lua = ["stylua"];
-              nix = ["alejandra"];
-              markdown = [["prettierd" "prettier"]];
-              yaml = ["yamllint" "yamlfmt"];
-            };
-          };
-        };
         undotree.enable = true;
         which-key.enable = true;
         treesitter = {
@@ -515,9 +496,13 @@
               prettier = {
                 enable = true;
                 disableTsServerFormatter = true;
+                settings = {
+                  extra_filetypes = ["yaml"];
+                };
               };
+              erb_format.enable = true;
+              pg_format.enable = true;
               stylua.enable = true;
-              yamlfmt.enable = true;
               gleam_format.enable = true;
               # gofmt.enable = true;
               # goimports.enable = true;
