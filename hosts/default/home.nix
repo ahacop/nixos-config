@@ -656,6 +656,7 @@
       enableCompletion = true;
       autosuggestion.enable = true;
       shellAliases = {
+        bc = "bin/rails c";
         be = "bundle exec";
         clean-boot-generations = "sudo /run/current-system/bin/switch-to-configuration boot";
         ga = "git aa";
