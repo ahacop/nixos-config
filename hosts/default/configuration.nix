@@ -250,7 +250,6 @@ in {
       inconsolata
       intel-one-mono
       jetbrains-mono
-      joypixels
       meslo-lgs-nf
       noto-fonts
       noto-fonts-emoji
@@ -298,7 +297,6 @@ in {
       rxvt-unicode-unwrapped
       sqlite
       tmux
-      unrar
       unzip
       wget
       xclip
@@ -337,16 +335,6 @@ in {
 
   # Interface is this on M1
   networking.interfaces.ens160.useDHCP = true;
-
-  nixpkgs = {
-    overlays = [inputs.emacs-overlay.overlays.default];
-    config = {
-      # Lots of stuff that uses aarch64 that claims doesn't work, but actually works.
-      allowUnfree = true;
-      allowUnsupportedSystem = true;
-      joypixels.acceptLicense = true;
-    };
-  };
 
   # This works through our custom module imported above
   virtualisation.vmware.guest.enable = true;
