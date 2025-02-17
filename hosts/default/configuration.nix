@@ -288,6 +288,7 @@ in {
       man-pages-posix
       neofetch
       neovim
+      nb
       nh
       nix-output-monitor
       nvd
