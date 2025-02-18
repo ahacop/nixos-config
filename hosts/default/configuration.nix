@@ -299,6 +299,7 @@ in {
       sqlite
       tmux
       unzip
+      w3m
       wget
       xclip
       xorg.xev
