@@ -296,6 +296,7 @@ in {
       pinentry
       ripgrep
       rxvt-unicode-unwrapped
+      socat # used by nb
       sqlite
       tmux
       unzip
