@@ -258,6 +258,7 @@ in {
     ];
   };
 
+  nixpkgs.config.allowUnfree = true;
   environment = {
     sessionVariables = {FLAKE = "/home/ahacop/nixos-config";};
 
@@ -268,6 +269,7 @@ in {
       aspellDicts.en
       bat
       cachix
+      code-cursor
       coreutils
       dmenu
       fd
