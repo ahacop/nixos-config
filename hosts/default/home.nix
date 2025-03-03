@@ -284,6 +284,7 @@
             };
           };
         };
+        indent-blankline.enable = true;
         undotree.enable = true;
         which-key.enable = true;
         treesitter = {
