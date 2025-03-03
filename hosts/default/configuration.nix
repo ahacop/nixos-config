@@ -269,6 +269,7 @@ in {
       aspellDicts.en
       bat
       cachix
+      claude-code
       code-cursor
       coreutils
       dmenu
