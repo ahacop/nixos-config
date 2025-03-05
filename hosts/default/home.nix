@@ -427,7 +427,6 @@
                   extra_filetypes = ["yaml"];
                 };
               };
-              erb_format.enable = true;
               pg_format.enable = true;
               stylua.enable = true;
               gleam_format.enable = true;
