@@ -265,6 +265,7 @@ in {
     # List packages installed in system profile. To search, run:
     # $ nix search wget
     systemPackages = with pkgs; [
+      _1password-cli
       aspell
       aspellDicts.en
       bat
