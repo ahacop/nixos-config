@@ -356,7 +356,19 @@
             # gopls.enable = true;
             # nixd.enable = true;
             bashls.enable = true;
-            cssls.enable = true;
+            cssls = {
+              enable = false;
+              extraOptions = {
+                on_attach = {
+                  # disable formatting
+                  __raw = ''
+                    function(client, bufnr)
+                      client.server_capabilities.documentFormattingProvider = false
+                    end
+                  '';
+                };
+              };
+            };
             elixirls.enable = true;
             eslint = {enable = true;};
             gleam.enable = true;
@@ -424,7 +436,7 @@
                 enable = true;
                 disableTsServerFormatter = true;
                 settings = {
-                  extra_filetypes = ["yaml"];
+                  extra_filetypes = ["yaml" "css"];
                 };
               };
               pg_format.enable = true;
