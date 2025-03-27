@@ -8,6 +8,11 @@
   stylix.targets.ghostty.enable = false;
 
   programs = {
+    yazi = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+
     ghostty = {
       enable = true;
       enableZshIntegration = true;
