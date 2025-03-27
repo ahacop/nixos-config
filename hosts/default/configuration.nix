@@ -90,8 +90,6 @@ in {
     image = config.lib.stylix.pixel "base00";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-soft.yaml";
 
-    cursor = {size = 64;};
-
     fonts = {
       serif = {
         package = pkgs.dejavu_fonts;
