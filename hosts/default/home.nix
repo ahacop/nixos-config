@@ -803,9 +803,11 @@
       asciinema
       awscli2
       bat
+      codex
       devenv
       duckdb
       fd
+      files-to-prompt
       firefox
       fzf
       htop
