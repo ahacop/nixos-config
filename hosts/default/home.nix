@@ -791,6 +791,8 @@
     file = {
       ".githelpers".source = ./../../config/githelpers;
       ".ssh/config".source = ./../../config/sshconfig;
+      ".local/flake-dev-envs/ruby/flake.nix".source = ./../../devflakes/ruby/flake.nix;
+      ".local/flake-dev-envs/ruby/flake.lock".source = ./../../devflakes/ruby/flake.lock;
       ".tigrc".text = ''
         bind generic Y !sh -c 'commit=%(commit); echo $commit | /run/current-system/sw/bin/xclip -selection clipboard & echo $commit | /run/current-system/sw/bin/tmux load-buffer -'
       '';
