@@ -489,7 +489,7 @@
         }
       ];
 
-      extraPlugins = with pkgs.vimPlugins; [vim-test direnv-vim aider-nvim];
+      extraPlugins = with pkgs.vimPlugins; [vim-test direnv-vim];
     };
 
     zoxide = {
@@ -788,7 +788,6 @@
     homeDirectory = "/home/ahacop";
 
     file = {
-      ".config/aider-chat/config.yaml".source = ./../../config/aider-chat-config.yaml;
       ".githelpers".source = ./../../config/githelpers;
       ".ssh/config".source = ./../../config/sshconfig;
       ".tigrc".text = ''
@@ -799,7 +798,6 @@
     stateVersion = "24.05";
 
     packages = with pkgs; [
-      aider-chat
       asciinema
       awscli2
       bat
