@@ -647,6 +647,7 @@
     git = {
       enable = true;
       difftastic = {enable = false;};
+      ignores = [".envrc" ".direnv/"];
       userName = "Ara Hacopian";
       userEmail = "ara@hacopian.de";
       lfs.enable = true;
