@@ -622,7 +622,7 @@
         showtodos = "git grep -l TODO | xargs -n1 git blame --show-email -f | grep TODO  | sed -E 's/[[:blank:]]+/ /g' | sort -k 4";
         strip = "sed $'s,x1b\\[[0-9;]*[a-zA-Z],,g;s,\r$,,g'";
       };
-      initExtra = ''
+      initContent = ''
         ${builtins.readFile ./../../config/zshrc}
 
         ${builtins.readFile ./../../config/functions}
