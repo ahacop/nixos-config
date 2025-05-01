@@ -270,6 +270,7 @@ in {
       cachix
       claude-code
       code-cursor
+      codex
       coreutils
       dmenu
       fd
