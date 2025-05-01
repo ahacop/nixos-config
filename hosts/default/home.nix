@@ -31,7 +31,11 @@
       vimAlias = true;
       withRuby = false;
 
-      diagnostics.virtual_lines.only_current_line = true;
+      diagnostic = {
+        settings = {
+          virtual_lines.only_current_line = true;
+        };
+      };
 
       globals = {mapleader = " ";};
 
