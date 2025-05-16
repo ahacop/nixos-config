@@ -811,6 +811,7 @@
       codex
       devenv
       duckdb
+      dysk
       fd
       files-to-prompt
       firefox
