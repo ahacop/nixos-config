@@ -269,7 +269,6 @@ in {
       bat
       cachix
       claude-code
-      code-cursor
       codex
       coreutils
       dmenu
