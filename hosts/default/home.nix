@@ -405,6 +405,7 @@
         lsp-lines = {
           enable = true;
         };
+        vim-test.enable = true;
         rustaceanvim.enable = true;
         trouble.enable = true;
         fidget = {
@@ -493,7 +494,7 @@
         }
       ];
 
-      extraPlugins = with pkgs.vimPlugins; [vim-test direnv-vim];
+      extraPlugins = with pkgs.vimPlugins; [direnv-vim];
     };
 
     zoxide = {
