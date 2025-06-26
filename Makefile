@@ -24,6 +24,11 @@ clean:
 optimize:
 	nix-store --optimize
 
+check-kernel:
+	@echo "Current kernel: $$(uname -r)"
+	@echo "Latest nixpkgs kernel: $$(nix eval --raw nixpkgs#linuxPackages_latest.kernel.version)"
+	@echo "Pinned 6.15.2 kernel: $$(nix eval --raw .#nixosConfigurations.${NIXNAME}.config.boot.kernelPackages.kernel.version)"
+
 switch:
 ifeq ($(UNAME), Darwin)
 	nix build --extra-experimental-features nix-command --extra-experimental-features flakes ".#darwinConfigurations.${NIXNAME}.system"
