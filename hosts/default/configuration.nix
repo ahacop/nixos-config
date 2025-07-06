@@ -111,7 +111,9 @@ in {
         name = "Noto Color Emoji";
       };
 
-      sizes = {terminal = 24;};
+      sizes = {
+        terminal = 24;
+      };
     };
   };
 
@@ -128,7 +130,10 @@ in {
   users.users.ahacop = {
     isNormalUser = true;
     home = "/home/ahacop";
-    extraGroups = ["docker" "wheel"];
+    extraGroups = [
+      "docker"
+      "wheel"
+    ];
     shell = pkgs.zsh;
     initialPassword = "password";
     openssh.authorizedKeys.keys = [
@@ -203,7 +208,9 @@ in {
   # };
 
   # Enable the X11 windowing system.
-  i18n = {defaultLocale = "en_US.UTF-8";};
+  i18n = {
+    defaultLocale = "en_US.UTF-8";
+  };
   services = {
     # setup windowing environment
     displayManager.defaultSession = "none+i3";
@@ -222,7 +229,9 @@ in {
         '';
       };
 
-      windowManager.i3 = {enable = true;};
+      windowManager.i3 = {
+        enable = true;
+      };
     };
 
     # Enable the OpenSSH daemon.
@@ -259,7 +268,9 @@ in {
 
   nixpkgs.config.allowUnfree = true;
   environment = {
-    sessionVariables = {FLAKE = "/home/ahacop/nixos-config";};
+    sessionVariables = {
+      FLAKE = "/home/ahacop/nixos-config";
+    };
 
     # List packages installed in system profile. To search, run:
     # $ nix search wget
@@ -269,13 +280,10 @@ in {
       aspellDicts.en
       bat
       cachix
-      claude-code
-      codex
       coreutils
       dmenu
       fd
       ffmpeg
-      firefox
       git
       gnumake
       gnupg
@@ -329,7 +337,9 @@ in {
 
   programs = {
     zsh.enable = true;
-    ssh = {startAgent = true;};
+    ssh = {
+      startAgent = true;
+    };
   };
 
   # Setup qemu so we can run x86_64 binaries

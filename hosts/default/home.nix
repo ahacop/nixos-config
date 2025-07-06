@@ -3,8 +3,11 @@
   lib,
   inputs,
   pkgs,
+  claude-code-latest,
   ...
 }: {
+  nixpkgs.config.allowUnfree = true;
+
   stylix.targets.ghostty.enable = false;
 
   programs = {
@@ -37,7 +40,9 @@
         };
       };
 
-      globals = {mapleader = " ";};
+      globals = {
+        mapleader = " ";
+      };
 
       extraConfigVim = ''
         cnoremap %% <C-R>=expand('%:h').'/'<cr>
@@ -45,7 +50,10 @@
 
       keymaps = [
         {
-          mode = ["i" "s"];
+          mode = [
+            "i"
+            "s"
+          ];
           key = "<C-k>";
           action.__raw = ''
             function()
@@ -61,7 +69,10 @@
           };
         }
         {
-          mode = ["i" "s"];
+          mode = [
+            "i"
+            "s"
+          ];
           key = "<C-j>";
           action.__raw = ''
             function()
@@ -102,46 +113,63 @@
           action = "<cmd>TestFile HEADLESS=0<CR>";
           key = "<leader>tf";
           mode = "n";
-          options = {desc = "TestFile";};
+          options = {
+            desc = "TestFile";
+          };
         }
         {
           action = "<cmd>TestNearest HEADLESS=0<CR>";
           key = "<leader>tt";
           mode = "n";
-          options = {desc = "TestNearest";};
+          options = {
+            desc = "TestNearest";
+          };
         }
         {
           action = "<cmd>TestSuite HEADLESS=0<CR>";
           key = "<leader>ts";
           mode = "n";
-          options = {desc = "TestSuite";};
+          options = {
+            desc = "TestSuite";
+          };
         }
         {
           action = "<cmd>TestFile HEADLESS=1<CR>";
           key = "<leader>thf";
           mode = "n";
-          options = {desc = "TestFile (HEADLESS=1)";};
+          options = {
+            desc = "TestFile (HEADLESS=1)";
+          };
         }
         {
           action = "<cmd>TestNearest HEADLESS=1<CR>";
           key = "<leader>tht";
           mode = "n";
-          options = {desc = "TestNearest HEADLESS=1";};
+          options = {
+            desc = "TestNearest HEADLESS=1";
+          };
         }
         {
           action = "<cmd>TestSuite HEADLESS=1<CR>";
           key = "<leader>ths";
           mode = "n";
-          options = {desc = "TestSuite HEADLESS=1";};
+          options = {
+            desc = "TestSuite HEADLESS=1";
+          };
         }
         {
           action = "<cmd>TestVisit<CR>";
           key = "<leader>tv";
           mode = "n";
-          options = {desc = "TestVisit";};
+          options = {
+            desc = "TestVisit";
+          };
         }
         {
-          mode = ["n" "v"];
+          mode = [
+            "n"
+            "v"
+          ];
           key = "<leader>gh";
           action = "gitsigns";
           options = {
@@ -189,7 +217,9 @@
           action = "<cmd>DBUI<CR>";
           key = "<leader>db";
           mode = "n";
-          options = {desc = "Run DadBod";};
+          options = {
+            desc = "Run DadBod";
+          };
         }
       ];
 
@@ -234,8 +264,12 @@
             };
             # formatting = {fields = ["kind" "abbr" "menu"];};
             window = {
-              completion = {border = "solid";};
-              documentation = {border = "solid";};
+              completion = {
+                border = "solid";
+              };
+              documentation = {
+                border = "solid";
+              };
             };
             sources = [
               {name = "nvim_lsp";}
@@ -268,11 +302,15 @@
         };
         gitlinker = {
           enable = true;
-          callbacks = {"github.com" = "get_github_type_url";};
+          callbacks = {
+            "github.com" = "get_github_type_url";
+          };
         };
         lspkind = {
           enable = false;
-          symbolMap = {Copilot = "";};
+          symbolMap = {
+            Copilot = "";
+          };
           extraOptions = {
             maxwidth = 50;
             ellipsis_char = "...";
@@ -284,12 +322,24 @@
             trouble = true;
             current_line_blame = false;
             signs = {
-              add = {text = "│";};
-              change = {text = "│";};
-              delete = {text = "_";};
-              topdelete = {text = "‾";};
-              changedelete = {text = "~";};
-              untracked = {text = "│";};
+              add = {
+                text = "│";
+              };
+              change = {
+                text = "│";
+              };
+              delete = {
+                text = "_";
+              };
+              topdelete = {
+                text = "‾";
+              };
+              changedelete = {
+                text = "~";
+              };
+              untracked = {
+                text = "│";
+              };
             };
           };
         };
@@ -304,7 +354,9 @@
         };
         treesitter-context = {
           enable = true;
-          settings = {max_lines = 2;};
+          settings = {
+            max_lines = 2;
+          };
         };
         rainbow-delimiters.enable = true;
         markdown-preview.enable = true;
@@ -313,39 +365,57 @@
           keymaps = {
             "<leader>ff" = {
               action = "find_files";
-              options = {desc = "Telescope find files";};
+              options = {
+                desc = "Telescope find files";
+              };
             };
             "<leader>fg" = {
               action = "live_grep";
-              options = {desc = "Telescope live_grep";};
+              options = {
+                desc = "Telescope live_grep";
+              };
             };
             "<leader>fb" = {
               action = "buffers";
-              options = {desc = "Telescope buffers";};
+              options = {
+                desc = "Telescope buffers";
+              };
             };
             "<leader>fh" = {
               action = "help_tags";
-              options = {desc = "Telescope help_tags";};
+              options = {
+                desc = "Telescope help_tags";
+              };
             };
             "<leader>fvcw" = {
               action = "git_commits";
-              options = {desc = "Telescope git_commits";};
+              options = {
+                desc = "Telescope git_commits";
+              };
             };
             "<leader>fvcb" = {
               action = "git_bcommits";
-              options = {desc = "Telescope git_bcommits";};
+              options = {
+                desc = "Telescope git_bcommits";
+              };
             };
             "<leader>fvb" = {
               action = "git_branches";
-              options = {desc = "Telescope git_branches";};
+              options = {
+                desc = "Telescope git_branches";
+              };
             };
             "<leader>fvs" = {
               action = "git_status";
-              options = {desc = "Telescope git_status";};
+              options = {
+                desc = "Telescope git_status";
+              };
             };
             "<leader>fvx" = {
               action = "git_stash";
-              options = {desc = "Telescope git_stash";};
+              options = {
+                desc = "Telescope git_stash";
+              };
             };
           };
         };
@@ -379,20 +449,36 @@
               };
             };
             elixirls.enable = true;
-            eslint = {enable = true;};
+            eslint = {
+              enable = true;
+            };
             gleam.enable = true;
-            html = {enable = true;};
-            lua_ls = {enable = true;};
-            marksman = {enable = true;};
-            nil_ls = {enable = true;};
+            html = {
+              enable = true;
+            };
+            lua_ls = {
+              enable = true;
+            };
+            marksman = {
+              enable = true;
+            };
+            nil_ls = {
+              enable = true;
+            };
             ruby_lsp = {
               enable = true;
               package = null;
             };
             tailwindcss.enable = true;
-            terraformls = {enable = true;};
-            ts_ls = {enable = false;};
-            yamlls = {enable = true;};
+            terraformls = {
+              enable = true;
+            };
+            ts_ls = {
+              enable = false;
+            };
+            yamlls = {
+              enable = true;
+            };
           };
           keymaps.lspBuf = {
             "gd" = "definition";
@@ -446,7 +532,10 @@
                 enable = true;
                 disableTsServerFormatter = true;
                 settings = {
-                  extra_filetypes = ["yaml" "css"];
+                  extra_filetypes = [
+                    "yaml"
+                    "css"
+                  ];
                 };
               };
               pg_format.enable = true;
@@ -626,6 +715,7 @@
         show-git-remote-authors = "git for-each-ref --format=' %(authorname) %09 %(refname)' --sort=authorname | grep remote";
         showtodos = "git grep -l TODO | xargs -n1 git blame --show-email -f | grep TODO  | sed -E 's/[[:blank:]]+/ /g' | sort -k 4";
         strip = "sed $'s,x1b\\[[0-9;]*[a-zA-Z],,g;s,\r$,,g'";
+        claude-update = "/home/ahacop/nixos-config/scripts/claude-update";
       };
       initContent = ''
         ${builtins.readFile ./../../config/zshrc}
@@ -651,8 +741,13 @@
 
     git = {
       enable = true;
-      difftastic = {enable = false;};
-      ignores = [".envrc" ".direnv/"];
+      difftastic = {
+        enable = false;
+      };
+      ignores = [
+        ".envrc"
+        ".direnv/"
+      ];
       userName = "Ara Hacopian";
       userEmail = "ara@hacopian.de";
       lfs.enable = true;
@@ -721,7 +816,9 @@
           conflictStyle = "zdiff3";
           tool = "nvimdiff";
         };
-        pull = {ff-only = true;};
+        pull = {
+          ff-only = true;
+        };
         push = {
           default = "tracking";
           autoSetupRemote = true;
@@ -738,7 +835,11 @@
       enable = true;
       prefix = "C-x";
       mouse = true;
-      plugins = with pkgs.tmuxPlugins; [prefix-highlight sensible yank];
+      plugins = with pkgs.tmuxPlugins; [
+        prefix-highlight
+        sensible
+        yank
+      ];
 
       extraConfig = ''
         # Start windows and panes at 1, not 0
@@ -787,7 +888,9 @@
   };
 
   xdg.enable = true;
-  xdg.configFile = {"i3/config".text = builtins.readFile ./../../config/i3;};
+  xdg.configFile = {
+    "i3/config".text = builtins.readFile ./../../config/i3;
+  };
 
   home = {
     username = "ahacop";
@@ -809,6 +912,7 @@
       asciinema
       awscli2
       bat
+      (claude-code-latest pkgs)
       codex
       devenv
       duckdb
@@ -819,6 +923,7 @@
       fzf
       htop
       jq
+      nodejs
       ripgrep
       rofi
       silicon
@@ -826,6 +931,8 @@
       tldr
       tree
     ];
-    sessionVariables = {PAGER = "less -FirSwX";};
+    sessionVariables = {
+      PAGER = "less -FirSwX";
+    };
   };
 }

@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -e
+
+DEBUG=false
+if [[ "$1" == "--debug" ]]; then
+    DEBUG=true
+    set -x
+fi
+
+cd /home/ahacop/nixos-config
+
+echo "Fetching latest Claude version from npm..."
+
+# Get latest version from npm
+LATEST_VERSION=$(curl -s https://registry.npmjs.org/@anthropic-ai/claude-code/latest | jq -r '.version')
+
+if [[ "$DEBUG" == "true" ]]; then
+    echo "Latest version: $LATEST_VERSION"
+fi
+
+# Read current version
+CURRENT_VERSION=$(jq -r '.version' claude-version.json)
+
+if [[ "$DEBUG" == "true" ]]; then
+    echo "Current version: $CURRENT_VERSION"
+fi
+
+if [[ "$LATEST_VERSION" == "$CURRENT_VERSION" ]]; then
+    echo "Already at latest version: $LATEST_VERSION"
+    exit 0
+fi
+
+echo "Updating from $CURRENT_VERSION to $LATEST_VERSION..."
+
+# Download and get hash
+echo "Downloading and calculating hash..."
+TARBALL_URL="https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${LATEST_VERSION}.tgz"
+TEMP_FILE=$(mktemp)
+wget -q "$TARBALL_URL" -O "$TEMP_FILE"
+NEW_HASH=$(nix-hash --type sha256 --base32 "$TEMP_FILE")
+NEW_HASH_PREFIXED="sha256-$(nix-hash --type sha256 --to-base16 "$NEW_HASH" | xxd -r -p | base64 | tr -d '\n')"
+rm "$TEMP_FILE"
+
+if [[ "$DEBUG" == "true" ]]; then
+    echo "New hash: $NEW_HASH_PREFIXED"
+fi
+
+# Update version file
+echo "Updating version file..."
+jq --arg version "$LATEST_VERSION" --arg sha256 "$NEW_HASH_PREFIXED" '.version = $version | .sha256 = $sha256' claude-version.json > claude-version.json.tmp
+mv claude-version.json.tmp claude-version.json
+
+echo "Claude version updated to $LATEST_VERSION!"
+echo "Run 'sudo nixos-rebuild switch --flake .#default' to install the update."
