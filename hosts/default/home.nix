@@ -24,6 +24,7 @@
         font-family = "Intel One Mono";
         font-size = 24;
         theme = "GruvboxDark";
+        window-decoration = "none";
       };
     };
 
