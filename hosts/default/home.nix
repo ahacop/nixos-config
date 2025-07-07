@@ -914,7 +914,6 @@
       awscli2
       bat
       (claude-code-latest pkgs)
-      codex
       devenv
       duckdb
       dysk
