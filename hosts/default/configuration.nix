@@ -217,7 +217,7 @@ in {
     xserver = {
       enable = true;
       xkb.layout = "us";
-      dpi = 220;
+      dpi = 110;
 
       displayManager = {
         lightdm.enable = true;
