@@ -283,6 +283,7 @@ in {
       coreutils
       dmenu
       fd
+      feh
       ffmpeg
       git
       gnumake
