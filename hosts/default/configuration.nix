@@ -142,9 +142,8 @@ in {
   };
 
   boot = {
-    # Be careful updating this.
-    # Pin kernel to 6.15.2 to avoid slow 6.15.4
-    kernelPackages = inputs.nixpkgs-6152.legacyPackages.${pkgs.system}.linuxPackages_latest;
+    # Use the latest kernel from nixpkgs
+    kernelPackages = pkgs.linuxPackages_latest;
     loader = {
       # Use the systemd-boot EFI boot loader.
       systemd-boot.enable = true;
