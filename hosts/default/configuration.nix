@@ -318,6 +318,7 @@ in {
       xorg.xev
       xorg.xmodmap
       xsel
+      xxd
       yt-dlp
       zip
 
