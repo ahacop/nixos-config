@@ -377,13 +377,26 @@ in {
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
-  # Enable sound.
-  # hardware.pulseaudio.enable = true;
-  # OR
-  # services.pipewire = {
-  #   enable = true;
-  #   pulse.enable = true;
-  # };
+  # Enable sound with PipeWire
+  services.pipewire = {
+    enable = true;
+    pulse.enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    jack.enable = true;
+  };
+
+  # Set volume to 60% on boot
+  systemd.user.services.set-volume = {
+    description = "Set audio volume to 60%";
+    wantedBy = [ "default.target" ];
+    after = [ "pipewire.service" "pipewire-pulse.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.pulseaudio}/bin/pactl set-sink-volume @DEFAULT_SINK@ 60%";
+      RemainAfterExit = true;
+    };
+  };
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.libinput.enable = true;
