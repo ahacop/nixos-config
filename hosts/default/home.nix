@@ -469,6 +469,17 @@
             ruby_lsp = {
               enable = true;
               package = null;
+              extraOptions = {
+                on_attach = {
+                  __raw = ''
+                    function(client, bufnr)
+                      -- Disable formatting to avoid RuboCop errors
+                      client.server_capabilities.documentFormattingProvider = false
+                      client.server_capabilities.documentRangeFormattingProvider = false
+                    end
+                  '';
+                };
+              };
             };
             tailwindcss.enable = true;
             terraformls = {
