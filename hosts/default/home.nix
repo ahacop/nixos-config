@@ -25,6 +25,7 @@
         font-size = 24;
         theme = "GruvboxDark";
         window-decoration = "none";
+        # bell-features = "system, attention";
       };
     };
 
