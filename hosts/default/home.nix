@@ -211,6 +211,32 @@
             desc = "Run DadBod";
           };
         }
+        {
+          mode = "n";
+          key = "<leader>tw";
+          action.__raw = ''
+            function()
+              require('mini.trailspace').trim()
+            end
+          '';
+          options = {
+            silent = true;
+            desc = "Trim trailing whitespace";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>tW";
+          action.__raw = ''
+            function()
+              require('mini.trailspace').trim_last_lines()
+            end
+          '';
+          options = {
+            silent = true;
+            desc = "Trim trailing empty lines";
+          };
+        }
       ];
 
       opts = {
