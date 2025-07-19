@@ -168,18 +168,6 @@
           };
         }
         {
-          mode = [
-            "n"
-            "v"
-          ];
-          key = "<leader>gh";
-          action = "gitsigns";
-          options = {
-            silent = true;
-            desc = "+hunks";
-          };
-        }
-        {
           mode = "n";
           key = "<leader>ghb";
           action = ":Gitsigns blame_line<CR>";
