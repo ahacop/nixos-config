@@ -112,7 +112,7 @@
           };
         }
         {
-          action = "<cmd>TestFile HEADLESS=0<CR>";
+          action = "<cmd>TestFile HEADLESS=1<CR>";
           key = "<leader>tf";
           mode = "n";
           options = {
@@ -120,7 +120,7 @@
           };
         }
         {
-          action = "<cmd>TestNearest HEADLESS=0<CR>";
+          action = "<cmd>TestNearest HEADLESS=1<CR>";
           key = "<leader>tt";
           mode = "n";
           options = {
@@ -128,7 +128,7 @@
           };
         }
         {
-          action = "<cmd>TestSuite HEADLESS=0<CR>";
+          action = "<cmd>TestSuite HEADLESS=1<CR>";
           key = "<leader>ts";
           mode = "n";
           options = {
@@ -136,27 +136,27 @@
           };
         }
         {
-          action = "<cmd>TestFile HEADLESS=1<CR>";
+          action = "<cmd>TestFile HEADLESS=0<CR>";
           key = "<leader>thf";
           mode = "n";
           options = {
-            desc = "TestFile (HEADLESS=1)";
+            desc = "TestFile in the browser";
           };
         }
         {
-          action = "<cmd>TestNearest HEADLESS=1<CR>";
+          action = "<cmd>TestNearest HEADLESS=0<CR>";
           key = "<leader>tht";
           mode = "n";
           options = {
-            desc = "TestNearest HEADLESS=1";
+            desc = "TestNearest in the browser";
           };
         }
         {
-          action = "<cmd>TestSuite HEADLESS=1<CR>";
+          action = "<cmd>TestSuite HEADLESS=0<CR>";
           key = "<leader>ths";
           mode = "n";
           options = {
-            desc = "TestSuite HEADLESS=1";
+            desc = "TestSuite in the browser";
           };
         }
         {
