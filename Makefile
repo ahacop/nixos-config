@@ -29,6 +29,10 @@ check-kernel:
 	@echo "Latest nixpkgs kernel: $$(nix eval --raw nixpkgs#linuxPackages_latest.kernel.version)"
 	@echo "Pinned 6.15.2 kernel: $$(nix eval --raw .#nixosConfigurations.${NIXNAME}.config.boot.kernelPackages.kernel.version)"
 
+check-claude-version:
+	@echo "Current claude-code version: $$(jq -r .version claude-version.json)"
+	@echo "Latest claude-code version: $$(npm view @anthropic-ai/claude-code version)"
+
 switch:
 ifeq ($(UNAME), Darwin)
 	nix build --extra-experimental-features nix-command --extra-experimental-features flakes ".#darwinConfigurations.${NIXNAME}.system"
