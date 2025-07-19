@@ -35,11 +35,15 @@ echo "Updating from $CURRENT_VERSION to $LATEST_VERSION..."
 # Download and get hash
 echo "Downloading and calculating hash..."
 TARBALL_URL="https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${LATEST_VERSION}.tgz"
-TEMP_FILE=$(mktemp)
-wget -q "$TARBALL_URL" -O "$TEMP_FILE"
-NEW_HASH=$(nix-hash --type sha256 --base32 "$TEMP_FILE")
-NEW_HASH_PREFIXED="sha256-$(nix-hash --type sha256 --to-base16 "$NEW_HASH" | xxd -r -p | base64 | tr -d '\n')"
-rm "$TEMP_FILE"
+
+# Use nix-prefetch-url to get the correct hash
+NEW_HASH_BASE32=$(nix-prefetch-url "$TARBALL_URL" 2>/dev/null)
+NEW_HASH_PREFIXED=$(nix hash to-sri --type sha256 "$NEW_HASH_BASE32" 2>/dev/null)
+
+# Fallback to new format if deprecated warning occurs
+if [[ -z "$NEW_HASH_PREFIXED" ]]; then
+    NEW_HASH_PREFIXED=$(nix hash convert --to sri sha256 "$NEW_HASH_BASE32" 2>/dev/null)
+fi
 
 if [[ "$DEBUG" == "true" ]]; then
     echo "New hash: $NEW_HASH_PREFIXED"
