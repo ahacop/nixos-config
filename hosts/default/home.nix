@@ -204,6 +204,164 @@
           };
         }
         {
+          mode = "n";
+          key = "]c";
+          action.__raw = ''
+            function()
+              if vim.wo.diff then
+                vim.cmd.normal({']c', bang = true})
+              else
+                require('gitsigns').nav_hunk('next')
+              end
+            end
+          '';
+          options = {
+            silent = true;
+            desc = "Next hunk";
+          };
+        }
+        {
+          mode = "n";
+          key = "[c";
+          action.__raw = ''
+            function()
+              if vim.wo.diff then
+                vim.cmd.normal({'[c', bang = true})
+              else
+                require('gitsigns').nav_hunk('prev')
+              end
+            end
+          '';
+          options = {
+            silent = true;
+            desc = "Previous hunk";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>ghs";
+          action = ":Gitsigns stage_hunk<CR>";
+          options = {
+            silent = true;
+            desc = "Stage hunk";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>ghr";
+          action = ":Gitsigns reset_hunk<CR>";
+          options = {
+            silent = true;
+            desc = "Reset hunk";
+          };
+        }
+        {
+          mode = "v";
+          key = "<leader>ghs";
+          action.__raw = ''
+            function()
+              require('gitsigns').stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+            end
+          '';
+          options = {
+            silent = true;
+            desc = "Stage hunk (visual)";
+          };
+        }
+        {
+          mode = "v";
+          key = "<leader>ghr";
+          action.__raw = ''
+            function()
+              require('gitsigns').reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+            end
+          '';
+          options = {
+            silent = true;
+            desc = "Reset hunk (visual)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>ghp";
+          action = ":Gitsigns preview_hunk<CR>";
+          options = {
+            silent = true;
+            desc = "Preview hunk";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>ghi";
+          action = ":Gitsigns preview_hunk_inline<CR>";
+          options = {
+            silent = true;
+            desc = "Preview hunk inline";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>ghD";
+          action.__raw = ''
+            function()
+              require('gitsigns').diffthis('~')
+            end
+          '';
+          options = {
+            silent = true;
+            desc = "Diff this ~";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>ghQ";
+          action.__raw = ''
+            function()
+              require('gitsigns').setqflist('all')
+            end
+          '';
+          options = {
+            silent = true;
+            desc = "Set quickfix list (all)";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>ghq";
+          action = ":Gitsigns setqflist<CR>";
+          options = {
+            silent = true;
+            desc = "Set quickfix list";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>gtb";
+          action = ":Gitsigns toggle_current_line_blame<CR>";
+          options = {
+            silent = true;
+            desc = "Toggle line blame";
+          };
+        }
+        {
+          mode = "n";
+          key = "<leader>gtw";
+          action = ":Gitsigns toggle_word_diff<CR>";
+          options = {
+            silent = true;
+            desc = "Toggle word diff";
+          };
+        }
+        {
+          mode = ["o" "x"];
+          key = "ih";
+          action = ":Gitsigns select_hunk<CR>";
+          options = {
+            silent = true;
+            desc = "Select hunk";
+          };
+        }
+        {
           action = "<cmd>DBUI<CR>";
           key = "<leader>db";
           mode = "n";
