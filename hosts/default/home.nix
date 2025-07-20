@@ -50,6 +50,64 @@
         cnoremap %% <C-R>=expand('%:h').'/'<cr>
       '';
 
+      userCommands = {
+        NavigateToTest = {
+          command.__raw = ''
+            function(opts)
+              local direction = opts.args or "next"
+              local test_pattern = [[\v^\s*(test|def test_|it\s+['"])]]
+              local current_line = vim.fn.line('.')
+
+              if direction == "next" then
+                -- Search forward for next test
+                local last_line = vim.fn.line('$')
+
+                for line_num = current_line + 1, last_line do
+                  local line = vim.fn.getline(line_num)
+                  if vim.fn.match(line, test_pattern) >= 0 then
+                    -- Move to the test line
+                    vim.cmd('normal! ' .. line_num .. 'G')
+
+                    -- Position test in top third of window
+                    local winheight = vim.fn.winheight(0)
+                    local top_third = math.floor(winheight / 3)
+                    vim.cmd('normal! zt')
+                    vim.cmd('normal! ' .. top_third .. 'k')
+                    vim.cmd('normal! ' .. top_third .. 'j')
+
+                    return
+                  end
+                end
+
+                print("No more tests found")
+              else
+                -- Search backward for previous test
+                for line_num = current_line - 1, 1, -1 do
+                  local line = vim.fn.getline(line_num)
+                  if vim.fn.match(line, test_pattern) >= 0 then
+                    -- Move to the test line
+                    vim.cmd('normal! ' .. line_num .. 'G')
+
+                    -- Position test in top third of window
+                    local winheight = vim.fn.winheight(0)
+                    local top_third = math.floor(winheight / 3)
+                    vim.cmd('normal! zt')
+                    vim.cmd('normal! ' .. top_third .. 'k')
+                    vim.cmd('normal! ' .. top_third .. 'j')
+
+                    return
+                  end
+                end
+
+                print("No previous tests found")
+              end
+            end
+          '';
+          desc = "Navigate to next or previous test";
+          nargs = "?";
+        };
+      };
+
       keymaps = [
         {
           mode = [
@@ -353,7 +411,10 @@
           };
         }
         {
-          mode = ["o" "x"];
+          mode = [
+            "o"
+            "x"
+          ];
           key = "ih";
           action = ":Gitsigns select_hunk<CR>";
           options = {
@@ -367,6 +428,24 @@
           mode = "n";
           options = {
             desc = "Run DadBod";
+          };
+        }
+        {
+          mode = "n";
+          key = "]t";
+          action = ":NavigateToTest next<CR>";
+          options = {
+            silent = true;
+            desc = "Next minitest";
+          };
+        }
+        {
+          mode = "n";
+          key = "[t";
+          action = ":NavigateToTest prev<CR>";
+          options = {
+            silent = true;
+            desc = "Previous minitest";
           };
         }
         {
