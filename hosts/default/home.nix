@@ -491,6 +491,8 @@
       };
 
       plugins = {
+        render-markdown.enable = true;
+        numbertoggle.enable = true;
         nvim-surround.enable = true;
         mini-trailspace.enable = true;
         gitgutter.enable = true;
