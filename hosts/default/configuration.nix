@@ -328,10 +328,9 @@ in {
         xrandr --output Virtual-1 --auto
       '')
 
-      # Generate a pleasant notification sound
-      (writeShellScriptBin "claude-notify" ''
-        # Generate a pleasant two-tone chime
-        ${pkgs.sox}/bin/play -q -n synth 0.15 sine 880 fade 0 0.15 0.05 : synth 0.15 sine 1320 fade 0 0.15 0.05 delay 0.15 remix - repeat 1
+      # macOS notification bridge
+      (writeShellScriptBin "notify-macos" ''
+        exec ${inputs.macos-notifier-bridge.packages.${pkgs.system}.notify-macos}/bin/notify-macos "$@"
       '')
 
       gtkmm3
@@ -396,8 +395,11 @@ in {
   # Set volume to 60% on boot
   systemd.user.services.set-volume = {
     description = "Set audio volume to 60%";
-    wantedBy = [ "default.target" ];
-    after = [ "pipewire.service" "pipewire-pulse.service" ];
+    wantedBy = ["default.target"];
+    after = [
+      "pipewire.service"
+      "pipewire-pulse.service"
+    ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${pkgs.pulseaudio}/bin/pactl set-sink-volume @DEFAULT_SINK@ 60%";

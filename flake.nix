@@ -18,6 +18,11 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    macos-notifier-bridge = {
+      url = "github:ahacop/macos-notifier-bridge";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
