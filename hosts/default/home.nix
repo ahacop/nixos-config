@@ -964,15 +964,13 @@
       shellAliases = {
         bc = "bin/rails c";
         be = "bundle exec";
+        bo = "bundle outdated";
         clean-boot-generations = "sudo /run/current-system/bin/switch-to-configuration boot";
         ga = "git aa";
         gc = "git ci -p";
         gca = "git ci -p --amend";
         germ = "dict -d fd-deu-eng";
-        gf = "git fetch";
         gl = "git log";
-        gos = "git diff-tree --no-commit-id --name-only -r";
-        gst = "git status";
         gv = "open_modified_and_untracked_in_vim";
         gvh = "open_changed_from_head_in_vim";
         gvv = "edit_diff_files_in_vim";
@@ -980,11 +978,9 @@
         ls = "ls -GF";
         pbcopy = "xclip";
         pbpaste = "xclip -o";
-        retag = "git ls-files | xargs ctags";
         show-git-remote-authors = "git for-each-ref --format=' %(authorname) %09 %(refname)' --sort=authorname | grep remote";
         showtodos = "git grep -l TODO | xargs -n1 git blame --show-email -f | grep TODO  | sed -E 's/[[:blank:]]+/ /g' | sort -k 4";
         strip = "sed $'s,x1b\\[[0-9;]*[a-zA-Z],,g;s,\r$,,g'";
-        claude-update = "/home/ahacop/nixos-config/scripts/claude-update";
       };
       initContent = ''
         ${builtins.readFile ./../../config/zshrc}
@@ -1021,13 +1017,11 @@
       userEmail = "ara@hacopian.de";
       lfs.enable = true;
       aliases = {
-        cleanup = "!git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 -r git branch -d";
-        prettylog = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(r) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative";
-        root = "rev-parse --show-toplevel";
         aa = "add --all";
         amend = "commit --amend";
         br = "branch";
         ci = "commit";
+        cleanup = "!git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 -r git branch -d";
         co = "checkout";
         dc = "diff --cached";
         df = "diff";
@@ -1036,29 +1030,19 @@
         ds = "diff --stat";
         fa = "fetch --all";
         ff = "merge --ff-only";
+        h = "!git head"; # h  = head
+        head = "!git l -1";
+        hp = "!. ~/.githelpers && show_git_head"; # hp = head with patch
+        l = "!. ~/.githelpers && pretty_git_log"; # l  = all commits, only current branch
+        la = "!git l --all"; # la = all commits, all reachable refs
         lg = "log -p";
         noff = "merge --no-ff";
+        prettylog = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(r) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative";
         pullff = "pull --ff-only";
+        r = "!git l -30"; # r  = recent commits, only current branch
+        ra = "!git r --all"; # ra = recent commits, all reachable refs
+        root = "rev-parse --show-toplevel";
         st = "status";
-        div = "divergence";
-
-        gn = "goodness";
-        gnc = "goodness --cached";
-
-        # Fancy logging.
-        #   h  = head
-        #   hp = head with patch
-        #   r  = recent commits, only current branch
-        #   ra = recent commits, all reachable refs
-        #   l  = all commits, only current branch
-        #   la = all commits, all reachable refs
-        head = "!git l -1";
-        h = "!git head";
-        hp = "!. ~/.githelpers && show_git_head";
-        r = "!git l -30";
-        ra = "!git r --all";
-        l = "!. ~/.githelpers && pretty_git_log";
-        la = "!git l --all";
         today = "log --since=midnight --author='ahacop' --oneline";
         yesterday = "log --since=midnight.yesterday --until=midnight --author='ahacop' --oneline";
       };
