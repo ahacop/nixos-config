@@ -332,6 +332,35 @@ in {
       (writeShellScriptBin "notify-macos" ''
         exec ${inputs.macos-notifier-bridge.packages.${pkgs.system}.notify-macos}/bin/notify-macos "$@"
       '')
+      # Get macOS system sound based on current directory
+      (writeShellScriptBin "get-dir-sound" ''
+        # Get the current directory name
+        DIR_NAME=$(basename "$PWD")
+
+        # List of available macOS system sounds
+        SOUNDS=(
+          "Basso"
+          "Blow"
+          "Bottle"
+          "Frog"
+          "Funk"
+          "Glass"
+          "Hero"
+          "Morse"
+          "Ping"
+          "Pop"
+          "Purr"
+          "Sosumi"
+          "Submarine"
+          "Tink"
+        )
+
+        # Hash the directory name and map to a sound
+        HASH=$(echo -n "$DIR_NAME" | ${pkgs.coreutils}/bin/sha256sum | cut -d' ' -f1)
+        # Convert first 8 hex chars to decimal and modulo by number of sounds
+        INDEX=$(( 0x''${HASH:0:8} % ''${#SOUNDS[@]} ))
+        echo "''${SOUNDS[$INDEX]}"
+      '')
 
       gtkmm3
       # ] ++ lib.optionals (currentSystemName == "vm-aarch64") [
