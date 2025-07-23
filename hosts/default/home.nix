@@ -986,6 +986,51 @@
         ${builtins.readFile ./../../config/zshrc}
 
         ${builtins.readFile ./../../config/functions}
+
+        # Tmux window renaming hooks
+        if [[ -n "$TMUX" ]]; then
+          # Function to rename tmux window
+          tmux_rename_window() {
+            if [[ -n "$1" ]]; then
+              tmux rename-window "$1" 2>/dev/null
+            fi
+          }
+
+          # Variable to store the last meaningful window name
+          typeset -g TMUX_LAST_WINDOW_NAME=""
+
+          # Hook that runs before command execution
+          preexec() {
+            local cmd="$1"
+            local cmd_name="''${cmd%% *}"
+
+            # Skip renaming for job control commands
+            if [[ "$cmd_name" =~ ^(fg|bg|jobs)$ ]]; then
+              return
+            fi
+
+            # Store current window name before changing it
+            TMUX_LAST_WINDOW_NAME=$(tmux display-message -p '#W' 2>/dev/null)
+
+            # Check if it's a make command and extract the target
+            if [[ "$cmd" =~ ^make[[:space:]]+([^[:space:]]+) ]]; then
+              tmux_rename_window "m:''${match[1]}"
+            elif [[ "$cmd" =~ ^claude ]]; then
+              tmux_rename_window "claude:''${PWD##*/}"
+            elif [[ "$cmd" =~ ^nvim ]]; then
+              tmux_rename_window "nvim:''${PWD##*/}"
+            else
+              # For other commands, just show the command name
+              tmux_rename_window "$cmd_name"
+            fi
+          }
+
+          # Hook that runs after command execution (when back at prompt)
+          precmd() {
+            # Reset to directory name when back at prompt
+            tmux_rename_window "''${PWD##*/}"
+          }
+        fi
       '';
     };
     gpg.enable = true;
@@ -1115,6 +1160,10 @@
         bind-key c new-window -c '#{pane_current_path}'
 
         bind-key C-x last-window
+
+        # Allow window renaming by shell hooks
+        set-option -g allow-rename on
+        set-window-option -g automatic-rename off
       '';
     };
 
