@@ -21,7 +21,7 @@ UNAME := $(shell uname)
 .DEFAULT_GOAL := help
 
 # Phony targets
-.PHONY: help clean optimize check-kernel check-claude-version switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
+.PHONY: help clean optimize check-kernel check-claude-version upgrade-claude switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
 
 # Help target
 help: ## Show this help message
@@ -29,6 +29,9 @@ help: ## Show this help message
 	@echo ''
 	@echo 'Configuration Management:'
 	@grep -E '^(switch|test|optimize|clean):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+	@echo ''
+	@echo 'Package Updates:'
+	@grep -E '^upgrade-.*:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 	@echo ''
 	@echo 'System Info:'
 	@grep -E '^check-.*:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
@@ -51,6 +54,9 @@ check-kernel: ## Check current vs available kernel versions
 check-claude-version: ## Check current vs latest Claude Code version
 	@echo "Current claude-code version: $$(jq -r .version claude-version.json)"
 	@echo "Latest claude-code version: $$(npm view @anthropic-ai/claude-code version)"
+
+upgrade-claude: ## Update Claude Code to latest version from npm
+	./scripts/claude-update
 
 switch: ## Apply configuration changes (rebuilds and switches)
 ifeq ($(UNAME), Darwin)
