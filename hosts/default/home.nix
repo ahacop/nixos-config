@@ -1045,6 +1045,7 @@
         st = "status";
         today = "log --since=midnight --author='ahacop' --oneline";
         yesterday = "log --since=midnight.yesterday --until=midnight --author='ahacop' --oneline";
+        churn = "!f() { git log --all -M -C --name-only --format='format:' \"$@\" | sort | grep -v '^$' | uniq -c | sort -n; }; f";
       };
       extraConfig = {
         branch = {
