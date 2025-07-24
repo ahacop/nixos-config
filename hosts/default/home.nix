@@ -11,6 +11,88 @@
   stylix.targets.ghostty.enable = false;
 
   programs = {
+    jujutsu = {
+      enable = true;
+      settings = {
+        user = {
+          name = "Ara Hacopian";
+          email = "ara@hacopian.de";
+        };
+        aliases = {
+          # Common shortcuts
+          d = ["diff"];
+          di = ["diff"];
+          l = ["log"];
+          ll = [
+            "log"
+            "-r"
+            "::@"
+          ]; # Show all ancestors of current revision
+          lg = [
+            "log"
+            "--graph"
+          ];
+
+          # Branch operations
+          b = ["branch"];
+          bl = [
+            "branch"
+            "list"
+          ];
+          bc = [
+            "branch"
+            "create"
+          ];
+          bd = [
+            "branch"
+            "delete"
+          ];
+
+          # Navigation
+          co = ["checkout"];
+          n = ["new"]; # Create new commit
+
+          # Working with changes
+          a = ["squash"]; # Amend/squash into parent
+          sp = ["split"];
+          ab = ["abandon"];
+
+          # History exploration
+          p = [
+            "log"
+            "-r"
+            "@-"
+          ]; # Show previous commit
+          pp = [
+            "log"
+            "-r"
+            "@--"
+          ]; # Show grandparent commit
+          r = [
+            "log"
+            "-r"
+            "root()"
+          ];
+
+          # Useful queries
+          mine = [
+            "log"
+            "-r"
+            "mine()"
+          ]; # Your commits
+          conflicts = [
+            "log"
+            "-r"
+            "conflict()"
+          ];
+          heads = [
+            "log"
+            "-r"
+            "heads()"
+          ];
+        };
+      };
+    };
     yazi = {
       enable = true;
       enableZshIntegration = true;

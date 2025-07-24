@@ -124,12 +124,31 @@ unidecode() {
   fi
 }
 
-# Simplified Git command or git status
+# Simplified Git command or git status, falls back to jujutsu if not in git repo
 g() {
-  if [[ $# -gt 0 ]]; then
-    git "$@"
+  if git rev-parse --git-dir > /dev/null 2>&1; then
+    # In a git repository
+    if [[ $# -gt 0 ]]; then
+      git "$@"
+    else
+      git status
+    fi
   else
-    git status
+    # Not in a git repository, use jujutsu
+    if [[ $# -gt 0 ]]; then
+      jj "$@"
+    else
+      jj status
+    fi
+  fi
+}
+
+# Simplified Jujutsu command or jj status
+j() {
+  if [[ $# -gt 0 ]]; then
+    jj "$@"
+  else
+    jj status
   fi
 }
 
