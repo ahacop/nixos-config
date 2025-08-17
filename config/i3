@@ -56,6 +56,7 @@ bindsym $mod+Return exec $term
 
 bindsym $mod+n exec emacs
 bindsym $mod+Shift+f exec /etc/profiles/per-user/ahacop/bin/firefox
+bindsym $mod+Shift+d exec /etc/profiles/per-user/ahacop/bin/readest
 
 # kill focused window
 bindsym $mod+w kill

@@ -1308,6 +1308,7 @@
       htop
       jq
       nodejs
+      readest
       ripgrep
       rofi
       silicon
