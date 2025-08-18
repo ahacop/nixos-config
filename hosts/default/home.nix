@@ -576,7 +576,14 @@
         render-markdown.enable = true;
         numbertoggle.enable = true;
         nvim-surround.enable = true;
-        mini-trailspace.enable = true;
+        mini = {
+          enable = true;
+          modules = {
+            trailspace = {
+              only_in_normal_buffers = true;
+            };
+          };
+        };
         gitgutter.enable = true;
         vim-dadbod.enable = true;
         vim-dadbod-completion.enable = true;
@@ -928,6 +935,18 @@
             __raw = ''
               function()
                 vim.opt.colorcolumn = "72"
+              end
+            '';
+          };
+        }
+        {
+          event = ["BufWritePre"];
+          pattern = ["*"];
+          callback = {
+            __raw = ''
+              function()
+                require('mini.trailspace').trim()
+                require('mini.trailspace').trim_last_lines()
               end
             '';
           };
