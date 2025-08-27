@@ -1063,6 +1063,10 @@
       enableCompletion = true;
       autosuggestion.enable = true;
       shellAliases = {
+        bf = "bun format";
+        br = "bin/rubocop -A";
+        bt = "bin/rails test";
+        bs = "bin/rails test:system";
         bc = "bin/rails c";
         be = "bundle exec";
         bo = "bundle outdated";
