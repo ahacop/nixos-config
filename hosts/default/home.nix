@@ -1320,6 +1320,7 @@
       asciinema
       awscli2
       bat
+      circumflex
       (claude-code-latest pkgs)
       devenv
       duckdb
