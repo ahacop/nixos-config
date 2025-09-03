@@ -1332,6 +1332,7 @@
       htop
       jq
       nodejs
+      presenterm
       readest
       ripgrep
       rofi
