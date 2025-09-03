@@ -194,6 +194,13 @@ in {
   # Virtualization settings
   virtualisation.docker.enable = true;
 
+  # XDG desktop portal for applications like kitty
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    config.common.default = "*";
+  };
+
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -232,6 +239,9 @@ in {
         enable = true;
       };
     };
+
+    # Enable desktop portal for applications like kitty
+    dbus.enable = true;
 
     # Enable the OpenSSH daemon.
     openssh = {
@@ -286,6 +296,9 @@ in {
       ffmpeg
       git
       gnumake
+      kitty
+      mesa
+      mesa-demos
       gnupg
       heroku
       htop

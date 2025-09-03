@@ -53,6 +53,7 @@ bindsym $mod+o exec rofi -show run
 # start a terminal
 set $term ghostty
 bindsym $mod+Return exec $term
+bindsym $mod+Shift+Return exec env LIBGL_ALWAYS_SOFTWARE=1 MESA_GL_VERSION_OVERRIDE=3.3 kitty
 
 bindsym $mod+n exec emacs
 bindsym $mod+Shift+f exec /etc/profiles/per-user/ahacop/bin/firefox

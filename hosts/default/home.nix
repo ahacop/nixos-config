@@ -1340,9 +1340,13 @@
       tig
       tldr
       tree
+      dunst
     ];
     sessionVariables = {
       PAGER = "less -FirSwX";
+      # Force software rendering for kitty in VM environment
+      LIBGL_ALWAYS_SOFTWARE = "1";
+      MESA_GL_VERSION_OVERRIDE = "3.3";
     };
   };
 }
