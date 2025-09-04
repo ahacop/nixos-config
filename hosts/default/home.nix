@@ -1331,6 +1331,7 @@
       fzf
       htop
       jq
+      mermaid-cli
       nodejs
       presenterm
       readest
