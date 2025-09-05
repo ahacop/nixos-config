@@ -850,7 +850,6 @@
           enable = true;
         };
         vim-test.enable = true;
-        rustaceanvim.enable = true;
         trouble.enable = true;
         fidget = {
           enable = true;
