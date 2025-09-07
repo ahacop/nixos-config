@@ -1091,6 +1091,11 @@
 
         ${builtins.readFile ./../../config/functions}
 
+        # Generate pgbox completion if available
+        if command -v pgbox >/dev/null 2>&1; then
+          eval "$(pgbox completion zsh)"
+        fi
+
         # Tmux window renaming hooks
         if [[ -n "$TMUX" ]]; then
           # Function to rename tmux window
@@ -1332,6 +1337,18 @@
       jq
       mermaid-cli
       nodejs
+      (pkgs.buildGoModule rec {
+        pname = "pgbox";
+        version = "main";
+        src = pkgs.fetchFromGitHub {
+          owner = "ahacop";
+          repo = "pgbox";
+          rev = "main";
+          sha256 = "sha256-R7Q1Dpw7SKikmADFkM2Hzq479alZcSPbHxjRBWOSw0g=";
+        };
+        vendorHash = "sha256-qpDNiYOzuXGzyV6m5KG2vtamJKOO6dNgF/2ga82jUZA=";
+        doCheck = false;
+      })
       presenterm
       readest
       ripgrep
