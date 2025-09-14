@@ -883,6 +883,7 @@
               yamllint.enable = true;
               hadolint.enable = true;
               golangci_lint.enable = true;
+              checkmake.enable = true;
             };
             formatting = {
               alejandra.enable = true;
