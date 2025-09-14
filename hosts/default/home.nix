@@ -779,7 +779,7 @@
         lsp = {
           enable = true;
           servers = {
-            # gopls.enable = true;
+            gopls.enable = true;
             # nixd.enable = true;
             bashls.enable = true;
             cssls = {
@@ -881,7 +881,7 @@
               statix.enable = true;
               yamllint.enable = true;
               hadolint.enable = true;
-              # golangci_lint.enable = true;
+              golangci_lint.enable = true;
             };
             formatting = {
               alejandra.enable = true;
@@ -898,8 +898,8 @@
               pg_format.enable = true;
               stylua.enable = true;
               gleam_format.enable = true;
-              # gofmt.enable = true;
-              # goimports.enable = true;
+              gofmt.enable = true;
+              goimports.enable = true;
               markdownlint.enable = true;
               shellharden.enable = true;
               shfmt.enable = true;
