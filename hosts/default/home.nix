@@ -570,6 +570,7 @@
         signcolumn = "yes";
         smartcase = true;
         spell = true;
+        tabstop = 2;
       };
 
       plugins = {
