@@ -1339,18 +1339,7 @@
       jq
       mermaid-cli
       nodejs
-      (pkgs.buildGoModule rec {
-        pname = "pgbox";
-        version = "main";
-        src = pkgs.fetchFromGitHub {
-          owner = "ahacop";
-          repo = "pgbox";
-          rev = "main";
-          sha256 = "sha256-R7Q1Dpw7SKikmADFkM2Hzq479alZcSPbHxjRBWOSw0g=";
-        };
-        vendorHash = "sha256-qpDNiYOzuXGzyV6m5KG2vtamJKOO6dNgF/2ga82jUZA=";
-        doCheck = false;
-      })
+      inputs.pgbox.packages.${pkgs.system}.default
       (pkgs.python3Packages.buildPythonApplication rec {
         pname = "pgxnclient";
         version = "1.3.2";

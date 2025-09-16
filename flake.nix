@@ -23,6 +23,11 @@
       url = "github:ahacop/macos-notifier-bridge";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    pgbox = {
+      url = "github:ahacop/pgbox";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -89,6 +94,7 @@
               };
               extraSpecialArgs = {
                 claude-code-latest = claude-code-latest;
+                inherit inputs;
               };
             };
           }
