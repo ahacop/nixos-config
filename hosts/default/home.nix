@@ -105,7 +105,7 @@
         cursor-style = "block";
         font-family = "Intel One Mono";
         font-size = 24;
-        theme = "GruvboxDark";
+        theme = "Gruvbox Dark Hard";
         window-decoration = "none";
         # bell-features = "system, attention";
       };
