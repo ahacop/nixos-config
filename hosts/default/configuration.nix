@@ -309,6 +309,7 @@ in
       i3status
       jpegoptim
       jq
+      just
       killall
       man-pages
       man-pages-posix
