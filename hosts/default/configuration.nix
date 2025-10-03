@@ -7,7 +7,8 @@
   inputs,
   pkgs,
   ...
-}: let
+}:
+let
   turboPascal = {
     base00 = "0000aa"; # Background (Blue)
     base01 = "0000cc"; # Lighter Background (Darker Blue)
@@ -84,7 +85,8 @@
     package = pkgs.ultimate-oldschool-pc-font-pack;
     name = "PxPlus IBM VGA 9x14";
   };
-in {
+in
+{
   stylix = {
     enable = true;
     image = config.lib.stylix.pixel "base00";
@@ -165,7 +167,7 @@ in {
     '';
 
     settings = {
-      substituters = ["https://nix-community.cachix.org"];
+      substituters = [ "https://nix-community.cachix.org" ];
       trusted-public-keys = [
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       ];
@@ -335,6 +337,21 @@ in {
       yt-dlp
       zip
       chromium
+      (python313Packages.llm.withPlugins {
+        llm-anthropic = true;
+        llm-git = true;
+        llm-templates-fabric = true;
+        llm-pdf-to-images = true;
+        llm-sentence-transformers = true;
+        llm-docs = true;
+        llm-hacker-news = true;
+        llm-fragments-github = true;
+        llm-jq = true;
+        llm-cmd = true;
+        llm-tools-sqlite = true;
+        llm-ollama = true;
+        llm-gemini = true;
+      })
 
       # For hypervisors that support auto-resizing, this script forces it.
       # I've noticed not everyone listens to the udev events so this is a hack.
@@ -393,11 +410,11 @@ in {
   };
 
   # Setup qemu so we can run x86_64 binaries
-  boot.binfmt.emulatedSystems = ["x86_64-linux"];
+  boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
 
   # Disable the default module and import our override. We have
   # customizations to make this work on aarch64.
-  disabledModules = ["virtualisation/vmware-guest.nix"];
+  disabledModules = [ "virtualisation/vmware-guest.nix" ];
 
   # Interface is this on M1
   networking.interfaces.ens160.useDHCP = true;
@@ -438,7 +455,7 @@ in {
   # Set volume to 60% on boot
   systemd.user.services.set-volume = {
     description = "Set audio volume to 60%";
-    wantedBy = ["default.target"];
+    wantedBy = [ "default.target" ];
     after = [
       "pipewire.service"
       "pipewire-pulse.service"
