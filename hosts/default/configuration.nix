@@ -337,6 +337,8 @@ in
       yt-dlp
       zip
       chromium
+      fish
+      gum
       (python313Packages.llm.withPlugins {
         llm-anthropic = true;
         llm-git = true;
@@ -391,6 +393,11 @@ in
         # Convert first 8 hex chars to decimal and modulo by number of sounds
         INDEX=$(( 0x''${HASH:0:8} % ''${#SOUNDS[@]} ))
         echo "''${SOUNDS[$INDEX]}"
+      '')
+
+      # AI-powered git commit wrapper for Fish function
+      (writeShellScriptBin "gc-ai" ''
+        exec ${pkgs.fish}/bin/fish -c "gc-ai $*"
       '')
 
       gtkmm3
