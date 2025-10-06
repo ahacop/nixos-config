@@ -575,7 +575,7 @@
 
       plugins = {
         render-markdown.enable = true;
-        numbertoggle.enable = true;
+        numbertoggle.enable = false;
         nvim-surround.enable = true;
         mini = {
           enable = true;
