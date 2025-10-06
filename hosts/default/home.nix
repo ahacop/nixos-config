@@ -1272,6 +1272,12 @@
 
         bind-key C-x last-window
 
+        # Move current window one position left
+        bind-key < swap-window -t -1
+
+        # Move current window one position right
+        bind-key > swap-window -t +1
+
         # Allow window renaming by shell hooks
         set-option -g allow-rename on
         set-window-option -g automatic-rename off
