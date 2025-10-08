@@ -5,7 +5,8 @@
   pkgs,
   claude-code-latest,
   ...
-}: {
+}:
+{
   nixpkgs.config.allowUnfree = true;
 
   stylix.targets.ghostty.enable = false;
@@ -20,9 +21,9 @@
         };
         aliases = {
           # Common shortcuts
-          d = ["diff"];
-          di = ["diff"];
-          l = ["log"];
+          d = [ "diff" ];
+          di = [ "diff" ];
+          l = [ "log" ];
           ll = [
             "log"
             "-r"
@@ -34,7 +35,7 @@
           ];
 
           # Branch operations
-          b = ["branch"];
+          b = [ "branch" ];
           bl = [
             "branch"
             "list"
@@ -49,13 +50,13 @@
           ];
 
           # Navigation
-          co = ["checkout"];
-          n = ["new"]; # Create new commit
+          co = [ "checkout" ];
+          n = [ "new" ]; # Create new commit
 
           # Working with changes
-          a = ["squash"]; # Amend/squash into parent
-          sp = ["split"];
-          ab = ["abandon"];
+          a = [ "squash" ]; # Amend/squash into parent
+          sp = [ "split" ];
+          ab = [ "abandon" ];
 
           # History exploration
           p = [
@@ -597,8 +598,8 @@
           filetype = {
             sql = {
               sources = [
-                {name = "vim-dadbod-completion";}
-                {name = "buffer";}
+                { name = "vim-dadbod-completion"; }
+                { name = "buffer"; }
               ];
             };
           };
@@ -620,10 +621,10 @@
               };
             };
             sources = [
-              {name = "nvim_lsp";}
-              {name = "buffer";}
-              {name = "luasnip";}
-              {name = "path";}
+              { name = "nvim_lsp"; }
+              { name = "buffer"; }
+              { name = "luasnip"; }
+              { name = "path"; }
               {
                 name = "cmdline";
                 option = {
@@ -642,7 +643,8 @@
             mapping = {
               "<C-n>" = "cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert })";
               "<C-p>" = "cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert })";
-              "<C-y>" = "cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.insert, select = true }, { 'i', 's' })";
+              "<C-y>" =
+                "cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.insert, select = true }, { 'i', 's' })";
               "<C-b>" = "cmp.mapping.scroll_docs(-4)";
               "<C-f>" = "cmp.mapping.scroll_docs(4)";
             };
@@ -918,7 +920,7 @@
 
       autoCmd = [
         {
-          event = ["TermOpen"];
+          event = [ "TermOpen" ];
           group = "custom_term_open";
           callback = {
             __raw = ''
@@ -930,8 +932,8 @@
           };
         }
         {
-          event = ["FileType"];
-          pattern = ["gitcommit"];
+          event = [ "FileType" ];
+          pattern = [ "gitcommit" ];
           callback = {
             __raw = ''
               function()
@@ -941,8 +943,8 @@
           };
         }
         {
-          event = ["BufWritePre"];
-          pattern = ["*"];
+          event = [ "BufWritePre" ];
+          pattern = [ "*" ];
           callback = {
             __raw = ''
               function()
@@ -954,7 +956,7 @@
         }
       ];
 
-      extraPlugins = with pkgs.vimPlugins; [direnv-vim];
+      extraPlugins = with pkgs.vimPlugins; [ direnv-vim ];
     };
 
     zoxide = {
@@ -1156,7 +1158,7 @@
       enable = true;
       gitCredentialHelper = {
         enable = true;
-        hosts = ["https://github.com"];
+        hosts = [ "https://github.com" ];
       };
     };
 
@@ -1331,7 +1333,6 @@
 
     packages = with pkgs; [
       asciinema
-      awscli2
       bat
       circumflex
       (claude-code-latest pkgs)
