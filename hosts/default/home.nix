@@ -652,8 +652,10 @@
         };
         gitlinker = {
           enable = true;
-          callbacks = {
-            "github.com" = "get_github_type_url";
+          settings = {
+            callbacks = {
+              "github.com".__raw = "require('gitlinker.hosts').get_github_type_url";
+            };
           };
         };
         lspkind = {
