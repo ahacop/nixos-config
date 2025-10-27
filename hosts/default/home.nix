@@ -1164,50 +1164,53 @@
       };
     };
 
+    difftastic = {
+      enable = false;
+    };
+
     git = {
       enable = true;
-      difftastic = {
-        enable = false;
-      };
       ignores = [
         ".envrc"
         ".direnv/"
       ];
-      userName = "Ara Hacopian";
-      userEmail = "ara@hacopian.de";
       lfs.enable = true;
-      aliases = {
-        aa = "add --all";
-        amend = "commit --amend";
-        br = "branch";
-        ci = "commit";
-        cleanup = "!git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 -r git branch -d";
-        co = "checkout";
-        dc = "diff --cached";
-        df = "diff";
-        dh1 = "diff HEAD~1";
-        di = "diff";
-        ds = "diff --stat";
-        fa = "fetch --all";
-        ff = "merge --ff-only";
-        h = "!git head"; # h  = head
-        head = "!git l -1";
-        hp = "!. ~/.githelpers && show_git_head"; # hp = head with patch
-        l = "!. ~/.githelpers && pretty_git_log"; # l  = all commits, only current branch
-        la = "!git l --all"; # la = all commits, all reachable refs
-        lg = "log -p";
-        noff = "merge --no-ff";
-        prettylog = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(r) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative";
-        pullff = "pull --ff-only";
-        r = "!git l -30"; # r  = recent commits, only current branch
-        ra = "!git r --all"; # ra = recent commits, all reachable refs
-        root = "rev-parse --show-toplevel";
-        st = "status";
-        today = "log --since=midnight --author='ahacop' --oneline";
-        yesterday = "log --since=midnight.yesterday --until=midnight --author='ahacop' --oneline";
-        churn = "!f() { git log --all -M -C --name-only --format='format:' \"$@\" | sort | grep -v '^$' | uniq -c | sort -n; }; f";
-      };
-      extraConfig = {
+      settings = {
+        user = {
+          name = "Ara Hacopian";
+          email = "ara@hacopian.de";
+        };
+        alias = {
+          aa = "add --all";
+          amend = "commit --amend";
+          br = "branch";
+          ci = "commit";
+          cleanup = "!git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 -r git branch -d";
+          co = "checkout";
+          dc = "diff --cached";
+          df = "diff";
+          dh1 = "diff HEAD~1";
+          di = "diff";
+          ds = "diff --stat";
+          fa = "fetch --all";
+          ff = "merge --ff-only";
+          h = "!git head"; # h  = head
+          head = "!git l -1";
+          hp = "!. ~/.githelpers && show_git_head"; # hp = head with patch
+          l = "!. ~/.githelpers && pretty_git_log"; # l  = all commits, only current branch
+          la = "!git l --all"; # la = all commits, all reachable refs
+          lg = "log -p";
+          noff = "merge --no-ff";
+          prettylog = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(r) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative";
+          pullff = "pull --ff-only";
+          r = "!git l -30"; # r  = recent commits, only current branch
+          ra = "!git r --all"; # ra = recent commits, all reachable refs
+          root = "rev-parse --show-toplevel";
+          st = "status";
+          today = "log --since=midnight --author='ahacop' --oneline";
+          yesterday = "log --since=midnight.yesterday --until=midnight --author='ahacop' --oneline";
+          churn = "!f() { git log --all -M -C --name-only --format='format:' \"$@\" | sort | grep -v '^$' | uniq -c | sort -n; }; f";
+        };
         branch = {
           autosetuprebase = "always";
           sort = "committerdate";
@@ -1342,7 +1345,6 @@
       duckdb
       dysk
       fd
-      files-to-prompt
       firefox
       fzf
       htop
