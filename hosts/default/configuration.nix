@@ -109,7 +109,7 @@ in
       };
 
       emoji = {
-        package = pkgs.noto-fonts-emoji;
+        package = pkgs.noto-fonts-color-emoji;
         name = "Noto Color Emoji";
       };
 
@@ -271,7 +271,7 @@ in
       jetbrains-mono
       meslo-lgs-nf
       noto-fonts
-      noto-fonts-emoji
+      noto-fonts-color-emoji
       nerd-fonts.terminess-ttf
       ultimate-oldschool-pc-font-pack
     ];
@@ -320,7 +320,7 @@ in
       nix-output-monitor
       nvd
       pandoc
-      pinentry
+      pinentry-curses
       ripgrep
       rxvt-unicode-unwrapped
       socat # used by nb
