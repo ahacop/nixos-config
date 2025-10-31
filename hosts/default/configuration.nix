@@ -149,6 +149,7 @@ in
     loader = {
       # Use the systemd-boot EFI boot loader.
       systemd-boot.enable = true;
+      systemd-boot.configurationLimit = 10;
       efi.canTouchEfiVariables = true;
 
       # VMware, Parallels both only support this being 0 otherwise you see
