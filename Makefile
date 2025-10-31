@@ -42,6 +42,7 @@ help: ## Show this help message
 clean: ## Clean old generations and garbage collect
 	sudo nix-env -p /nix/var/nix/profiles/system --delete-generations old
 	nix-collect-garbage -d
+	sudo nixos-rebuild boot --flake ".#${NIXNAME}"
 
 optimize: ## Optimize nix store
 	nix-store --optimize
