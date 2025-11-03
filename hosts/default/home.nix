@@ -1351,7 +1351,7 @@
       jq
       mermaid-cli
       nodejs
-      inputs.pgbox.packages.${pkgs.system}.default
+      inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
       (pkgs.python3Packages.buildPythonApplication rec {
         pname = "pgxnclient";
         version = "1.3.2";

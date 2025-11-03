@@ -365,7 +365,7 @@ in
 
       # macOS notification bridge
       (writeShellScriptBin "notify-macos" ''
-        exec ${inputs.macos-notifier-bridge.packages.${pkgs.system}.notify-macos}/bin/notify-macos "$@"
+        exec ${inputs.macos-notifier-bridge.packages.${pkgs.stdenv.hostPlatform.system}.notify-macos}/bin/notify-macos "$@"
       '')
       # Get macOS system sound based on current directory
       (writeShellScriptBin "get-dir-sound" ''
