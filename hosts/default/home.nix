@@ -193,44 +193,6 @@
 
       keymaps = [
         {
-          mode = [
-            "i"
-            "s"
-          ];
-          key = "<C-k>";
-          action.__raw = ''
-            function()
-              local ls = require("luasnip")
-              if ls.expand_or_jumpable() then
-                ls.expand_or_jump()
-              end
-            end
-          '';
-          options = {
-            silent = true;
-            desc = "LuaSnip jump forward";
-          };
-        }
-        {
-          mode = [
-            "i"
-            "s"
-          ];
-          key = "<C-j>";
-          action.__raw = ''
-            function()
-              local ls = require("luasnip")
-              if ls.jumpable(-1) then
-                ls.jump(-1)
-              end
-            end
-          '';
-          options = {
-            silent = true;
-            desc = "LuaSnip jump backward";
-          };
-        }
-        {
           action.__raw = ''
             function()
               -- if there is an active search highlight and we are not in the quickfix
@@ -591,7 +553,6 @@
         vim-dadbod-completion.enable = true;
         vim-dadbod-ui.enable = true;
         web-devicons.enable = true;
-        luasnip.enable = true;
         friendly-snippets.enable = true;
         cmp = {
           enable = true;
@@ -623,7 +584,6 @@
             sources = [
               { name = "nvim_lsp"; }
               { name = "buffer"; }
-              { name = "luasnip"; }
               { name = "path"; }
               {
                 name = "cmdline";
@@ -635,10 +595,6 @@
                 };
               }
             ];
-
-            snippet = {
-              expand = "function(args) require('luasnip').lsp_expand(args.body) end";
-            };
 
             mapping = {
               "<C-n>" = "cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert })";
