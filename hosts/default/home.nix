@@ -133,6 +133,32 @@
         cnoremap %% <C-R>=expand('%:h').'/'<cr>
       '';
 
+      extraConfigLua = ''
+        local function dig(name, code)
+          vim.cmd(string.format("digraph %s %d", name, code))
+        end
+
+        -- "ebook" namespace: all digraphs start with comma
+
+        -- Curly quotes
+        dig(",l", 8216)  -- ‘ left single
+        dig(",r", 8217)  -- ’ right single
+        dig(",L", 8220)  -- “ left double
+        dig(",R", 8221)  -- ” right double
+
+        -- Spaces
+        dig(",s", 160)   -- no-break space
+        dig(",t", 8201)  -- thin space
+        dig(",h", 8202)  -- hair space
+
+        -- Dashes
+        dig(",n", 8211)  -- – en dash
+        dig(",m", 8212)  -- — em dash
+
+        -- Ellipsis
+        dig(",.", 8230)  -- … ellipsis
+      '';
+
       userCommands = {
         NavigateToTest = {
           command.__raw = ''
