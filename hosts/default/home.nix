@@ -545,6 +545,81 @@
             desc = "Trim trailing empty lines";
           };
         }
+        {
+          mode = "n";
+          key = "<leader>ep";
+          action.__raw = ''
+            function()
+              -- Kill existing ebook-viewer instances
+              vim.fn.system([[pkill -9 -f ebook-viewer-wrapped]])
+
+              print("Building EPUB...")
+              vim.fn.system([[se build --output-dir=/tmp .]])
+              local latest_epub = vim.fn.system([[ls -t /tmp/*.epub | head -n1]]):gsub([[%s+''$]], [[]])
+              if latest_epub ~= [[]] then
+                local cmd = {[[ebook-viewer]]}
+
+                -- Check if current buffer is a text/*.xhtml file
+                local current_file = vim.fn.expand([[%:.]])
+                local chapter_file = current_file:match([[([^/]+%.xhtml)''$]])
+                if chapter_file and current_file:match([[text/]]) then
+                  table.insert(cmd, [[--open-at=toc-href-contains:]] .. chapter_file:gsub([[%.xhtml''$]], [[]]))
+                  print("Opening " .. latest_epub .. " at " .. chapter_file)
+                else
+                  print("Opening " .. latest_epub)
+                end
+
+                table.insert(cmd, latest_epub)
+                vim.fn.jobstart(cmd, {detach = true})
+              else
+                print("No EPUB found in /tmp")
+              end
+            end
+          '';
+          options = {
+            silent = false;
+            desc = "Build and preview EPUB";
+          };
+        }
+        {
+          mode = "x";
+          key = "<leader>ep";
+          action.__raw = ''
+            function()
+              -- Kill existing ebook-viewer instances
+              vim.fn.system([[pkill -9 -f ebook-viewer-wrapped]])
+
+              -- Yank selection to register z
+              vim.cmd([[normal! "zy]])
+              local selection = vim.fn.getreg([[z]])
+
+              print("Building EPUB...")
+              vim.fn.system([[se build --output-dir=/tmp .]])
+              local latest_epub = vim.fn.system([[ls -t /tmp/*.epub | head -n1]]):gsub([[%s+''$]], [[]])
+              if latest_epub ~= [[]] then
+                local cmd = {[[ebook-viewer]]}
+
+                -- Strip HTML tags and whitespace
+                local search_text = selection:gsub([[<[^>]+>]], [[]]):gsub([[^%s+]], [[]]):gsub([[%s+''$]], [[]])
+                if search_text ~= [[]] then
+                  table.insert(cmd, [[--open-at=search:]] .. search_text)
+                  print("Opening " .. latest_epub .. " searching for: " .. search_text)
+                else
+                  print("Opening " .. latest_epub)
+                end
+
+                table.insert(cmd, latest_epub)
+                vim.fn.jobstart(cmd, {detach = true})
+              else
+                print("No EPUB found in /tmp")
+              end
+            end
+          '';
+          options = {
+            silent = false;
+            desc = "Build and preview EPUB with search";
+          };
+        }
       ];
 
       opts = {
@@ -1321,6 +1396,7 @@
     packages = with pkgs; [
       asciinema
       bat
+      calibre
       circumflex
       (claude-code-latest pkgs)
       devenv
