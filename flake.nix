@@ -28,6 +28,11 @@
       url = "github:ahacop/pgbox";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    mw-cli = {
+      url = "github:ahacop/mw-cli";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {

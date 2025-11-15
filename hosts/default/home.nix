@@ -1407,6 +1407,7 @@
       htop
       jq
       mermaid-cli
+      inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
       nodejs
       inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
       (pkgs.python3Packages.buildPythonApplication rec {
