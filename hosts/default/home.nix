@@ -1272,7 +1272,6 @@
           autosetuprebase = "always";
           sort = "committerdate";
         };
-        blame.ignoreRevsFile = ".git-blame-ignore-revs";
         commit.verbose = true;
         color.ui = true;
         core = {
