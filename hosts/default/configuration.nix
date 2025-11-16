@@ -345,7 +345,6 @@ in
         llm-anthropic = true;
         llm-git = true;
         llm-templates-fabric = true;
-        llm-pdf-to-images = true;
         llm-sentence-transformers = true;
         llm-docs = true;
         llm-hacker-news = true;
@@ -365,7 +364,9 @@ in
 
       # macOS notification bridge
       (writeShellScriptBin "notify-macos" ''
-        exec ${inputs.macos-notifier-bridge.packages.${pkgs.stdenv.hostPlatform.system}.notify-macos}/bin/notify-macos "$@"
+        exec ${
+          inputs.macos-notifier-bridge.packages.${pkgs.stdenv.hostPlatform.system}.notify-macos
+        }/bin/notify-macos "$@"
       '')
       # Get macOS system sound based on current directory
       (writeShellScriptBin "get-dir-sound" ''
