@@ -894,7 +894,7 @@
               enable = true;
             };
             ts_ls = {
-              enable = false;
+              enable = true;
             };
             yamlls = {
               enable = true;
