@@ -403,6 +403,50 @@ in
         exec ${pkgs.fish}/bin/fish -c "gc-ai $*"
       '')
 
+      # Copy latest screenshot(s) from Desktop to current directory
+      (writeShellScriptBin "copy-screenshot" ''
+        set -euo pipefail
+
+        DESKTOP_PATH="/host/ahacop/Desktop"
+        NUM_SCREENSHOTS="''${1:-1}"
+
+        # Validate the argument is a positive integer
+        if ! [[ "$NUM_SCREENSHOTS" =~ ^[0-9]+$ ]] || [ "$NUM_SCREENSHOTS" -lt 1 ]; then
+          echo "Error: Argument must be a positive integer" >&2
+          echo "Usage: copy-screenshot [N]" >&2
+          exit 1
+        fi
+
+        # Check if Desktop directory exists
+        if [ ! -d "$DESKTOP_PATH" ]; then
+          echo "Error: Desktop directory not found at $DESKTOP_PATH" >&2
+          exit 1
+        fi
+
+        # Find screenshots and sort by modification time (newest first)
+        # Screenshot filenames look like: "Screenshot 2025-11-30 at 5.31.47 PM.png"
+        mapfile -t screenshots < <(${pkgs.findutils}/bin/find "$DESKTOP_PATH" -maxdepth 1 -type f -name "Screenshot *.png" -printf '%T@ %p\n' | ${pkgs.coreutils}/bin/sort -rn | ${pkgs.coreutils}/bin/head -n "$NUM_SCREENSHOTS" | ${pkgs.coreutils}/bin/cut -d' ' -f2-)
+
+        # Check if any screenshots were found
+        if [ ''${#screenshots[@]} -eq 0 ]; then
+          echo "No screenshots found in $DESKTOP_PATH" >&2
+          exit 1
+        fi
+
+        # Check if we found fewer screenshots than requested
+        if [ ''${#screenshots[@]} -lt "$NUM_SCREENSHOTS" ]; then
+          echo "Warning: Only found ''${#screenshots[@]} screenshot(s), requested $NUM_SCREENSHOTS" >&2
+        fi
+
+        # Copy each screenshot to current directory
+        for screenshot in "''${screenshots[@]}"; do
+          filename=$(${pkgs.coreutils}/bin/basename "$screenshot")
+          ${pkgs.coreutils}/bin/cp -v "$screenshot" "./$filename"
+        done
+
+        echo "Copied ''${#screenshots[@]} screenshot(s) to current directory"
+      '')
+
       gtkmm3
       # ] ++ lib.optionals (currentSystemName == "vm-aarch64") [
       #   # This is needed for the vmware user tools clipboard to work.
