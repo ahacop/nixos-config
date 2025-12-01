@@ -913,6 +913,24 @@
         };
         vim-test.enable = true;
         trouble.enable = true;
+
+        lint = {
+          enable = true;
+          lintersByFt = {
+            markdown = [ "vale" ];
+            mdx = [ "vale" ];
+          };
+          autoCmd = {
+            callback = {
+              __raw = ''
+                function()
+                  require('lint').try_lint()
+                end
+              '';
+            };
+            event = [ "BufWritePost" "BufReadPost" "InsertLeave" ];
+          };
+        };
         fidget = {
           enable = true;
           settings = {
@@ -1451,6 +1469,7 @@
       tldr
       tree
       dunst
+      vale
     ];
     sessionVariables = {
       PAGER = "less -FirSwX";
