@@ -471,7 +471,7 @@ in
   disabledModules = [ "virtualisation/vmware-guest.nix" ];
 
   # Interface is this on M1
-  networking.interfaces.ens160.useDHCP = true;
+  networking.interfaces.enp2s0.useDHCP = true;
 
   # This works through our custom module imported above
   virtualisation.vmware.guest.enable = true;
