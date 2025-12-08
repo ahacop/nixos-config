@@ -190,6 +190,7 @@
       enableZshIntegration = true;
       settings = {
         cursor-style = "block";
+        font-size = 18;
         font-family = "Intel One Mono";
         window-decoration = "none";
         keybind = [
