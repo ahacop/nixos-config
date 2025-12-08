@@ -33,6 +33,20 @@
       url = "github:ahacop/mw-cli";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    niri = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    elephant = {
+      url = "github:abenz1267/elephant";
+    };
+
+    walker = {
+      url = "github:abenz1267/walker";
+      inputs.elephant.follows = "elephant";
+    };
   };
 
   outputs =
@@ -91,6 +105,9 @@
           modules = [
             inputs.stylix.nixosModules.stylix
             ./hosts/default/configuration.nix
+            {
+              nixpkgs.overlays = [ inputs.niri.overlays.niri ];
+            }
             home-manager.nixosModules.default
             {
               home-manager = {
@@ -99,6 +116,9 @@
                   imports = [
                     ./hosts/default/home.nix
                     inputs.nixvim.homeModules.nixvim
+                    inputs.niri.homeModules.niri
+                    inputs.niri.homeModules.stylix
+                    inputs.walker.homeManagerModules.default
                   ];
                 };
                 extraSpecialArgs = {

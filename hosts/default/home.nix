@@ -9,9 +9,95 @@
 {
   nixpkgs.config.allowUnfree = true;
 
-  stylix.targets.ghostty.enable = false;
+  services.cliphist = {
+    enable = true;
+    allowImages = true;
+  };
+
+  services.mako = {
+    enable = true;
+    settings.default-timeout = 5000; # 5 seconds
+  };
 
   programs = {
+    walker = {
+      enable = true;
+      runAsService = true;
+      config = {
+        keybinds = {
+          next = [
+            "Down"
+            "ctrl n"
+            "ctrl j"
+          ];
+          previous = [
+            "Up"
+            "ctrl k"
+          ];
+        };
+        builtins = {
+          runner = {
+            entries = [
+              {
+                name = "Clipboard: Sync from Host";
+                cmd = "sh -c 'cat /host/ahacop/clipboard.txt | wl-copy && notify-send \"Synced from host\"'";
+              }
+              {
+                name = "Clipboard: Sync to Host";
+                cmd = "sh -c 'wl-paste > /host/ahacop/clipboard.txt && notify-send \"Synced to host\"'";
+              }
+              {
+                name = "Clipboard: History";
+                cmd = "sh -c 'cliphist list | walker --dmenu | cliphist decode | wl-copy'";
+              }
+            ];
+          };
+        };
+      };
+      elephant = {
+        provider.websearch.settings = {
+          always_show_default = false;
+          entries = [
+            {
+              name = "DuckDuckGo";
+              url = "https://duckduckgo.com/?q=%TERM%";
+              default = true;
+            }
+            {
+              name = "Google";
+              url = "https://www.google.com/search?q=%TERM%";
+              prefix = "g:";
+            }
+            {
+              name = "Wikipedia";
+              url = "https://en.wikipedia.org/wiki/Special:Search?search=%TERM%";
+              prefix = "w:";
+            }
+            {
+              name = "NixOS Options";
+              url = "https://search.nixos.org/options?query=%TERM%";
+              prefix = "no:";
+            }
+            {
+              name = "Home Manager Options";
+              url = "https://home-manager-options.extranix.com/?query=%TERM%";
+              prefix = "hm:";
+            }
+          ];
+        };
+      };
+    };
+
+    kitty = {
+      enable = true;
+      extraConfig = ''
+        # Use pbcopy/pbpaste for clipboard to sync with host
+        clipboard_control write-clipboard write-primary read-clipboard read-primary
+        clipboard_write pbcopy
+        clipboard_read pbpaste
+      '';
+    };
+
     jujutsu = {
       enable = true;
       settings = {
@@ -105,10 +191,14 @@
       settings = {
         cursor-style = "block";
         font-family = "Intel One Mono";
-        font-size = 24;
-        theme = "Gruvbox Dark Hard";
         window-decoration = "none";
-        # bell-features = "system, attention";
+        keybind = [
+          "ctrl+equal=increase_font_size:1"
+          "ctrl+minus=decrease_font_size:1"
+          "ctrl+zero=reset_font_size"
+          "shift+enter=text:\\x0a"
+        ];
+        bell-features = "system, attention";
       };
     };
 
@@ -928,7 +1018,11 @@
                 end
               '';
             };
-            event = [ "BufWritePost" "BufReadPost" "InsertLeave" ];
+            event = [
+              "BufWritePost"
+              "BufReadPost"
+              "InsertLeave"
+            ];
           };
         };
         fidget = {
@@ -1159,10 +1253,7 @@
         gv = "open_modified_and_untracked_in_vim";
         gvh = "open_changed_from_head_in_vim";
         gvv = "edit_diff_files_in_vim";
-        i3b = "list-i3-keybindings | fzf";
         ls = "ls -GF";
-        pbcopy = "xclip";
-        pbpaste = "xclip -o";
         show-git-remote-authors = "git for-each-ref --format=' %(authorname) %09 %(refname)' --sort=authorname | grep remote";
         showtodos = "git grep -l TODO | xargs -n1 git blame --show-email -f | grep TODO  | sed -E 's/[[:blank:]]+/ /g' | sort -k 4";
         strip = "sed $'s,x1b\\[[0-9;]*[a-zA-Z],,g;s,\r$,,g'";
@@ -1370,28 +1461,356 @@
       enableZshIntegration = true;
     };
 
-    i3status = {
+    waybar = {
       enable = true;
+      systemd.enable = false; # Started directly by niri spawn-at-startup
+      # style = ''
+      #   * {
+      #     font-family: monospace;
+      #     font-size: 16px;
+      #     font-weight: bold;
+      #   }
+      #
+      #   #network,
+      #   #disk,
+      #   #memory,
+      #   #cpu,
+      #   #battery {
+      #     padding-left: 12px;
+      #     padding-right: 12px;
+      #     border-right: 2px solid rgba(255, 255, 255, 0.3);
+      #   }
+      #
+      #   #clock {
+      #     padding-left: 12px;
+      #     padding-right: 12px;
+      #   }
+      # '';
+      settings = {
+        mainBar = {
+          position = "bottom";
+          layer = "top";
+          height = 35;
+          modules-left = [ ];
+          modules-center = [ ];
+          modules-right = [
+            "network"
+            "disk"
+            "memory"
+            "cpu"
+            "battery"
+            "clock"
+          ];
 
-      general = {
-        colors = true;
-        color_good = "#8C9440";
-        color_bad = "#A54242";
-        color_degraded = "#DE935F";
+          network = {
+            interval = 5;
+            format-ethernet = "E: {ipaddr} ({bandwidthDownBits})";
+            format-wifi = "W: {essid} {ipaddr}";
+            format-disconnected = "E: down";
+            tooltip-format = "{ifname}: {ipaddr}/{cidr}";
+          };
+
+          disk = {
+            interval = 30;
+            format = "/ {free}";
+            path = "/";
+          };
+
+          memory = {
+            interval = 5;
+            format = "M: {percentage}%";
+            tooltip-format = "Memory: {used:0.1f}G / {total:0.1f}G";
+          };
+
+          cpu = {
+            interval = 5;
+            format = "C: {usage}%";
+            tooltip-format = "CPU: {usage}%";
+          };
+
+          battery = {
+            interval = 60;
+            states = {
+              warning = 30;
+              critical = 15;
+            };
+            format = "B: {capacity}%";
+            format-charging = "B: {capacity}% ⚡";
+            format-plugged = "B: {capacity}% ";
+            tooltip-format = "Battery: {capacity}% - {time}";
+          };
+
+          clock = {
+            format = "{:%Y-%m-%d %H:%M:%S}";
+            tooltip-format = "{:%A, %B %d, %Y}";
+          };
+        };
+      };
+    };
+
+    niri.settings = {
+      # Environment variables
+      environment = {
+        QT_QPA_PLATFORM = "wayland";
+        MOZ_ENABLE_WAYLAND = "1";
+        NIXOS_OZONE_WL = "1";
       };
 
-      modules = {
-        ipv6.enable = false;
-        "wireless _first_".enable = false;
-        "battery all".enable = false;
+      # Output configuration
+      outputs."Virtual-1" = {
+        scale = 1.5;
+      };
+
+      input = {
+        keyboard = {
+          xkb = {
+            layout = "us";
+          };
+          repeat-delay = 400;
+          repeat-rate = 30;
+          track-layout = "window";
+        };
+
+        touchpad = {
+          tap = true;
+          dwt = true;
+          natural-scroll = true;
+          click-method = "clickfinger";
+        };
+
+        mouse = {
+          accel-speed = 0.0;
+          accel-profile = "flat";
+        };
+
+        focus-follows-mouse = {
+          enable = true;
+          max-scroll-amount = "10%";
+        };
+
+        workspace-auto-back-and-forth = true;
+      };
+
+      cursor = {
+        hide-when-typing = true;
+      };
+
+      # Layout configuration
+      layout = {
+        gaps = 0;
+
+        # center-focused-column = "on-overflow";
+
+        # Make windows share space (two windows visible side by side)
+        # default-column-width = {
+        #   proportion = 0.5;
+        # };
+        #
+        # preset-column-widths = [
+        #   { proportion = 1.0 / 3.0; }
+        #   { proportion = 1.0 / 2.0; }
+        #   { proportion = 2.0 / 3.0; }
+        # ];
+      };
+
+      animations = {
+        enable = true;
+      };
+
+      spawn-at-startup = [
+        {
+          command = [
+            "sh"
+            "-c"
+            "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
+          ];
+        }
+        { command = [ "waybar" ]; }
+      ];
+
+      window-rules = [
+        {
+          matches = [
+            {
+              app-id = "firefox$";
+              title = "^Picture-in-Picture$";
+            }
+          ];
+          open-floating = true;
+        }
+
+        # Dialogs and popups - floating by default
+        {
+          matches = [
+            { title = "^Open File$"; }
+            { title = "^Save File$"; }
+            { title = "^Save As$"; }
+          ];
+          open-floating = true;
+        }
+      ];
+
+      binds = with config.lib.niri.actions; {
+        "Mod+Shift+Slash".action = show-hotkey-overlay;
+
+        "Mod+Return".action = spawn "ghostty";
+        "Mod+Shift+Return".action = spawn "kitty";
+        "Mod+D".action = spawn "walker";
+
+        "Super+Alt+S" = {
+          action = spawn-sh "pkill orca || exec orca";
+          allow-when-locked = true;
+        };
+
+        "XF86AudioRaiseVolume" = {
+          action = spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0";
+          allow-when-locked = true;
+        };
+        "XF86AudioLowerVolume" = {
+          action = spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-";
+          allow-when-locked = true;
+        };
+        "XF86AudioMute" = {
+          action = spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+          allow-when-locked = true;
+        };
+        "XF86AudioMicMute" = {
+          action = spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
+          allow-when-locked = true;
+        };
+
+        "XF86AudioPlay" = {
+          action = spawn-sh "playerctl play-pause";
+          allow-when-locked = true;
+        };
+        "XF86AudioStop" = {
+          action = spawn-sh "playerctl stop";
+          allow-when-locked = true;
+        };
+        "XF86AudioPrev" = {
+          action = spawn-sh "playerctl previous";
+          allow-when-locked = true;
+        };
+        "XF86AudioNext" = {
+          action = spawn-sh "playerctl next";
+          allow-when-locked = true;
+        };
+
+        "XF86MonBrightnessUp" = {
+          action = spawn [
+            "brightnessctl"
+            "--class=backlight"
+            "set"
+            "+10%"
+          ];
+          allow-when-locked = true;
+        };
+        "XF86MonBrightnessDown" = {
+          action = spawn [
+            "brightnessctl"
+            "--class=backlight"
+            "set"
+            "10%-"
+          ];
+          allow-when-locked = true;
+        };
+
+        "Mod+O" = {
+          action = toggle-overview;
+          repeat = false;
+        };
+
+        "Mod+W" = {
+          action = close-window;
+          repeat = false;
+        };
+
+        "Mod+Left".action = focus-column-left;
+        "Mod+Down".action = focus-window-down;
+        "Mod+Up".action = focus-window-up;
+        "Mod+Right".action = focus-column-right;
+        "Mod+H".action = focus-column-left;
+        "Mod+J".action = focus-window-down;
+        "Mod+K".action = focus-window-up;
+        "Mod+L".action = focus-column-right;
+
+        "Mod+Ctrl+Left".action = move-column-left;
+        "Mod+Ctrl+Down".action = move-window-down;
+        "Mod+Ctrl+Up".action = move-window-up;
+        "Mod+Ctrl+Right".action = move-column-right;
+        "Mod+Ctrl+H".action = move-column-left;
+        "Mod+Ctrl+J".action = move-window-down;
+        "Mod+Ctrl+K".action = move-window-up;
+        "Mod+Ctrl+L".action = move-column-right;
+
+        "Mod+Home".action = focus-column-first;
+        "Mod+End".action = focus-column-last;
+        "Mod+Ctrl+Home".action = move-column-to-first;
+        "Mod+Ctrl+End".action = move-column-to-last;
+
+        "Mod+Shift+Left".action = focus-monitor-left;
+        "Mod+Shift+Down".action = focus-monitor-down;
+        "Mod+Shift+Up".action = focus-monitor-up;
+        "Mod+Shift+Right".action = focus-monitor-right;
+        "Mod+Shift+H".action = focus-monitor-left;
+        "Mod+Shift+J".action = focus-monitor-down;
+        "Mod+Shift+K".action = focus-monitor-up;
+        "Mod+Shift+L".action = focus-monitor-right;
+
+        "Mod+Shift+Ctrl+Left".action = move-column-to-monitor-left;
+        "Mod+Shift+Ctrl+Down".action = move-column-to-monitor-down;
+        "Mod+Shift+Ctrl+Up".action = move-column-to-monitor-up;
+        "Mod+Shift+Ctrl+Right".action = move-column-to-monitor-right;
+        "Mod+Shift+Ctrl+H".action = move-column-to-monitor-left;
+        "Mod+Shift+Ctrl+J".action = move-column-to-monitor-down;
+        "Mod+Shift+Ctrl+K".action = move-column-to-monitor-up;
+        "Mod+Shift+Ctrl+L".action = move-column-to-monitor-right;
+
+        "Mod+BracketLeft".action = consume-or-expel-window-left;
+        "Mod+BracketRight".action = consume-or-expel-window-right;
+
+        "Mod+Comma".action = consume-window-into-column;
+        "Mod+Period".action = expel-window-from-column;
+
+        "Mod+R".action = switch-preset-column-width;
+        "Mod+Shift+R".action = switch-preset-window-height;
+        "Mod+Ctrl+R".action = reset-window-height;
+        "Mod+F".action = maximize-column;
+        "Mod+Shift+F".action = fullscreen-window;
+
+        "Mod+Ctrl+F".action = expand-column-to-available-width;
+
+        "Mod+C".action = center-column;
+        "Mod+Ctrl+C".action = center-visible-columns;
+
+        "Mod+Minus".action = set-column-width "-10%";
+        "Mod+Equal".action = set-column-width "+10%";
+
+        "Mod+Shift+Minus".action = set-window-height "-10%";
+        "Mod+Shift+Equal".action = set-window-height "+10%";
+
+        "Mod+V".action = toggle-window-floating;
+        "Mod+Shift+V".action = switch-focus-between-floating-and-tiling;
+
+        "Mod+Shift+W".action = toggle-column-tabbed-display;
+
+        "Mod+Escape" = {
+          action = toggle-keyboard-shortcuts-inhibit;
+          allow-inhibiting = false;
+        };
+
+        "Mod+Shift+X".action = quit;
+
+        "Mod+P".action.screenshot = [ ];
+        "Mod+Ctrl+P".action.screenshot-screen = [ ];
+        "Mod+Alt+P".action.screenshot-window = [ ];
+
+        "Mod+Shift+P".action = power-off-monitors;
       };
     };
   };
 
   xdg.enable = true;
-  xdg.configFile = {
-    "i3/config".text = builtins.readFile ./../../config/i3;
-  };
 
   home = {
     username = "ahacop";
@@ -1404,7 +1823,30 @@
       ".local/flake-dev-envs/ruby/flake.lock".source = ./../../devflakes/ruby/flake.lock;
       ".config/fish/functions/gc-ai.fish".source = ./../../scripts/gc-ai.fish;
       ".tigrc".text = ''
-        bind generic Y !sh -c 'commit=%(commit); echo $commit | /run/current-system/sw/bin/xclip -selection clipboard & echo $commit | /run/current-system/sw/bin/tmux load-buffer -'
+        bind generic Y !sh -c 'commit=%(commit); echo $commit | /run/current-system/sw/bin/wl-copy & echo $commit | /run/current-system/sw/bin/tmux load-buffer -'
+      '';
+
+      # Walker-accessible clipboard sync scripts
+      ".local/share/applications/clipboard-sync-from-host.desktop".text = ''
+        [Desktop Entry]
+        Type=Application
+        Name=Clipboard: Sync from Host
+        Comment=Sync clipboard from host file to Wayland clipboard
+        Exec=sh -c 'cat /host/ahacop/clipboard.txt | wl-copy && notify-send "Clipboard synced from host"'
+        Terminal=false
+        Categories=Utility;
+        NoDisplay=false
+      '';
+
+      ".local/share/applications/clipboard-sync-to-host.desktop".text = ''
+        [Desktop Entry]
+        Type=Application
+        Name=Clipboard: Sync to Host
+        Comment=Sync Wayland clipboard to host file
+        Exec=sh -c 'wl-paste > /host/ahacop/clipboard.txt && notify-send "Clipboard synced to host"'
+        Terminal=false
+        Categories=Utility;
+        NoDisplay=false
       '';
     };
 
@@ -1463,19 +1905,15 @@
       presenterm
       readest
       ripgrep
-      rofi
       silicon
       tig
       tldr
       tree
-      dunst
       vale
+      waybar
     ];
     sessionVariables = {
       PAGER = "less -FirSwX";
-      # Force software rendering for kitty in VM environment
-      LIBGL_ALWAYS_SOFTWARE = "1";
-      MESA_GL_VERSION_OVERRIDE = "3.3";
     };
   };
 }

@@ -112,10 +112,6 @@ in
         package = pkgs.noto-fonts-color-emoji;
         name = "Noto Color Emoji";
       };
-
-      sizes = {
-        terminal = 24;
-      };
     };
   };
 
@@ -194,14 +190,37 @@ in
 
   security.sudo.wheelNeedsPassword = false;
 
+  # Enable hardware 3D acceleration for VMware
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = false; # only available on x86
+    extraPackages = with pkgs; [
+      mesa
+    ];
+  };
+
   # Virtualization settings
   virtualisation.docker.enable = true;
 
-  # XDG desktop portal for applications like kitty
+  # Enable Niri window manager
+  programs.niri.enable = true;
+
+  # Enable greetd with tuigreet
+  services.greetd = {
+    enable = true;
+    settings = {
+      default_session.command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --user-menu --cmd niri-session";
+    };
+  };
+
+  # XDG desktop portal for Wayland
   xdg.portal = {
     enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-    config.common.default = "*";
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+    ];
+    # Use GTK portal for everything (no GNOME dependencies)
+    config.common.default = [ "gtk" ];
   };
 
   # Configure network proxy if necessary
@@ -216,33 +235,11 @@ in
   #   useXkbConfig = true; # use xkb.options in tty.
   # };
 
-  # Enable the X11 windowing system.
+  # Enable Niri Wayland compositor
   i18n = {
     defaultLocale = "en_US.UTF-8";
   };
   services = {
-    # setup windowing environment
-    displayManager.defaultSession = "none+i3";
-    xserver = {
-      enable = true;
-      xkb.layout = "us";
-      dpi = 110;
-
-      displayManager = {
-        lightdm.enable = true;
-
-        # AARCH64: For now, on Apple Silicon, we must manually set the
-        # display resolution. This is a known issue with VMware Fusion.
-        sessionCommands = ''
-          ${pkgs.xorg.xset}/bin/xset r rate 200 40
-        '';
-      };
-
-      windowManager.i3 = {
-        enable = true;
-      };
-    };
-
     # Enable desktop portal for applications like kitty
     dbus.enable = true;
 
@@ -282,6 +279,9 @@ in
   environment = {
     sessionVariables = {
       FLAKE = "/home/ahacop/nixos-config";
+      # Force Mesa to use the VMware SVGA driver for hardware acceleration
+      LIBGL_ALWAYS_SOFTWARE = "0";
+      MESA_LOADER_DRIVER_OVERRIDE = "vmwgfx";
     };
 
     # List packages installed in system profile. To search, run:
@@ -293,21 +293,16 @@ in
       bat
       cachix
       coreutils
-      dmenu
       fd
-      feh
       ffmpeg
       git
       gnumake
-      kitty
       mesa
       mesa-demos
       gnupg
       heroku
       htop
       hunspell
-      i3
-      i3status
       jpegoptim
       jq
       just
@@ -330,11 +325,8 @@ in
       tmux
       unzip
       w3m
+      wl-clipboard
       wget
-      xclip
-      xorg.xev
-      xorg.xmodmap
-      xsel
       xxd
       yt-dlp
       zip
@@ -355,12 +347,6 @@ in
         llm-ollama = true;
         llm-gemini = true;
       })
-
-      # For hypervisors that support auto-resizing, this script forces it.
-      # I've noticed not everyone listens to the udev events so this is a hack.
-      (writeShellScriptBin "xrandr-auto" ''
-        xrandr --output Virtual-1 --auto
-      '')
 
       # macOS notification bridge
       (writeShellScriptBin "notify-macos" ''
@@ -401,6 +387,19 @@ in
       # AI-powered git commit wrapper for Fish function
       (writeShellScriptBin "gc-ai" ''
         exec ${pkgs.fish}/bin/fish -c "gc-ai $*"
+      '')
+
+      # Clipboard sync with host via shared filesystem
+      (writeShellScriptBin "pbcopy" ''
+        # Copy to both Wayland clipboard AND host file
+        ${pkgs.coreutils}/bin/tee /host/ahacop/clipboard.txt | ${pkgs.wl-clipboard}/bin/wl-copy
+      '')
+
+      (writeShellScriptBin "pbpaste" ''
+        # Always paste from host file (single source of truth)
+        if [ -f /host/ahacop/clipboard.txt ]; then
+          ${pkgs.coreutils}/bin/cat /host/ahacop/clipboard.txt
+        fi
       '')
 
       # Copy latest screenshot(s) from Desktop to current directory
@@ -463,6 +462,9 @@ in
     };
   };
 
+  # Disable GNOME's SSH agent to avoid conflict
+  services.gnome.gnome-keyring.enable = lib.mkForce false;
+
   # Setup qemu so we can run x86_64 binaries
   boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
 
@@ -517,6 +519,19 @@ in
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${pkgs.pulseaudio}/bin/pactl set-sink-volume @DEFAULT_SINK@ 60%";
+      RemainAfterExit = true;
+    };
+  };
+
+  # Export Wayland environment to D-Bus for xdg-desktop-portal
+  # This fixes slow startup of GTK apps (like ghostty) that query the portal
+  systemd.user.services.xdg-desktop-portal-env = {
+    description = "Export Wayland environment to D-Bus";
+    wantedBy = [ "graphical-session.target" ];
+    before = [ "xdg-desktop-portal.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.dbus}/bin/dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP";
       RemainAfterExit = true;
     };
   };
