@@ -67,11 +67,11 @@
         pkgs:
         pkgs.stdenv.mkDerivation rec {
           pname = "claude-code";
-          version = claudeVersionInfo.version;
+          inherit (claudeVersionInfo) version;
 
           src = pkgs.fetchurl {
             url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${version}.tgz";
-            sha256 = claudeVersionInfo.sha256;
+            inherit (claudeVersionInfo) sha256;
           };
 
           buildInputs = [ pkgs.nodejs ];
@@ -100,7 +100,7 @@
           specialArgs = {
             inherit inputs;
             inherit user;
-            claude-code-latest = claude-code-latest;
+            inherit claude-code-latest;
           };
           modules = [
             inputs.stylix.nixosModules.stylix
@@ -122,7 +122,7 @@
                   ];
                 };
                 extraSpecialArgs = {
-                  claude-code-latest = claude-code-latest;
+                  inherit claude-code-latest;
                   inherit inputs;
                 };
               };
