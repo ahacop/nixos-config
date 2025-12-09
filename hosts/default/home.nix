@@ -1813,7 +1813,8 @@
       ".local/share/applications/clipboard-sync-from-host.desktop".text = ''
         [Desktop Entry]
         Type=Application
-        Name=Clipboard: Sync from Host
+        Icon=edit-copy
+        Name=Clipboard: Sync from Host (sf)
         Comment=Sync clipboard from host file to Wayland clipboard
         Exec=sh -c 'cat /host/ahacop/clipboard.txt | wl-copy && notify-send "Clipboard synced from host"'
         Terminal=false
@@ -1824,7 +1825,8 @@
       ".local/share/applications/clipboard-sync-to-host.desktop".text = ''
         [Desktop Entry]
         Type=Application
-        Name=Clipboard: Sync to Host
+        Icon=edit-copy
+        Name=Clipboard: Sync to Host (st)
         Comment=Sync Wayland clipboard to host file
         Exec=sh -c 'wl-paste > /host/ahacop/clipboard.txt && notify-send "Clipboard synced to host"'
         Terminal=false
