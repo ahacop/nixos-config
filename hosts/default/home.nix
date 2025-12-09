@@ -35,24 +35,6 @@
             "ctrl k"
           ];
         };
-        builtins = {
-          runner = {
-            entries = [
-              {
-                name = "Clipboard: Sync from Host";
-                cmd = "sh -c 'cat /host/ahacop/clipboard.txt | wl-copy && notify-send \"Synced from host\"'";
-              }
-              {
-                name = "Clipboard: Sync to Host";
-                cmd = "sh -c 'wl-paste > /host/ahacop/clipboard.txt && notify-send \"Synced to host\"'";
-              }
-              {
-                name = "Clipboard: History";
-                cmd = "sh -c 'cliphist list | walker --dmenu | cliphist decode | wl-copy'";
-              }
-            ];
-          };
-        };
       };
       elephant = {
         provider.websearch.settings = {
