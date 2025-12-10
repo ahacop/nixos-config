@@ -1806,7 +1806,7 @@
       ".local/flake-dev-envs/ruby/flake.lock".source = ./../../devflakes/ruby/flake.lock;
       ".config/fish/functions/gc-ai.fish".source = ./../../scripts/gc-ai.fish;
       ".tigrc".text = ''
-        bind generic Y !sh -c 'commit=%(commit); echo $commit | /run/current-system/sw/bin/wl-copy & echo $commit | /run/current-system/sw/bin/tmux load-buffer -'
+        bind generic Y !sh -c 'commit=%(commit); echo $commit | /run/current-system/sw/bin/wl-copy -n & echo $commit | /run/current-system/sw/bin/tmux load-buffer -'
       '';
 
       # Walker-accessible clipboard sync scripts
@@ -1816,7 +1816,7 @@
         Icon=edit-copy
         Name=Clipboard: Sync from Host (sf)
         Comment=Sync clipboard from host file to Wayland clipboard
-        Exec=sh -c 'cat /host/ahacop/clipboard.txt | wl-copy && notify-send "Clipboard synced from host"'
+        Exec=sh -c 'cat /host/ahacop/clipboard.txt | wl-copy -n && notify-send "Clipboard synced from host"'
         Terminal=false
         Categories=Utility;
         NoDisplay=false
@@ -1828,7 +1828,7 @@
         Icon=edit-copy
         Name=Clipboard: Sync to Host (st)
         Comment=Sync Wayland clipboard to host file
-        Exec=sh -c 'wl-paste > /host/ahacop/clipboard.txt && notify-send "Clipboard synced to host"'
+        Exec=sh -c 'wl-paste -n > /host/ahacop/clipboard.txt && notify-send "Clipboard synced to host"'
         Terminal=false
         Categories=Utility;
         NoDisplay=false

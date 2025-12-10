@@ -392,7 +392,7 @@ in
       # Clipboard sync with host via shared filesystem
       (writeShellScriptBin "pbcopy" ''
         # Copy to both Wayland clipboard AND host file
-        ${pkgs.coreutils}/bin/tee /host/ahacop/clipboard.txt | ${pkgs.wl-clipboard}/bin/wl-copy
+        ${pkgs.coreutils}/bin/tee /host/ahacop/clipboard.txt | ${pkgs.wl-clipboard}/bin/wl-copy -n
       '')
 
       (writeShellScriptBin "pbpaste" ''
