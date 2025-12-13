@@ -1240,6 +1240,8 @@
         show-git-remote-authors = "git for-each-ref --format=' %(authorname) %09 %(refname)' --sort=authorname | grep remote";
         showtodos = "git grep -l TODO | xargs -n1 git blame --show-email -f | grep TODO  | sed -E 's/[[:blank:]]+/ /g' | sort -k 4";
         strip = "sed $'s,x1b\\[[0-9;]*[a-zA-Z],,g;s,\r$,,g'";
+        res-low = "niri msg output Virtual-1 mode 1920x1080@60.000";
+        res-default = "niri msg output Virtual-1 mode 7680x3200@60.000";
       };
       initContent = ''
         ${builtins.readFile ./../../config/zshrc}
