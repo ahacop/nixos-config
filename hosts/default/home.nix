@@ -6,8 +6,16 @@
   claude-code-latest,
   ...
 }:
+let
+  nur = import inputs.nur {
+    inherit pkgs;
+    nurpkgs = pkgs;
+  };
+in
 {
   nixpkgs.config.allowUnfree = true;
+
+  stylix.targets.firefox.profileNames = [ "default" ];
 
   services.cliphist = {
     enable = true;
@@ -165,6 +173,37 @@
     yazi = {
       enable = true;
       enableZshIntegration = true;
+    };
+
+    firefox = {
+      enable = true;
+      profiles.default = {
+        isDefault = true;
+        extensions.packages = with nur.repos.rycee.firefox-addons; [
+          clearurls
+          facebook-container
+          ublock-origin
+          vimium
+        ];
+        settings = {
+          # Video decode: software only (VMware GPU has no VA-API)
+          "media.ffmpeg.vaapi.enabled" = false;
+          "media.ffvpx.enabled" = true;
+          "media.av1.enabled" = false; # AV1 software decode is very CPU heavy
+          "media.hardware-video-decoding.enabled" = false;
+          # WebRender: use GPU acceleration (OpenGL 4.3 is available)
+          "gfx.webrender.all" = true;
+          "gfx.webrender.compositor" = true;
+          "layers.acceleration.force-enabled" = true;
+          # Wayland native
+          "widget.use-xdg-desktop-portal.file-picker" = 1;
+          # Smooth scrolling
+          "general.smoothScroll" = true;
+          # Disable bloat
+          "extensions.pocket.enabled" = false;
+          "browser.newtabpage.activity-stream.feeds.section.topstories" = false;
+        };
+      };
     };
 
     ghostty = {
@@ -1849,7 +1888,6 @@
       duckdb
       dysk
       fd
-      firefox
       fzf
       htop
       jq

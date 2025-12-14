@@ -282,6 +282,8 @@ in
       # Force Mesa to use the VMware SVGA driver for hardware acceleration
       LIBGL_ALWAYS_SOFTWARE = "0";
       MESA_LOADER_DRIVER_OVERRIDE = "vmwgfx";
+      MOZ_ENABLE_WAYLAND = "1";
+      MOZ_WEBRENDER = "1";
     };
 
     # List packages installed in system profile. To search, run:
