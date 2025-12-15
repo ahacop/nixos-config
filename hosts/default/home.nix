@@ -1439,7 +1439,7 @@ in
 
     tmux = {
       enable = true;
-      prefix = "C-x";
+      # prefix = "C-x";
       mouse = true;
       plugins = with pkgs.tmuxPlugins; [
         prefix-highlight
