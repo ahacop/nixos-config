@@ -4,6 +4,7 @@
   inputs,
   pkgs,
   claude-code-latest,
+  bdui-latest,
   ...
 }:
 let
@@ -1895,6 +1896,8 @@ in
       mermaid-cli
       inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
       nodejs
+      inputs.beads.packages.${pkgs.stdenv.hostPlatform.system}.default
+      (bdui-latest pkgs)
       inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
       (pkgs.python3Packages.buildPythonApplication rec {
         pname = "pgxnclient";
