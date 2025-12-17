@@ -872,7 +872,7 @@ in
           enable = true;
           nixGrammars = true;
           settings.indent.enable = false;
-          folding = false;
+          folding.enable = false;
         };
         treesitter-context = {
           enable = true;
