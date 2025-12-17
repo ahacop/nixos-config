@@ -1272,6 +1272,7 @@ in
         gca = "git ci -p --amend";
         germ = "dict -d fd-deu-eng";
         gl = "git log";
+        gp = "git push";
         gv = "open_modified_and_untracked_in_vim";
         gvh = "open_changed_from_head_in_vim";
         gvv = "edit_diff_files_in_vim";
