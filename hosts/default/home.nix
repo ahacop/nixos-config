@@ -884,6 +884,19 @@ in
         markdown-preview.enable = true;
         telescope = {
           enable = true;
+          settings = {
+            defaults = {
+              file_ignore_patterns = [
+                "^.git/"
+                "node_modules/"
+              ];
+            };
+            pickers = {
+              find_files = {
+                hidden = true;
+              };
+            };
+          };
           keymaps = {
             "<leader>ff" = {
               action = "find_files";
@@ -938,6 +951,11 @@ in
               options = {
                 desc = "Telescope git_stash";
               };
+            };
+          };
+          extensions = {
+            fzf-native = {
+              enable = true;
             };
           };
         };
