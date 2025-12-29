@@ -180,6 +180,10 @@ in
       enable = true;
       profiles.default = {
         isDefault = true;
+        search = {
+          default = "ddg";
+          force = true;
+        };
         extensions.packages = with nur.repos.rycee.firefox-addons; [
           clearurls
           facebook-container
