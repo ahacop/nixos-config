@@ -191,6 +191,7 @@ in
           vimium
         ];
         settings = {
+          "extensions.autoDisableScopes" = 0;
           # Video decode: software only (VMware GPU has no VA-API)
           "media.ffmpeg.vaapi.enabled" = false;
           "media.ffvpx.enabled" = true;
