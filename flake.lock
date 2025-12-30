@@ -525,11 +525,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1758102809,
-        "narHash": "sha256-7jQg6168AH4+bTreE+P+ekfYfQH6PB0fcet3bq/hyL8=",
+        "lastModified": 1767053819,
+        "narHash": "sha256-UeOR4TZ/PynmBFwGz+pzQG3Y2fJTpzoDoJz+U/3DgKw=",
         "owner": "ahacop",
         "repo": "pgbox",
-        "rev": "3cb2ddd637e3704f6e1d7b2112383b2f637ae0fd",
+        "rev": "14391e13555a052a79f17967aa71f234335b2063",
         "type": "github"
       },
       "original": {
