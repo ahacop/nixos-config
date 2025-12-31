@@ -1905,63 +1905,18 @@ in
     stateVersion = "24.05";
 
     packages = with pkgs; [
-      asciinema
-      bat
       calibre
       circumflex
       (claude-code-latest pkgs)
       devenv
       duckdb
-      dysk
-      fd
-      fzf
-      htop
-      jq
       mermaid-cli
       inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
-      nodejs
       inputs.beads.packages.${pkgs.stdenv.hostPlatform.system}.default
       (bdui-latest pkgs)
       inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
-      (pkgs.python3Packages.buildPythonApplication rec {
-        pname = "pgxnclient";
-        version = "1.3.2";
-        pyproject = true;
-
-        src = pkgs.fetchPypi {
-          inherit pname version;
-          sha256 = "sha256-sDQ+BEuNAET/S+WF7M4BR7EAfbeuixJ0O/IidYpOx9k=";
-        };
-
-        postPatch = ''
-          # Fix the setup.py to remove pytest-runner requirement
-          substituteInPlace setup.py \
-            --replace "setup_requires = ['pytest-runner']" "" \
-            --replace "setup_requires" "# setup_requires"
-        '';
-
-        build-system = with pkgs.python3Packages; [
-          setuptools
-          wheel
-        ];
-
-        dependencies = with pkgs.python3Packages; [
-          six
-        ];
-
-        meta = with lib; {
-          description = "Command line client for the PostgreSQL Extension Network";
-          homepage = "https://pgxn.org/";
-          license = licenses.bsd3;
-        };
-      })
       presenterm
       readest
-      ripgrep
-      silicon
-      tig
-      tldr
-      tree
       vale
       waybar
     ];

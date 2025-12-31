@@ -293,12 +293,21 @@ in
       aspell
       aspellDicts.en
       bat
+      bc
+      bind.dnsutils # dig, nslookup, etc.
+      btop
       cachix
       coreutils
+      curl
+      duf
+      dust
+      entr
       fd
       ffmpeg
+      file
       git
       gnumake
+      iproute2
       mesa
       mesa-demos
       gnupg
@@ -309,24 +318,37 @@ in
       jq
       just
       killall
+      lsof
       man-pages
       man-pages-posix
+      ncdu
+      netcat
       neofetch
       neovim
       nb
       nh
       nix-output-monitor
+      nmap
       nvd
+      p7zip
       pandoc
+      pciutils
       pinentry-curses
+      procps
       ripgrep
+      rsync
       rxvt-unicode-unwrapped
       socat # used by nb
       sox
       sqlite
+      strace
+      tcpdump
       tmux
       unzip
+      usbutils
       w3m
+      watch
+      which
       wl-clipboard
       wget
       xxd
@@ -447,6 +469,48 @@ in
 
         echo "Copied ''${#screenshots[@]} screenshot(s) to current directory"
       '')
+
+      # System utilities moved from home.nix
+      asciinema
+      dysk
+      fzf
+      nodejs
+      (pkgs.python3Packages.buildPythonApplication rec {
+        pname = "pgxnclient";
+        version = "1.3.2";
+        pyproject = true;
+
+        src = pkgs.fetchPypi {
+          inherit pname version;
+          sha256 = "sha256-sDQ+BEuNAET/S+WF7M4BR7EAfbeuixJ0O/IidYpOx9k=";
+        };
+
+        postPatch = ''
+          # Fix the setup.py to remove pytest-runner requirement
+          substituteInPlace setup.py \
+            --replace "setup_requires = ['pytest-runner']" "" \
+            --replace "setup_requires" "# setup_requires"
+        '';
+
+        build-system = with pkgs.python3Packages; [
+          setuptools
+          wheel
+        ];
+
+        dependencies = with pkgs.python3Packages; [
+          six
+        ];
+
+        meta = with lib; {
+          description = "Command line client for the PostgreSQL Extension Network";
+          homepage = "https://pgxn.org/";
+          license = licenses.bsd3;
+        };
+      })
+      silicon
+      tig
+      tldr
+      tree
 
       gtkmm3
       # ] ++ lib.optionals (currentSystemName == "vm-aarch64") [
