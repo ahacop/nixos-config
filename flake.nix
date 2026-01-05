@@ -54,11 +54,6 @@
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    beads = {
-      url = "github:steveyegge/beads/v0.30.2";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
@@ -73,71 +68,6 @@
 
       # Load Claude version info
       claudeVersionInfo = builtins.fromJSON (builtins.readFile ./claude-version.json);
-      bduiVersionInfo = builtins.fromJSON (builtins.readFile ./bdui-version.json);
-
-      # Custom bdui derivation (TUI for beads issue tracker)
-      bdui-latest =
-        pkgs:
-        let
-          version = bduiVersionInfo.version;
-
-          src = pkgs.fetchFromGitHub {
-            owner = "assimelha";
-            repo = "bdui";
-            rev = "v${version}";
-            inherit (bduiVersionInfo) hash;
-          };
-
-          # Fixed-output derivation to fetch bun dependencies
-          bunDeps = pkgs.stdenv.mkDerivation {
-            pname = "bdui-bun-deps";
-            inherit version src;
-
-            nativeBuildInputs = [ pkgs.bun pkgs.cacert ];
-
-            buildPhase = ''
-              export HOME=$TMPDIR
-              export SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
-              bun install --frozen-lockfile
-            '';
-
-            installPhase = ''
-              mkdir -p $out
-              cp -r node_modules $out/
-            '';
-
-            outputHashAlgo = "sha256";
-            outputHashMode = "recursive";
-            outputHash = bduiVersionInfo.depsHash;
-          };
-        in
-        pkgs.stdenv.mkDerivation {
-          pname = "bdui";
-          inherit version src;
-
-          nativeBuildInputs = [ pkgs.bun pkgs.makeWrapper ];
-
-          dontBuild = true;
-
-          installPhase = ''
-            runHook preInstall
-            mkdir -p $out/lib/bdui
-            cp -r ./* $out/lib/bdui/
-            cp -r ${bunDeps}/node_modules $out/lib/bdui/
-            mkdir -p $out/bin
-            makeWrapper ${pkgs.bun}/bin/bun $out/bin/bdui \
-              --add-flags "run $out/lib/bdui/src/index.tsx"
-            runHook postInstall
-          '';
-
-          meta = with pkgs.lib; {
-            description = "A beautiful TUI visualizer for the bd (beads) issue tracker";
-            homepage = "https://github.com/assimelha/bdui";
-            license = licenses.mit;
-            maintainers = [ ];
-            platforms = platforms.linux;
-          };
-        };
 
       # Custom Claude derivation
       claude-code-latest =
@@ -178,7 +108,6 @@
             inherit inputs;
             inherit user;
             inherit claude-code-latest;
-            inherit bdui-latest;
           };
           modules = [
             inputs.stylix.nixosModules.stylix
@@ -201,7 +130,6 @@
                 };
                 extraSpecialArgs = {
                   inherit claude-code-latest;
-                  inherit bdui-latest;
                   inherit inputs;
                 };
               };

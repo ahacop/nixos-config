@@ -4,7 +4,6 @@
   inputs,
   pkgs,
   claude-code-latest,
-  bdui-latest,
   ...
 }:
 let
@@ -1912,8 +1911,6 @@ in
       duckdb
       mermaid-cli
       inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
-      inputs.beads.packages.${pkgs.stdenv.hostPlatform.system}.default
-      (bdui-latest pkgs)
       inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
       presenterm
       readest
