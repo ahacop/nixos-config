@@ -213,10 +213,26 @@ remove_gb_wm() {
 
 function edit_diff_files_in_vim() {
     [[ -z "$1" ]] && echo "Usage: git_vim_open_commit <commit-sha>" && return 1
-    
+
     local files=($(git diff-tree --no-commit-id --name-only -r "$1"))
-    
+
     [[ ${#files[@]} -eq 0 ]] && echo "No files found in commit $1" && return 1
-    
+
     vim -p "${files[@]}"
+}
+
+watch-deploy() {
+  local selection=$(gh run list --status in_progress --limit 20 --json databaseId,headBranch,status,name \
+    --jq '.[] | "\(.databaseId)\t\(.headBranch)\t\(.status)\t\(.name)"' | sk)
+  [[ -z "$selection" ]] && return 0
+  local run_id=$(echo "$selection" | cut -f1)
+  local branch=$(echo "$selection" | cut -f2)
+  if gh run watch $run_id; then
+    notify-macos "$branch deployed"
+  else
+    (
+      conclusion=$(gh run view $run_id --json conclusion --jq '.conclusion')
+      [[ "$conclusion" == "failure" ]] && notify-macos "$branch failed"
+    ) &>/dev/null &
+  fi
 }
