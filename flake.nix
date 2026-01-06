@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -22,16 +23,19 @@
     macos-notifier-bridge = {
       url = "github:ahacop/macos-notifier-bridge";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
     };
 
     pgbox = {
       url = "github:ahacop/pgbox";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
     };
 
     mw-cli = {
       url = "github:ahacop/mw-cli";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
     };
 
     niri = {
@@ -58,6 +62,7 @@
     clipboard-txt-watcher = {
       url = "github:ahacop/clipboard-txt-watcher";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
     };
   };
 
