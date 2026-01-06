@@ -1916,6 +1916,7 @@ in
       readest
       vale
       waybar
+      zathura
     ];
     sessionVariables = {
       PAGER = "less -FirSwX";
