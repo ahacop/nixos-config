@@ -1909,6 +1909,7 @@ in
       (claude-code-latest pkgs)
       devenv
       duckdb
+      glow
       mermaid-cli
       inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
       inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
