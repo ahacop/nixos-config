@@ -27,6 +27,12 @@ in
     settings.default-timeout = 5000; # 5 seconds
   };
 
+  services.clipboard-txt-watcher = {
+    enable = true;
+    watchFile = "/host/ahacop/clipboard.txt";
+    clipboardBackend = "wayland";
+  };
+
   programs = {
     walker = {
       enable = true;

@@ -54,6 +54,11 @@
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    clipboard-txt-watcher = {
+      url = "github:ahacop/clipboard-txt-watcher";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -126,6 +131,7 @@
                     inputs.niri.homeModules.niri
                     inputs.niri.homeModules.stylix
                     inputs.walker.homeManagerModules.default
+                    inputs.clipboard-txt-watcher.homeManagerModules.default
                   ];
                 };
                 extraSpecialArgs = {
