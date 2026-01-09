@@ -1866,6 +1866,14 @@ in
   };
 
   xdg.enable = true;
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "text/html" = [ "firefox.desktop" ];
+      "application/xhtml+xml" = [ "firefox.desktop" ];
+      "application/pdf" = [ "org.pwmt.zathura.desktop" ];
+    };
+  };
 
   home = {
     username = "ahacop";
