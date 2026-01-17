@@ -283,6 +283,51 @@ in
       '';
 
       userCommands = {
+        ClaudeRecentPlan = {
+          command.__raw = ''
+            function()
+              local plans_dir = vim.fn.expand("~/.claude/plans")
+              local handle = io.popen("ls -t " .. plans_dir .. " 2>/dev/null | head -n1")
+              if handle then
+                local result = handle:read("*a")
+                handle:close()
+                local filename = result:gsub("%s+$", "")
+                if filename ~= "" then
+                  vim.cmd("edit " .. plans_dir .. "/" .. filename)
+                else
+                  print("No plans found in ~/.claude/plans")
+                end
+              else
+                print("Could not access ~/.claude/plans")
+              end
+            end
+          '';
+          desc = "Open the most recent Claude plan";
+        };
+
+        ClaudePlans = {
+          command.__raw = ''
+            function()
+              local plans_dir = vim.fn.expand("~/.claude/plans")
+              -- Use Telescope if available, otherwise use netrw
+              local ok, telescope = pcall(require, "telescope.builtin")
+              if ok then
+                telescope.find_files({
+                  cwd = plans_dir,
+                  prompt_title = "Claude Plans",
+                  sorting_strategy = "ascending",
+                  file_ignore_patterns = {},
+                  find_command = { "ls", "-t", plans_dir },
+                })
+              else
+                -- Fallback: open directory in netrw
+                vim.cmd("Explore " .. plans_dir)
+              end
+            end
+          '';
+          desc = "Browse Claude plans sorted by most recent";
+        };
+
         NavigateToTest = {
           command.__raw = ''
             function(opts)
@@ -341,6 +386,24 @@ in
       };
 
       keymaps = [
+        {
+          action = "<cmd>ClaudeRecentPlan<CR>";
+          key = "<leader>cr";
+          mode = "n";
+          options = {
+            silent = true;
+            desc = "Open most recent Claude plan";
+          };
+        }
+        {
+          action = "<cmd>ClaudePlans<CR>";
+          key = "<leader>cp";
+          mode = "n";
+          options = {
+            silent = true;
+            desc = "Browse Claude plans";
+          };
+        }
         {
           action.__raw = ''
             function()
