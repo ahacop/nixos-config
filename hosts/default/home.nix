@@ -11,6 +11,25 @@ let
     inherit pkgs;
     nurpkgs = pkgs;
   };
+
+  websters-1913-stardict = pkgs.stdenv.mkDerivation {
+    pname = "websters-1913-stardict";
+    version = "2.4.2";
+
+    src = pkgs.fetchFromGitHub {
+      owner = "ahacop";
+      repo = "websters-dict-1913-stardict";
+      rev = "main";
+      sha256 = "sha256-XmmbS0mnGn4WEUnEm4XDxaIQ890/JXjFwPkK+2YsgGs=";
+    };
+
+    nativeBuildInputs = [ pkgs.gnutar pkgs.gzip ];
+
+    installPhase = ''
+      mkdir -p $out/share/stardict/dic
+      tar -xzf stardict-dictd-web1913-2.4.2.tgz -C $out/share/stardict/dic
+    '';
+  };
 in
 {
   nixpkgs.config.allowUnfree = true;
@@ -1363,6 +1382,7 @@ in
         ga = "git aa";
         gc = "git ci -p";
         gca = "git ci -p --amend";
+        define = "sdcv";
         germ = "dict -d fd-deu-eng";
         gl = "git log";
         gp = "git push";
@@ -1377,6 +1397,9 @@ in
         res-default = "niri msg output Virtual-1 mode 7680x3200@60.000";
       };
       initContent = ''
+        # StarDict dictionary path (set unconditionally for subshells)
+        export STARDICT_DATA_DIR="${websters-1913-stardict}/share/stardict/dic"
+
         ${builtins.readFile ./../../config/zshrc}
 
         ${builtins.readFile ./../../config/functions}
@@ -1993,8 +2016,10 @@ in
       opencode
       presenterm
       readest
+      sdcv
       vale
       waybar
+      websters-1913-stardict
       zathura
     ];
     sessionVariables = {
