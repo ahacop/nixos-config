@@ -299,6 +299,112 @@ in
 
         -- Ellipsis
         dig(",.", 8230)  -- … ellipsis
+
+        -- WordNet thesaurus functions
+        local function wordnet_lookup(word)
+          local output = vim.fn.systemlist("wn " .. vim.fn.shellescape(word) .. " -synsn -synsv -synsa -antsn -antsv -antsa 2>/dev/null")
+          if vim.v.shell_error ~= 0 or #output == 0 then
+            return nil
+          end
+          return output
+        end
+
+        -- Show WordNet results in a floating window
+        function _G.wordnet_float(word)
+          word = word or vim.fn.expand("<cword>")
+          local output = wordnet_lookup(word)
+          if not output then
+            vim.notify("No results for: " .. word, vim.log.levels.WARN)
+            return
+          end
+
+          local buf = vim.api.nvim_create_buf(false, true)
+          vim.api.nvim_buf_set_lines(buf, 0, -1, false, output)
+          vim.api.nvim_set_option_value("filetype", "wordnet", { buf = buf })
+
+          local width = math.min(80, vim.o.columns - 4)
+          local height = math.min(#output, vim.o.lines - 4)
+          local win = vim.api.nvim_open_win(buf, true, {
+            relative = "cursor",
+            row = 1,
+            col = 0,
+            width = width,
+            height = height,
+            style = "minimal",
+            border = "rounded",
+            title = " Thesaurus: " .. word .. " ",
+            title_pos = "center",
+          })
+
+          vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = buf, silent = true })
+          vim.keymap.set("n", "<Esc>", "<cmd>close<CR>", { buffer = buf, silent = true })
+        end
+
+        -- Telescope picker for WordNet
+        function _G.telescope_wordnet()
+          local pickers = require("telescope.pickers")
+          local finders = require("telescope.finders")
+          local conf = require("telescope.config").values
+          local actions = require("telescope.actions")
+          local action_state = require("telescope.actions.state")
+          local previewers = require("telescope.previewers")
+
+          local current_word = vim.fn.expand("<cword>")
+
+          pickers.new({}, {
+            prompt_title = "WordNet Thesaurus",
+            default_text = current_word,
+            finder = finders.new_dynamic({
+              fn = function(prompt)
+                if not prompt or prompt == "" then return {} end
+                local output = vim.fn.systemlist("wn " .. vim.fn.shellescape(prompt) .. " -synsn -synsv -synsa 2>/dev/null")
+                if vim.v.shell_error ~= 0 then return {} end
+
+                -- Parse synonyms from output
+                local synonyms = {}
+                local seen = {}
+                for _, line in ipairs(output) do
+                  -- Match words in synonym lines (after =>)
+                  local syn_match = line:match("=>%s*(.+)")
+                  if syn_match then
+                    for word in syn_match:gmatch("([%w_-]+)") do
+                      if not seen[word] and word ~= prompt then
+                        seen[word] = true
+                        table.insert(synonyms, word)
+                      end
+                    end
+                  end
+                end
+                return synonyms
+              end,
+              entry_maker = function(entry)
+                return {
+                  value = entry,
+                  display = entry,
+                  ordinal = entry,
+                }
+              end,
+            }),
+            sorter = conf.generic_sorter({}),
+            previewer = previewers.new_buffer_previewer({
+              title = "WordNet Definition",
+              define_preview = function(self, entry)
+                local output = vim.fn.systemlist("wn " .. vim.fn.shellescape(entry.value) .. " -over 2>/dev/null")
+                vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, output)
+              end,
+            }),
+            attach_mappings = function(prompt_bufnr)
+              actions.select_default:replace(function()
+                local selection = action_state.get_selected_entry()
+                actions.close(prompt_bufnr)
+                if selection then
+                  vim.cmd("normal! ciw" .. selection.value)
+                end
+              end)
+              return true
+            end,
+          }):find()
+        end
       '';
 
       userCommands = {
@@ -421,6 +527,24 @@ in
           options = {
             silent = true;
             desc = "Browse Claude plans";
+          };
+        }
+        {
+          action.__raw = "function() _G.wordnet_float() end";
+          key = "<leader>wt";
+          mode = "n";
+          options = {
+            silent = true;
+            desc = "WordNet thesaurus (word under cursor)";
+          };
+        }
+        {
+          action.__raw = "function() _G.telescope_wordnet() end";
+          key = "<leader>wT";
+          mode = "n";
+          options = {
+            silent = true;
+            desc = "WordNet thesaurus (Telescope)";
           };
         }
         {

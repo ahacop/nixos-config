@@ -351,6 +351,16 @@ in
       which
       wl-clipboard
       wget
+      wordnet
+
+      # Thesaurus helper using WordNet
+      (writeShellScriptBin "thes" ''
+        if [ -z "$1" ]; then
+          echo "Usage: thes <word>" >&2
+          exit 1
+        fi
+        ${pkgs.wordnet}/bin/wn "$1" -over
+      '')
       xxd
       yt-dlp
       zip
@@ -572,6 +582,17 @@ in
     alsa.enable = true;
     alsa.support32Bit = true;
     jack.enable = true;
+  };
+
+  # Local dictionary server
+  services.dictd = {
+    enable = true;
+    DBs = with pkgs.dictdDBs; [
+      wordnet
+      wiktionary
+      eng2deu
+      deu2eng
+    ];
   };
 
   # Set volume to 60% on boot
