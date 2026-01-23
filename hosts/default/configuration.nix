@@ -85,6 +85,24 @@ let
     package = pkgs.ultimate-oldschool-pc-font-pack;
     name = "PxPlus IBM VGA 9x14";
   };
+
+  # Moby Thesaurus - 30,000+ root words, 2.5 million synonyms
+  moby-thesaurus = pkgs.stdenv.mkDerivation {
+    pname = "moby-thesaurus";
+    version = "1.0";
+
+    src = pkgs.fetchurl {
+      url = "https://www.gutenberg.org/files/3202/files/mthesaur.txt";
+      sha256 = "sha256-fJdCse2UQ1qJPAcZtCZyXtuKUkL4xSanVGG9bO4t/TI=";
+    };
+
+    dontUnpack = true;
+
+    installPhase = ''
+      mkdir -p $out/share/moby
+      cp $src $out/share/moby/mthesaur.txt
+    '';
+  };
 in
 {
   stylix = {
@@ -353,13 +371,22 @@ in
       wget
       wordnet
 
-      # Thesaurus helper using WordNet
+      # Thesaurus using Moby Thesaurus (30k+ words, 2.5M synonyms)
       (writeShellScriptBin "thes" ''
         if [ -z "$1" ]; then
           echo "Usage: thes <word>" >&2
           exit 1
         fi
-        ${pkgs.wordnet}/bin/wn "$1" -over
+        word="$1"
+        result=$(${pkgs.gnugrep}/bin/grep -i "^$word," ${moby-thesaurus}/share/moby/mthesaur.txt | head -1)
+        if [ -z "$result" ]; then
+          echo "No synonyms found for: $word" >&2
+          exit 1
+        fi
+        # Print header then synonyms in columns
+        echo "$result" | cut -d',' -f1
+        echo "---"
+        echo "$result" | cut -d',' -f2- | tr ',' '\n' | ${pkgs.util-linux}/bin/column
       '')
       xxd
       yt-dlp
