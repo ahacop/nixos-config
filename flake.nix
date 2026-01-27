@@ -64,6 +64,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+
+    claude-code-overlay = {
+      url = "github:ryoppippi/claude-code-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -75,41 +80,6 @@
     }@inputs:
     let
       user = "ahacop";
-
-      # Load Claude version info
-      claudeVersionInfo = builtins.fromJSON (builtins.readFile ./claude-version.json);
-
-      # Custom Claude derivation
-      claude-code-latest =
-        pkgs:
-        pkgs.stdenv.mkDerivation rec {
-          pname = "claude-code";
-          inherit (claudeVersionInfo) version;
-
-          src = pkgs.fetchurl {
-            url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${version}.tgz";
-            inherit (claudeVersionInfo) sha256;
-          };
-
-          buildInputs = [ pkgs.nodejs ];
-
-          installPhase = ''
-            runHook preInstall
-            mkdir -p $out/lib/node_modules/@anthropic-ai/claude-code
-            cp -r ./* $out/lib/node_modules/@anthropic-ai/claude-code/
-            mkdir -p $out/bin
-            ln -s $out/lib/node_modules/@anthropic-ai/claude-code/cli.js $out/bin/claude
-            runHook postInstall
-          '';
-
-          meta = with pkgs.lib; {
-            description = "Claude Code - agentic coding tool";
-            homepage = "https://github.com/anthropics/claude-code";
-            license = licenses.unfree;
-            maintainers = [ ];
-            platforms = platforms.all;
-          };
-        };
     in
     {
       nixosConfigurations = {
@@ -117,17 +87,20 @@
           specialArgs = {
             inherit inputs;
             inherit user;
-            inherit claude-code-latest;
           };
           modules = [
             inputs.stylix.nixosModules.stylix
             ./hosts/default/configuration.nix
             {
-              nixpkgs.overlays = [ inputs.niri.overlays.niri ];
+              nixpkgs.overlays = [
+                inputs.niri.overlays.niri
+                inputs.claude-code-overlay.overlays.default
+              ];
             }
             home-manager.nixosModules.default
             {
               home-manager = {
+                useGlobalPkgs = true;
                 useUserPackages = true;
                 users.ahacop = {
                   imports = [
@@ -140,7 +113,6 @@
                   ];
                 };
                 extraSpecialArgs = {
-                  inherit claude-code-latest;
                   inherit inputs;
                 };
               };

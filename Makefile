@@ -56,11 +56,12 @@ check-kernel: ## Check current vs available kernel versions
 	@echo "Pinned 6.15.2 kernel: $$(nix eval --raw .#nixosConfigurations.${NIXNAME}.config.boot.kernelPackages.kernel.version)"
 
 check-claude-version: ## Check current vs latest Claude Code version
-	@echo "Current claude-code version: $$(jq -r .version claude-version.json)"
-	@echo "Latest claude-code version: $$(npm view @anthropic-ai/claude-code version)"
+	@echo "Installed: $$(claude --version)"
+	@echo "Pinned:    $$(nix flake metadata --json 2>/dev/null | jq -r '.locks.nodes["claude-code-overlay"].locked.rev // empty' | xargs -I{} curl -sf 'https://raw.githubusercontent.com/ryoppippi/claude-code-overlay/{}/sources.json' | jq -r '.version')"
+	@echo "Latest:    $$(curl -sf 'https://raw.githubusercontent.com/ryoppippi/claude-code-overlay/main/sources.json' | jq -r '.version')"
 
-upgrade-claude: ## Update Claude Code to latest version from npm
-	./scripts/claude-update
+upgrade-claude: ## Update Claude Code overlay to latest version
+	nix flake update claude-code-overlay
 
 switch: ## Apply configuration changes (rebuilds and switches)
 ifeq ($(UNAME), Darwin)

@@ -3,7 +3,6 @@
   lib,
   inputs,
   pkgs,
-  claude-code-latest,
   ...
 }:
 let
@@ -32,8 +31,6 @@ let
   };
 in
 {
-  nixpkgs.config.allowUnfree = true;
-
   stylix.targets.firefox.profileNames = [ "default" ];
 
   services.cliphist = {
@@ -2128,7 +2125,7 @@ in
     stateVersion = "24.05";
 
     packages = with pkgs; [
-      (claude-code-latest pkgs)
+      claude-code
       calibre
       circumflex
       devenv

@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `make check-claude-version` - Compare current vs latest Claude Code version
 
 ### Package Updates
-- `make upgrade-claude` - Update Claude Code to latest version from npm (runs `scripts/claude-update`)
+- `make upgrade-claude` - Update Claude Code flake input to latest version
 - After updating Claude, run `make switch` to apply
 
 ### VM Management (for remote bootstrap from host machine)
@@ -29,12 +29,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a flake-based NixOS configuration for a VMware Fusion VM running on Apple Silicon (aarch64-linux).
 
 ### Key Files
-- `flake.nix` - Main flake definition with inputs (nixpkgs, home-manager, stylix, nixvim, niri, walker) and custom Claude Code derivation
+- `flake.nix` - Main flake definition with inputs (nixpkgs, home-manager, stylix, nixvim, niri, walker, claude-code-overlay)
 - `hosts/default/configuration.nix` - System-level NixOS configuration (boot, networking, services, system packages, Stylix theming)
 - `hosts/default/home.nix` - User-level configuration via Home Manager (shell, git, nixvim, window manager, application launchers)
 - `modules/vmware-guest.nix` - Custom VMware guest module modified for aarch64 support
-- `claude-version.json` - Tracks Claude Code version and SHA256 hash for the custom derivation
-- `scripts/claude-update` - Bash script that fetches latest Claude version from npm, calculates hash, and updates `claude-version.json`
 
 ### Configuration Workflow
 1. Edit configuration files (`flake.nix`, `hosts/default/*.nix`, `modules/*.nix`)
@@ -42,12 +40,8 @@ This is a flake-based NixOS configuration for a VMware Fusion VM running on Appl
 3. Run `make switch` to build and activate the new configuration
 4. System will rebuild based on flake configuration and switch to new generation
 
-### Custom Derivations
-The `claude-code-latest` function in `flake.nix` builds Claude Code from the npm registry. It:
-- Reads version and hash from `claude-version.json`
-- Downloads the tarball from npm registry
-- Creates a derivation that installs it to `/nix/store`
-- Symlinks the CLI to `$out/bin/claude`
+### Claude Code
+Claude Code is provided via the `claude-code-overlay` flake input ([ryoppippi/claude-code-overlay](https://github.com/ryoppippi/claude-code-overlay)), which supplies pre-built official binaries. Update with `make upgrade-claude`, then `make switch`.
 
 ### Window Manager (Wayland)
 Uses Niri (scrollable-tiling Wayland compositor) with:
