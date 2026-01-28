@@ -1601,6 +1601,7 @@ in
       ignores = [
         ".envrc"
         ".direnv/"
+        ".claude/"
       ];
       lfs.enable = true;
       settings = {
