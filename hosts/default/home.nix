@@ -1604,6 +1604,16 @@ in
         ".claude/"
       ];
       lfs.enable = true;
+      includes = [
+        {
+          condition = "gitdir:~/code/changebot-ai/";
+          contents = {
+            user = {
+              email = "ara@changebot.ai";
+            };
+          };
+        }
+      ];
       settings = {
         user = {
           name = "Ara Hacopian";
