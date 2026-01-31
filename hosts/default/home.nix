@@ -975,6 +975,7 @@ in
             };
           };
         };
+        direnv.enable = true;
         gitgutter.enable = true;
         vim-dadbod.enable = true;
         vim-dadbod-completion.enable = true;
