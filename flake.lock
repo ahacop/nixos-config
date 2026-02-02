@@ -132,6 +132,27 @@
         "type": "github"
       }
     },
+    "erwindb": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-overlay": "rust-overlay"
+      },
+      "locked": {
+        "lastModified": 1770024303,
+        "narHash": "sha256-zYVCfw7gOpDuWeRJAwf+gtJ+J1Bse9WauCoaqFn7doA=",
+        "owner": "ahacop",
+        "repo": "erwindb",
+        "rev": "41ef2a17d75b791c6f9f29ab5359aade4d018470",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ahacop",
+        "repo": "erwindb",
+        "type": "github"
+      }
+    },
     "firefox-gnome-theme": {
       "flake": false,
       "locked": {
@@ -516,6 +537,7 @@
         "claude-code-overlay": "claude-code-overlay",
         "clipboard-txt-watcher": "clipboard-txt-watcher",
         "elephant": "elephant",
+        "erwindb": "erwindb",
         "flake-utils": "flake-utils",
         "home-manager": "home-manager",
         "macos-notifier-bridge": "macos-notifier-bridge",
@@ -527,6 +549,27 @@
         "pgbox": "pgbox",
         "stylix": "stylix",
         "walker": "walker"
+      }
+    },
+    "rust-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "erwindb",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1769828398,
+        "narHash": "sha256-zmnvRUm15QrlKH0V1BZoiT3U+Q+tr+P5Osi8qgtL9fY=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "a1d32c90c8a4ea43e9586b7e5894c179d5747425",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
       }
     },
     "stylix": {

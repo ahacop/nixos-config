@@ -38,6 +38,11 @@
       inputs.flake-utils.follows = "flake-utils";
     };
 
+    erwindb = {
+      url = "github:ahacop/erwindb";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     niri = {
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";

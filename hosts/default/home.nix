@@ -2143,6 +2143,7 @@ in
       devenv
       duckdb
       glow
+      inputs.erwindb.packages.${pkgs.stdenv.hostPlatform.system}.default
       inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
       inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
       mermaid-cli
