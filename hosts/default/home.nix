@@ -22,7 +22,10 @@ let
       sha256 = "sha256-XmmbS0mnGn4WEUnEm4XDxaIQ890/JXjFwPkK+2YsgGs=";
     };
 
-    nativeBuildInputs = [ pkgs.gnutar pkgs.gzip ];
+    nativeBuildInputs = [
+      pkgs.gnutar
+      pkgs.gzip
+    ];
 
     installPhase = ''
       mkdir -p $out/share/stardict/dic
@@ -2145,7 +2148,7 @@ in
       glow
       inputs.erwindb.packages.${pkgs.stdenv.hostPlatform.system}.default
       inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
-      inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
+      # inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
       mermaid-cli
       opencode
       presenterm

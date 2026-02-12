@@ -509,29 +509,6 @@
         "type": "github"
       }
     },
-    "pgbox": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1767053819,
-        "narHash": "sha256-UeOR4TZ/PynmBFwGz+pzQG3Y2fJTpzoDoJz+U/3DgKw=",
-        "owner": "ahacop",
-        "repo": "pgbox",
-        "rev": "14391e13555a052a79f17967aa71f234335b2063",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ahacop",
-        "repo": "pgbox",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "claude-code-overlay": "claude-code-overlay",
@@ -546,7 +523,6 @@
         "nixpkgs": "nixpkgs",
         "nixvim": "nixvim",
         "nur": "nur",
-        "pgbox": "pgbox",
         "stylix": "stylix",
         "walker": "walker"
       }

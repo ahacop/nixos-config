@@ -26,11 +26,11 @@
       inputs.flake-utils.follows = "flake-utils";
     };
 
-    pgbox = {
-      url = "github:ahacop/pgbox";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
+    # pgbox = {
+    #   url = "github:ahacop/pgbox";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    #   inputs.flake-utils.follows = "flake-utils";
+    # };
 
     mw-cli = {
       url = "github:ahacop/mw-cli";
