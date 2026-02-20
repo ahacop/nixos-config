@@ -198,6 +198,7 @@ in
     yazi = {
       enable = true;
       enableZshIntegration = true;
+      shellWrapperName = "y";
     };
 
     firefox = {
