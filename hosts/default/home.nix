@@ -2107,7 +2107,6 @@ in
       ".ssh/config".source = ./../../config/sshconfig;
       ".local/flake-dev-envs/ruby/flake.nix".source = ./../../devflakes/ruby/flake.nix;
       ".local/flake-dev-envs/ruby/flake.lock".source = ./../../devflakes/ruby/flake.lock;
-      ".config/fish/functions/gc-ai.fish".source = ./../../scripts/gc-ai.fish;
       ".tigrc".text = ''
         bind generic Y !sh -c 'commit=%(commit); echo $commit | /run/current-system/sw/bin/wl-copy -n & echo $commit | /run/current-system/sw/bin/tmux load-buffer -'
       '';
@@ -2142,7 +2141,7 @@ in
 
     packages = with pkgs; [
       claude-code
-      calibre
+      (calibre.override { speechSupport = false; })
       circumflex
       devenv
       duckdb
