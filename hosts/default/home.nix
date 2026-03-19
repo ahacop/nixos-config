@@ -1350,6 +1350,19 @@ in
 
       autoCmd = [
         {
+          event = [ "TextYankPost" ];
+          callback = {
+            __raw = ''
+              function()
+                if vim.env.TMUX then
+                  local text = vim.fn.getreg('"')
+                  vim.fn.system({'tmux', 'set-buffer', text})
+                end
+              end
+            '';
+          };
+        }
+        {
           event = [ "TermOpen" ];
           group = "custom_term_open";
           callback = {
