@@ -27,7 +27,7 @@ UNAME := $(shell uname)
 .DEFAULT_GOAL := help
 
 # Phony targets
-.PHONY: help clean optimize check-kernel check-claude-version upgrade-claude switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
+.PHONY: help clean optimize check-kernel check-claude-version upgrade-claude restart-walker switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
 .PHONY: disk-status gc-roots stale-results stale-direnvs bloated-direnvs clean-results clean-direnvs clean-direnv-profiles clean-caches clean-all
 
 # Help target
@@ -35,7 +35,7 @@ help: ## Show this help message
 	@echo 'Usage: make [target]'
 	@echo ''
 	@echo 'Configuration Management:'
-	@grep -E '^(switch|test|optimize|clean):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+	@grep -E '^(switch|test|optimize|clean|restart-walker):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 	@echo ''
 	@echo 'Disk Cleanup (use STALE_DAYS=N to adjust threshold, default 30):'
 	@grep -E '^(disk-status|gc-roots|stale-[a-z]+|bloated-[a-z]+|clean-[a-z-]+):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
@@ -239,6 +239,10 @@ check-claude-version: ## Check current vs latest Claude Code version
 
 upgrade-claude: ## Update Claude Code overlay to latest version
 	nix flake update claude-code-overlay
+
+restart-walker: ## Restart Walker and Elephant services
+	systemctl --user restart elephant.service
+	systemctl --user restart walker.service
 
 switch: ## Apply configuration changes (rebuilds and switches)
 ifeq ($(UNAME), Darwin)
