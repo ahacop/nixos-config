@@ -234,8 +234,13 @@ check-kernel: ## Check current vs available kernel versions
 
 check-claude-version: ## Check current vs latest Claude Code version
 	@echo "Installed: $$(claude --version)"
-	@echo "Pinned:    $$(nix flake metadata --json 2>/dev/null | jq -r '.locks.nodes["claude-code-overlay"].locked.rev // empty' | xargs -I{} curl -sf 'https://raw.githubusercontent.com/ryoppippi/claude-code-overlay/{}/sources.json' | jq -r '.version')"
-	@echo "Latest:    $$(curl -sf 'https://raw.githubusercontent.com/ryoppippi/claude-code-overlay/main/sources.json' | jq -r '.version')"
+	@echo "Pinned:    $$(REV=$$(nix flake metadata --json 2>/dev/null | jq -r '.locks.nodes["claude-code-overlay"].locked.rev // empty'); \
+		V=$$(curl -sf "https://raw.githubusercontent.com/ryoppippi/claude-code-overlay/$$REV/sources.json" | jq -r '.version // empty'); \
+		if [ -z "$$V" ]; then \
+			V=$$(curl -sf "https://api.github.com/repos/ryoppippi/claude-code-overlay/contents/versions?ref=$$REV" | jq -r '[.[].name | select(endswith(".json")) | rtrimstr(".json")] | sort_by(split(".") | map(tonumber)) | last'); \
+		fi; \
+		echo "$$V")"
+	@echo "Latest:    $$(curl -sf 'https://api.github.com/repos/ryoppippi/claude-code-overlay/contents/versions' | jq -r '[.[].name | select(endswith(".json")) | rtrimstr(".json")] | sort_by(split(".") | map(tonumber)) | last')"
 
 upgrade-claude: ## Update Claude Code overlay to latest version
 	nix flake update claude-code-overlay
