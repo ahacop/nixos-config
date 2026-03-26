@@ -23,6 +23,8 @@ SSH_OPTIONS := -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o Str
 # We need to do some OS switching below.
 UNAME := $(shell uname)
 
+CLAUDE_OVERLAY_API := https://api.github.com/repos/ryoppippi/nix-claude-code/contents/versions
+
 # Default target
 .DEFAULT_GOAL := help
 
@@ -235,12 +237,8 @@ check-kernel: ## Check current vs available kernel versions
 check-claude-version: ## Check current vs latest Claude Code version
 	@echo "Installed: $$(claude --version)"
 	@echo "Pinned:    $$(REV=$$(nix flake metadata --json 2>/dev/null | jq -r '.locks.nodes["claude-code-overlay"].locked.rev // empty'); \
-		V=$$(curl -sf "https://raw.githubusercontent.com/ryoppippi/claude-code-overlay/$$REV/sources.json" | jq -r '.version // empty'); \
-		if [ -z "$$V" ]; then \
-			V=$$(curl -sf "https://api.github.com/repos/ryoppippi/claude-code-overlay/contents/versions?ref=$$REV" | jq -r '[.[].name | select(endswith(".json")) | rtrimstr(".json")] | sort_by(split(".") | map(tonumber)) | last'); \
-		fi; \
-		echo "$$V")"
-	@echo "Latest:    $$(curl -sf 'https://api.github.com/repos/ryoppippi/claude-code-overlay/contents/versions' | jq -r '[.[].name | select(endswith(".json")) | rtrimstr(".json")] | sort_by(split(".") | map(tonumber)) | last')"
+		curl -sf "$(CLAUDE_OVERLAY_API)?ref=$$REV" | jq -r '[.[].name | select(endswith(".json")) | rtrimstr(".json")] | sort_by(split(".") | map(tonumber)) | last')"
+	@echo "Latest:    $$(curl -sf '$(CLAUDE_OVERLAY_API)' | jq -r '[.[].name | select(endswith(".json")) | rtrimstr(".json")] | sort_by(split(".") | map(tonumber)) | last')"
 
 upgrade-claude: ## Update Claude Code overlay to latest version
 	nix flake update claude-code-overlay

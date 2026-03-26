@@ -75,16 +75,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1774302978,
-        "narHash": "sha256-PCR6Gqmgu06zWcueVvvHa/z5AqPOdQ2Vt4gbCbBc/+A=",
+        "lastModified": 1774525081,
+        "narHash": "sha256-5KFUqokTqcmEUQNhrdxZVPfBFHUrDtAhljixn2fPhWI=",
         "owner": "ryoppippi",
-        "repo": "claude-code-overlay",
-        "rev": "9de89ca1dc76379a0faf86a3d2905a754b70b189",
+        "repo": "nix-claude-code",
+        "rev": "893ee907cd44982b98d9a6d1d3f884615f88460e",
         "type": "github"
       },
       "original": {
         "owner": "ryoppippi",
-        "repo": "claude-code-overlay",
+        "repo": "nix-claude-code",
         "type": "github"
       }
     },
