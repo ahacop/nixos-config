@@ -1616,6 +1616,7 @@ in
 
     git = {
       enable = true;
+      signing.format = "openpgp";
       ignores = [
         ".envrc"
         ".direnv/"
@@ -2110,6 +2111,8 @@ in
       "application/pdf" = [ "org.pwmt.zathura.desktop" ];
     };
   };
+
+  gtk.gtk4.theme = config.gtk.theme;
 
   home = {
     username = "ahacop";
