@@ -11,6 +11,11 @@ let
     nurpkgs = pkgs;
   };
 
+  just-completions = pkgs.runCommand "just-zsh-completions" { } ''
+    mkdir -p $out
+    JUST_COMPLETE=zsh ${pkgs.just}/bin/just > $out/_just
+  '';
+
   websters-1913-stardict = pkgs.stdenv.mkDerivation {
     pname = "websters-1913-stardict";
     version = "2.4.2";
@@ -1536,62 +1541,65 @@ in
         res-default = "niri msg output Virtual-1 mode 7680x3200@60.000";
       };
       initContent = ''
-        # StarDict dictionary path (set unconditionally for subshells)
-        export STARDICT_DATA_DIR="${websters-1913-stardict}/share/stardict/dic"
+          # Static just completions (the default source <(...) wrapper breaks with direnv)
+          source ${just-completions}/_just
 
-        ${builtins.readFile ./../../config/zshrc}
+          # StarDict dictionary path (set unconditionally for subshells)
+          export STARDICT_DATA_DIR="${websters-1913-stardict}/share/stardict/dic"
 
-        ${builtins.readFile ./../../config/functions}
+          ${builtins.readFile ./../../config/zshrc}
 
-        # Generate pgbox completion if available
-        if command -v pgbox >/dev/null 2>&1; then
-          eval "$(pgbox completion zsh)"
-        fi
+          ${builtins.readFile ./../../config/functions}
 
-        # Tmux window renaming hooks
-        if [[ -n "$TMUX" ]]; then
-          # Function to rename tmux window
-          tmux_rename_window() {
-            if [[ -n "$1" ]]; then
-              tmux rename-window "$1" 2>/dev/null
-            fi
-          }
+          # Generate pgbox completion if available
+          if command -v pgbox >/dev/null 2>&1; then
+            eval "$(pgbox completion zsh)"
+          fi
 
-          # Variable to store the last meaningful window name
-          typeset -g TMUX_LAST_WINDOW_NAME=""
+          # Tmux window renaming hooks
+          if [[ -n "$TMUX" ]]; then
+            # Function to rename tmux window
+            tmux_rename_window() {
+              if [[ -n "$1" ]]; then
+                tmux rename-window "$1" 2>/dev/null
+              fi
+            }
 
-          # Hook that runs before command execution
-          preexec() {
-            local cmd="$1"
-            local cmd_name="''${cmd%% *}"
+            # Variable to store the last meaningful window name
+            typeset -g TMUX_LAST_WINDOW_NAME=""
 
-            # Skip renaming for job control commands
-            if [[ "$cmd_name" =~ ^(fg|bg|jobs)$ ]]; then
-              return
-            fi
+            # Hook that runs before command execution
+            preexec() {
+              local cmd="$1"
+              local cmd_name="''${cmd%% *}"
 
-            # Store current window name before changing it
-            TMUX_LAST_WINDOW_NAME=$(tmux display-message -p '#W' 2>/dev/null)
+              # Skip renaming for job control commands
+              if [[ "$cmd_name" =~ ^(fg|bg|jobs)$ ]]; then
+                return
+              fi
 
-            # Check if it's a make command and extract the target
-            if [[ "$cmd" =~ ^make[[:space:]]+([^[:space:]]+) ]]; then
-              tmux_rename_window "m:''${match[1]}"
-            elif [[ "$cmd" =~ ^claude ]]; then
-              tmux_rename_window "claude:''${PWD##*/}"
-            elif [[ "$cmd" =~ ^nvim ]]; then
-              tmux_rename_window "nvim:''${PWD##*/}"
-            else
-              # For other commands, just show the command name
-              tmux_rename_window "$cmd_name"
-            fi
-          }
+              # Store current window name before changing it
+              TMUX_LAST_WINDOW_NAME=$(tmux display-message -p '#W' 2>/dev/null)
 
-          # Hook that runs after command execution (when back at prompt)
-          precmd() {
-            # Reset to directory name when back at prompt
-            tmux_rename_window "''${PWD##*/}"
-          }
-        fi
+              # Check if it's a make command and extract the target
+              if [[ "$cmd" =~ ^make[[:space:]]+([^[:space:]]+) ]]; then
+                tmux_rename_window "m:''${match[1]}"
+              elif [[ "$cmd" =~ ^claude ]]; then
+                tmux_rename_window "claude:''${PWD##*/}"
+              elif [[ "$cmd" =~ ^nvim ]]; then
+                tmux_rename_window "nvim:''${PWD##*/}"
+              else
+                # For other commands, just show the command name
+                tmux_rename_window "$cmd_name"
+              fi
+            }
+
+            # Hook that runs after command execution (when back at prompt)
+            precmd() {
+              # Reset to directory name when back at prompt
+              tmux_rename_window "''${PWD##*/}"
+            }
+          fi
       '';
     };
     gpg.enable = true;
