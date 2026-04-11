@@ -286,7 +286,8 @@ in
           vim.cmd(string.format("digraph %s %d", name, code))
         end
 
-        -- "ebook" namespace: all digraphs start with comma
+        -- Standard Ebooks insert-mode group: all digraphs start with comma
+        -- (parallel to the <leader>s normal-mode group for `se` commands)
 
         -- Curly quotes
         dig(",l", 8216)  -- ‘ left single
@@ -551,6 +552,15 @@ in
           options = {
             silent = true;
             desc = "WordNet thesaurus (Telescope)";
+          };
+        }
+        {
+          action = ":!se titlecase --no-newline<CR>";
+          key = "<leader>st";
+          mode = "v";
+          options = {
+            silent = true;
+            desc = "SE titlecase selection";
           };
         }
         {
@@ -882,7 +892,7 @@ in
         }
         {
           mode = "n";
-          key = "<leader>ep";
+          key = "<leader>sb";
           action.__raw = ''
             function()
               -- Kill existing ebook-viewer instances
@@ -913,12 +923,12 @@ in
           '';
           options = {
             silent = false;
-            desc = "Build and preview EPUB";
+            desc = "SE build + preview EPUB";
           };
         }
         {
           mode = "x";
-          key = "<leader>ep";
+          key = "<leader>sb";
           action.__raw = ''
             function()
               -- Kill existing ebook-viewer instances
@@ -952,7 +962,7 @@ in
           '';
           options = {
             silent = false;
-            desc = "Build and preview EPUB with search";
+            desc = "SE build + preview EPUB at selection";
           };
         }
       ];
@@ -1090,7 +1100,15 @@ in
         };
         indent-blankline.enable = true;
         undotree.enable = true;
-        which-key.enable = true;
+        which-key = {
+          enable = true;
+          settings.spec = [
+            {
+              __unkeyed-1 = "<leader>s";
+              group = "standard ebooks";
+            }
+          ];
+        };
         treesitter = {
           enable = true;
           nixGrammars = true;
