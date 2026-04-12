@@ -1531,7 +1531,14 @@ in
       dotDir = "${config.xdg.configHome}/zsh";
       defaultKeymap = "emacs";
       enableCompletion = true;
+      completionInit = "autoload -U compinit && compinit -i";
       autosuggestion.enable = true;
+      plugins = [
+        {
+          name = "zsh-completion-sync";
+          src = "${pkgs.zsh-completion-sync}/share/zsh-completion-sync";
+        }
+      ];
       shellAliases = {
         bf = "bun format";
         br = "bin/rubocop -A";
@@ -1559,6 +1566,9 @@ in
         res-default = "niri msg output Virtual-1 mode 7680x3200@60.000";
       };
       initContent = ''
+          # Tell zsh-completion-sync to pass -i to compinit (ignore insecure directories)
+          zstyle ':completion-sync:compinit' arguments -i
+
           # Static just completions (the default source <(...) wrapper breaks with direnv)
           source ${just-completions}/_just
 
