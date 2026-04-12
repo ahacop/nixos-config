@@ -370,6 +370,7 @@ in
       usbutils
       w3m
       watch
+      wdiff
       which
       wl-clipboard
       wget
