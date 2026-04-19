@@ -2145,6 +2145,7 @@ in
       "text/html" = [ "firefox.desktop" ];
       "application/xhtml+xml" = [ "firefox.desktop" ];
       "application/pdf" = [ "org.pwmt.zathura.desktop" ];
+      "application/epub+zip" = [ "com.github.johnfactotum.Foliate.desktop" ];
     };
   };
 
@@ -2197,6 +2198,7 @@ in
       circumflex
       devenv
       duckdb
+      foliate
       glow
       inputs.erwindb.packages.${pkgs.stdenv.hostPlatform.system}.default
       inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
@@ -2204,7 +2206,6 @@ in
       mermaid-cli
       opencode
       presenterm
-      readest
       sdcv
       vale
       waybar
