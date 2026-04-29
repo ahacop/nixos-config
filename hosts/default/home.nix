@@ -37,6 +37,60 @@ let
       tar -xzf stardict-dictd-web1913-2.4.2.tgz -C $out/share/stardict/dic
     '';
   };
+
+  whisper-dictate = pkgs.writeShellApplication {
+    name = "whisper-dictate";
+    runtimeInputs = with pkgs; [
+      ffmpeg
+      whisper-cpp
+      wtype
+      libnotify
+      coreutils
+      gnused
+    ];
+    text = ''
+      MODEL_NAME="''${WHISPER_DICTATE_MODEL:-medium.en}"
+      MODEL_DIR="''${XDG_CACHE_HOME:-$HOME/.cache}/whisper-dictate"
+      MODEL_FILE="$MODEL_DIR/ggml-$MODEL_NAME.bin"
+      WAV="/tmp/whisper-dictate-$UID.wav"
+      TXT="$WAV.txt"
+      PIDFILE="/tmp/whisper-dictate-$UID.pid"
+
+      mkdir -p "$MODEL_DIR"
+
+      if [[ ! -f "$MODEL_FILE" ]]; then
+        notify-send -t 5000 "Whisper" "Downloading $MODEL_NAME model (one-time)…"
+        whisper-cpp-download-ggml-model "$MODEL_NAME" "$MODEL_DIR"
+      fi
+
+      if [[ -f "$PIDFILE" ]] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+        PID="$(cat "$PIDFILE")"
+        rm -f "$PIDFILE"
+        kill -INT "$PID" 2>/dev/null || true
+        for _ in 1 2 3 4 5 6 7 8; do
+          kill -0 "$PID" 2>/dev/null || break
+          sleep 0.25
+        done
+        notify-send -t 1500 "Whisper" "Transcribing…"
+        whisper-cli -m "$MODEL_FILE" -f "$WAV" -nt -np -otxt >/dev/null 2>&1 || true
+        TEXT=""
+        if [[ -f "$TXT" ]]; then
+          TEXT="$(tr -d '\n' < "$TXT" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')"
+        fi
+        rm -f "$WAV" "$TXT"
+        if [[ -n "$TEXT" ]]; then
+          wtype -- "$TEXT"
+        else
+          notify-send -t 1500 "Whisper" "(no speech detected)"
+        fi
+      else
+        rm -f "$WAV" "$TXT" "$PIDFILE"
+        notify-send -t 1500 "Whisper" "Recording… (press again to stop)"
+        ffmpeg -loglevel error -nostdin -f pulse -i default -ar 16000 -ac 1 -y "$WAV" >/dev/null 2>&1 &
+        echo $! > "$PIDFILE"
+      fi
+    '';
+  };
 in
 {
   stylix.targets.firefox.profileNames = [ "default" ];
@@ -1985,6 +2039,10 @@ in
         "Mod+Return".action = spawn "ghostty";
         "Mod+Shift+Return".action = spawn "kitty";
         "Mod+D".action = spawn "walker";
+        "Mod+Shift+Backslash" = {
+          action = spawn "whisper-dictate";
+          repeat = false;
+        };
 
         "Super+Alt+S" = {
           action = spawn-sh "pkill orca || exec orca";
@@ -2211,6 +2269,7 @@ in
       vale
       waybar
       websters-1913-stardict
+      whisper-dictate
       zathura
     ];
     sessionVariables = {
