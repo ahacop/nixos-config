@@ -38,6 +38,42 @@ let
     '';
   };
 
+  # Bun standalone executables append the embedded script as a trailer past
+  # the ELF end. autoPatchelfHook's --set-rpath/--shrink-rpath calls rewrite
+  # the section header table at the end of the file and clobber the trailer,
+  # which makes Bun's StandaloneModuleGraph.fromExecutable return null and
+  # the binary runs as plain `bun`. Setting only the interpreter with a
+  # single patchelf call preserves the trailer.
+  hunk = pkgs.stdenv.mkDerivation rec {
+    pname = "hunk";
+    version = "0.10.0";
+
+    src = pkgs.fetchurl {
+      url = "https://github.com/modem-dev/hunk/releases/download/v${version}/hunkdiff-linux-arm64.tar.gz";
+      hash = "sha256-epaG0urTx3nqr2mIClkDLzrxf+gOZE4EDyC0YyEPq8M=";
+    };
+
+    nativeBuildInputs = [ pkgs.patchelf ];
+
+    dontStrip = true;
+    dontPatchELF = true;
+
+    installPhase = ''
+      runHook preInstall
+      install -Dm755 hunk $out/bin/hunk
+      patchelf --set-interpreter "${pkgs.glibc}/lib/ld-linux-aarch64.so.1" $out/bin/hunk
+      runHook postInstall
+    '';
+
+    meta = {
+      description = "Review-first terminal diff viewer for agentic coders";
+      homepage = "https://github.com/modem-dev/hunk";
+      license = pkgs.lib.licenses.mit;
+      mainProgram = "hunk";
+      platforms = [ "aarch64-linux" ];
+    };
+  };
+
   whisper-dictate = pkgs.writeShellApplication {
     name = "whisper-dictate";
     runtimeInputs = with pkgs; [
@@ -2259,6 +2295,7 @@ in
       duckdb
       foliate
       glow
+      hunk
       inputs.erwindb.packages.${pkgs.stdenv.hostPlatform.system}.default
       inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
       # inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
