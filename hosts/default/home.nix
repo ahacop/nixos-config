@@ -2301,6 +2301,7 @@ in
       # inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
       mermaid-cli
       opencode
+      pomodoro
       presenterm
       sdcv
       vale
