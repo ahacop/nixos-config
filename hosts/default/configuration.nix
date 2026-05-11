@@ -290,9 +290,11 @@ in
       intel-one-mono
       jetbrains-mono
       meslo-lgs-nf
+      nerd-fonts.terminess-ttf
       noto-fonts
       noto-fonts-color-emoji
-      nerd-fonts.terminess-ttf
+      source-sans
+      source-serif
       ultimate-oldschool-pc-font-pack
     ];
   };
