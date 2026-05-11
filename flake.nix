@@ -74,6 +74,11 @@
       url = "github:ryoppippi/nix-claude-code";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    hunk = {
+      url = "github:modem-dev/hunk";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -115,6 +120,7 @@
                     inputs.niri.homeModules.stylix
                     inputs.walker.homeManagerModules.default
                     inputs.clipboard-txt-watcher.homeManagerModules.default
+                    inputs.hunk.homeManagerModules.default
                   ];
                 };
                 extraSpecialArgs = {
