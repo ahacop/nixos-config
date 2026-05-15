@@ -20,9 +20,6 @@ CODE_DIRS ?= $(HOME)/code
 # reused a lot so we just store them up here.
 SSH_OPTIONS := -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
 
-# We need to do some OS switching below.
-UNAME := $(shell uname)
-
 CLAUDE_OVERLAY_API := https://api.github.com/repos/ryoppippi/nix-claude-code/contents/versions
 
 # Default target
@@ -248,20 +245,10 @@ restart-walker: ## Restart Walker and Elephant services
 	systemctl --user restart walker.service
 
 switch: ## Apply configuration changes (rebuilds and switches)
-ifeq ($(UNAME), Darwin)
-	nix build --extra-experimental-features nix-command --extra-experimental-features flakes ".#darwinConfigurations.${NIXNAME}.system"
-	./result/sw/bin/darwin-rebuild switch --flake "$$(pwd)#${NIXNAME}"
-else
 	sudo nixos-rebuild switch --flake ".#${NIXNAME}"
-endif
 
 test: ## Test configuration changes without switching
-ifeq ($(UNAME), Darwin)
-	nix build ".#darwinConfigurations.${NIXNAME}.system"
-	./result/sw/bin/darwin-rebuild test --flake "$$(pwd)#${NIXNAME}"
-else
 	sudo nixos-rebuild test --flake ".#$(NIXNAME)"
-endif
 
 vm/bootstrap0: ## Bootstrap brand new VM with NixOS installation
 	ssh $(SSH_OPTIONS) -p$(NIXPORT) root@$(NIXADDR) " \
