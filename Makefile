@@ -27,7 +27,7 @@ CLAUDE_OVERLAY_API := https://api.github.com/repos/ryoppippi/nix-claude-code/con
 
 # Phony targets
 .PHONY: help clean optimize check-kernel check-claude-version upgrade-claude restart-walker switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
-.PHONY: disk-status gc-roots stale-results stale-direnvs bloated-direnvs clean-results clean-direnvs clean-direnv-profiles clean-caches clean-all
+.PHONY: disk-status gc-roots stale-results stale-direnvs bloated-direnvs clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean-all
 
 # Help target
 help: ## Show this help message
@@ -212,17 +212,38 @@ clean-direnvs: ## Remove .direnv from projects inactive for STALE_DAYS
 	done
 	@echo "Done."
 
-clean-caches: ## Clean nix and other caches
+# Re-downloadable tool caches safe to nuke. Listed explicitly so adding a new
+# one is a deliberate review (don't add ~/.cache/mozilla without thinking).
+SAFE_CACHE_DIRS := nix trivy ms-playwright puppeteer chrome-devtools-mcp \
+	pip deno bundix go-build bun pnpm chromium informers
+
+clean-caches: ## Clean nix and other re-downloadable tool caches
 	@echo "Cleaning caches..."
-	rm -rf $(HOME)/.cache/nix
-	@echo "  Removed ~/.cache/nix"
-	@if [ -d "$(HOME)/.cache/trivy" ]; then \
-		rm -rf $(HOME)/.cache/trivy; \
-		echo "  Removed ~/.cache/trivy"; \
+	@for name in $(SAFE_CACHE_DIRS); do \
+		dir="$(HOME)/.cache/$$name"; \
+		if [ -d "$$dir" ]; then \
+			size=$$(du -sh "$$dir" 2>/dev/null | cut -f1); \
+			rm -rf "$$dir"; \
+			printf "  Removed ~/.cache/%-22s (%s)\n" "$$name" "$$size"; \
+		fi; \
+	done
+	@echo "Done."
+
+clean-stores: ## Prune content-addressable package stores (pnpm, gem)
+	@echo "Pruning package stores..."
+	@if [ -d "$(HOME)/.local/share/pnpm/store" ]; then \
+		size=$$(du -sh "$(HOME)/.local/share/pnpm/store" 2>/dev/null | cut -f1); \
+		rm -rf "$(HOME)/.local/share/pnpm/store"; \
+		printf "  Removed ~/.local/share/pnpm/store    (%s)\n" "$$size"; \
+	fi
+	@if [ -d "$(HOME)/.local/share/gem" ]; then \
+		size=$$(du -sh "$(HOME)/.local/share/gem" 2>/dev/null | cut -f1); \
+		rm -rf "$(HOME)/.local/share/gem"; \
+		printf "  Removed ~/.local/share/gem           (%s)\n" "$$size"; \
 	fi
 	@echo "Done."
 
-clean-all: clean-results clean-direnvs clean-caches clean ## Full cleanup (stale items + caches + gc)
+clean-all: clean-results clean-direnvs clean-caches clean-stores clean ## Full cleanup (stale items + caches + stores + gc)
 	@echo ""
 	@echo "=== Full cleanup complete ==="
 
