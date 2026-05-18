@@ -271,6 +271,13 @@ in
       settings.PasswordAuthentication = true;
       settings.PermitRootLogin = "no";
     };
+
+    # mDNS/Bonjour so we can resolve the Mac host (and other peers) via *.local
+    # without depending on the router's DNS or a fixed IP.
+    avahi = {
+      enable = true;
+      nssmdns4 = true;
+    };
   };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.

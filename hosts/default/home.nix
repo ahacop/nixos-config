@@ -2278,6 +2278,9 @@ in
     ];
     sessionVariables = {
       PAGER = "less -FirSwX";
+      # Ollama runs on the Mac host. Resolved via mDNS (avahi enabled in
+      # configuration.nix) so it survives the host's IP changing.
+      OLLAMA_HOST = "http://chunky-peanut-butter.local:11434";
     };
   };
 }
