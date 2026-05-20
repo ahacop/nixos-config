@@ -349,6 +349,7 @@ in
       jq
       just
       killall
+      litemdview
       lsof
       man-pages
       man-pages-posix
