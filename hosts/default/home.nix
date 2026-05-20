@@ -1022,6 +1022,42 @@ in
             desc = "SE build + preview EPUB at selection";
           };
         }
+        {
+          action.__raw = "function() require('aoc').input() end";
+          key = "<leader>ai";
+          mode = "n";
+          options = {
+            silent = true;
+            desc = "AoC input buffer";
+          };
+        }
+        {
+          action.__raw = "function() require('aoc').run() end";
+          key = "<leader>ar";
+          mode = "n";
+          options = {
+            silent = true;
+            desc = "AoC run real input";
+          };
+        }
+        {
+          action.__raw = "function() require('aoc').example() end";
+          key = "<leader>ae";
+          mode = "n";
+          options = {
+            silent = true;
+            desc = "AoC run example buffer";
+          };
+        }
+        {
+          action.__raw = "function() require('aoc').submit() end";
+          key = "<leader>as";
+          mode = "n";
+          options = {
+            silent = true;
+            desc = "AoC submit";
+          };
+        }
       ];
 
       opts = {
@@ -1342,6 +1378,7 @@ in
         };
         vim-test.enable = true;
         trouble.enable = true;
+        overseer.enable = true;
 
         lint = {
           enable = true;
@@ -1480,6 +1517,82 @@ in
       ];
 
       extraPlugins = with pkgs.vimPlugins; [ direnv-vim ];
+
+      extraFiles."lua/aoc.lua".text = ''
+        local M = {}
+
+        local INPUT_BUFNAME = "aoc-input"
+
+        local function args_from_buffer()
+          local path = vim.api.nvim_buf_get_name(0)
+          local year, day, part = path:match("solutions/(%d+)/day(%d+)_part(%d+)%.rb$")
+          if not year then
+            vim.notify("not an AoC solution: " .. path, vim.log.levels.WARN)
+            return
+          end
+          return year, tostring(tonumber(day)), part
+        end
+
+        local function find_input_buf()
+          for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+            if vim.api.nvim_buf_is_loaded(buf)
+                and vim.api.nvim_buf_get_name(buf):match(INPUT_BUFNAME .. "$") then
+              return buf
+            end
+          end
+        end
+
+        local function run_task(name, cmd)
+          vim.cmd.write({ mods = { silent = true } })
+          local overseer = require("overseer")
+          local task = overseer.new_task({ name = name, cmd = cmd })
+          task:start()
+          overseer.open({ enter = false })
+        end
+
+        function M.input()
+          local buf = find_input_buf()
+          if buf then
+            vim.cmd("buffer " .. buf)
+          else
+            vim.cmd("enew")
+            vim.api.nvim_buf_set_name(0, INPUT_BUFNAME)
+            vim.bo.buftype, vim.bo.bufhidden, vim.bo.swapfile = "nofile", "hide", false
+          end
+        end
+
+        function M.run()
+          local y, d, p = args_from_buffer()
+          if y then
+            run_task(("aoc run %s/%s/%s"):format(y, d, p), { "just", "run", y, d, p })
+          end
+        end
+
+        function M.example()
+          local y, d, p = args_from_buffer()
+          if not y then return end
+          local buf = find_input_buf()
+          if not buf then
+            vim.notify("no aoc-input buffer — <leader>ai to create one", vim.log.levels.WARN)
+            return
+          end
+          local tmp = vim.fn.tempname()
+          vim.fn.writefile(vim.api.nvim_buf_get_lines(buf, 0, -1, false), tmp)
+          run_task(
+            ("aoc example %s/%s/%s"):format(y, d, p),
+            ("just example %s %s %s < %s"):format(y, d, p, vim.fn.shellescape(tmp))
+          )
+        end
+
+        function M.submit()
+          local y, d, p = args_from_buffer()
+          if y then
+            run_task(("aoc submit %s/%s/%s"):format(y, d, p), { "just", "submit", y, d, p })
+          end
+        end
+
+        return M
+      '';
     };
 
     zoxide = {
