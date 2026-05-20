@@ -136,6 +136,26 @@
         "type": "github"
       }
     },
+    "crit": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1779230309,
+        "narHash": "sha256-TLVl6sUqjAlZUFYs8YBxy/U2nvhH5hC8L/iJZo8ioNE=",
+        "owner": "tomasz-tomczyk",
+        "repo": "crit",
+        "rev": "d268970610431fb985edff2194321dbf385226bd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tomasz-tomczyk",
+        "repo": "crit",
+        "type": "github"
+      }
+    },
     "elephant": {
       "inputs": {
         "nixpkgs": [
@@ -605,6 +625,7 @@
       "inputs": {
         "claude-code-overlay": "claude-code-overlay",
         "clipboard-txt-watcher": "clipboard-txt-watcher",
+        "crit": "crit",
         "elephant": "elephant",
         "erwindb": "erwindb",
         "flake-utils": "flake-utils",

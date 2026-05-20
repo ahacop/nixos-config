@@ -79,6 +79,11 @@
       url = "github:modem-dev/hunk";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    crit = {
+      url = "github:tomasz-tomczyk/crit";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
