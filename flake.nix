@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -23,25 +22,16 @@
     macos-notifier-bridge = {
       url = "github:ahacop/macos-notifier-bridge";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
-
-    # pgbox = {
-    #   url = "github:ahacop/pgbox";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    #   inputs.flake-utils.follows = "flake-utils";
-    # };
 
     mw-cli = {
       url = "github:ahacop/mw-cli";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
 
     aoc-cli = {
       url = "github:ahacop/aoc-cli";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
 
     erwindb = {
@@ -73,7 +63,6 @@
     clipboard-txt-watcher = {
       url = "github:ahacop/clipboard-txt-watcher";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
 
     claude-code-overlay = {
@@ -103,44 +92,33 @@
       user = "ahacop";
     in
     {
-      nixosConfigurations = {
-        default = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs;
-            inherit user;
-          };
-          modules = [
-            inputs.stylix.nixosModules.stylix
-            ./hosts/default/configuration.nix
-            {
-              nixpkgs.overlays = [
-                inputs.niri.overlays.niri
-                inputs.claude-code-overlay.overlays.default
+      nixosConfigurations.default = nixpkgs.lib.nixosSystem {
+        specialArgs = { inherit inputs user; };
+        modules = [
+          ./hosts/default/configuration.nix
+          inputs.stylix.nixosModules.stylix
+          home-manager.nixosModules.default
+          {
+            nixpkgs.overlays = [
+              inputs.niri.overlays.niri
+              inputs.claude-code-overlay.overlays.default
+            ];
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              extraSpecialArgs = { inherit inputs; };
+              users.${user}.imports = [
+                ./hosts/default/home.nix
+                inputs.nixvim.homeModules.nixvim
+                inputs.niri.homeModules.niri
+                inputs.niri.homeModules.stylix
+                inputs.walker.homeManagerModules.default
+                inputs.clipboard-txt-watcher.homeManagerModules.default
+                inputs.hunk.homeManagerModules.default
               ];
-            }
-            home-manager.nixosModules.default
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                users.ahacop = {
-                  imports = [
-                    ./hosts/default/home.nix
-                    inputs.nixvim.homeModules.nixvim
-                    inputs.niri.homeModules.niri
-                    inputs.niri.homeModules.stylix
-                    inputs.walker.homeManagerModules.default
-                    inputs.clipboard-txt-watcher.homeManagerModules.default
-                    inputs.hunk.homeManagerModules.default
-                  ];
-                };
-                extraSpecialArgs = {
-                  inherit inputs;
-                };
-              };
-            }
-          ];
-        };
+            };
+          }
+        ];
       };
     };
 }
