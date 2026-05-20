@@ -1,5 +1,26 @@
 {
   "nodes": {
+    "aoc-cli": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-overlay": "rust-overlay"
+      },
+      "locked": {
+        "lastModified": 1779282335,
+        "narHash": "sha256-5nOd03597a+YzUq5sA1M+AqDhylAzngdMAp1hKZAreY=",
+        "owner": "ahacop",
+        "repo": "aoc-cli",
+        "rev": "0e7ee79ee5bb6b39597f4efb8cc07ae6d8087a38",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ahacop",
+        "repo": "aoc-cli",
+        "type": "github"
+      }
+    },
     "base16": {
       "inputs": {
         "fromYaml": "fromYaml"
@@ -182,7 +203,7 @@
         "nixpkgs": [
           "nixpkgs"
         ],
-        "rust-overlay": "rust-overlay"
+        "rust-overlay": "rust-overlay_2"
       },
       "locked": {
         "lastModified": 1774598306,
@@ -623,6 +644,7 @@
     },
     "root": {
       "inputs": {
+        "aoc-cli": "aoc-cli",
         "claude-code-overlay": "claude-code-overlay",
         "clipboard-txt-watcher": "clipboard-txt-watcher",
         "crit": "crit",
@@ -642,6 +664,27 @@
       }
     },
     "rust-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "aoc-cli",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1779247103,
+        "narHash": "sha256-DwltBoBl9a7fCzlKi3xnNha1NHbfvawwkNdnTXEyfFQ=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "86dbfb70dc1c2967245d87ed6d07d2c8bda305e3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "rust-overlay_2": {
       "inputs": {
         "nixpkgs": [
           "erwindb",

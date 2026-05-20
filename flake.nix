@@ -38,6 +38,12 @@
       inputs.flake-utils.follows = "flake-utils";
     };
 
+    aoc-cli = {
+      url = "github:ahacop/aoc-cli";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+
     erwindb = {
       url = "github:ahacop/erwindb";
       inputs.nixpkgs.follows = "nixpkgs";
