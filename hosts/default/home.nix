@@ -2219,8 +2219,6 @@ in
     file = {
       ".githelpers".source = ./../../config/githelpers;
       ".ssh/config".source = ./../../config/sshconfig;
-      ".local/flake-dev-envs/ruby/flake.nix".source = ./../../devflakes/ruby/flake.nix;
-      ".local/flake-dev-envs/ruby/flake.lock".source = ./../../devflakes/ruby/flake.lock;
       ".tigrc".text = ''
         bind generic Y !sh -c 'commit=%(commit); echo $commit | /run/current-system/sw/bin/wl-copy -n & echo $commit | /run/current-system/sw/bin/tmux load-buffer -'
         set main-view = line-number:no id:yes date:custom,format="%Y-%m-%d %H:%M" author:full commit-title:yes,graph,refs,overflow=no

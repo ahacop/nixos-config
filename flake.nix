@@ -92,6 +92,21 @@
       user = "ahacop";
     in
     {
+      templates = {
+        ruby = {
+          path = ./devflakes/ruby;
+          description = "Ruby dev shell (pinned ruby + gem build deps)";
+        };
+        rails = {
+          path = ./devflakes/rails;
+          description = "Rails dev shell (ruby + postgres, node, vips, flyctl, etc.)";
+        };
+        rust = {
+          path = ./devflakes/rust;
+          description = "Rust dev shell (stable toolchain + clippy/rustfmt/rust-analyzer)";
+        };
+      };
+
       nixosConfigurations.default = nixpkgs.lib.nixosSystem {
         specialArgs = { inherit inputs user; };
         modules = [

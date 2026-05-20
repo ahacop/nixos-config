@@ -236,3 +236,20 @@ watch-deploy() {
     ) &>/dev/null &
   fi
 }
+
+mkdevenv() {
+  local flake="$HOME/nixos-config"
+
+  if [[ -z "$1" || "$1" == "-h" || "$1" == "--help" ]]; then
+    echo "usage: mkdevenv <template>"
+    nix flake show "$flake" 2>/dev/null | sed -n '/templates/,$p'
+    return 1
+  fi
+
+  nix flake init -t "$flake#$1" || return $?
+
+  if [[ ! -e ./.envrc ]]; then
+    echo "use flake" > ./.envrc
+    echo "wrote ./.envrc — run 'direnv allow' to activate"
+  fi
+}

@@ -3,3 +3,4 @@
 result
 iso/nixos.iso
 .aider*
+devflakes/*/flake.lock
