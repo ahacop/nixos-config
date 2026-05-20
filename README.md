@@ -77,28 +77,3 @@ You should have a graphical functioning dev VM.
 At this point, I never use Mac terminals ever again. I clone this repository
 in my VM and I use the other Make tasks such as `make test`, `make switch`, etc.
 to make changes my VM.
-
-## Setup (macOS/Darwin)
-
-**THIS IS OPTIONAL AND UNRELATED TO THE VM WORK.** I recommend you ignore
-this unless you're interested in using Nix to manage your Mac too.
-
-I share some of my Nix configurations with my Mac host and use Nix
-to manage _some_ aspects of my macOS installation, too. This uses the
-[nix-darwin](https://github.com/LnL7/nix-darwin) project. I don't manage
-_everything_ with Nix, for example I don't manage apps, some of my system
-settings, Homebrew, etc. I plan to migrate some of those in time.
-
-To utilize the Mac setup, first install Nix using some Nix installer.
-There are two great installers right now:
-[nix-installer](https://github.com/DeterminateSystems/nix-installer)
-by Determinate Systems and [Flox](https://floxdev.com/). The point of both
-for my configs is just to get the `nix` CLI with flake support installed.
-
-Once installed, clone this repo and run `make`. If there are any errors,
-follow the error message (some folders may need permissions changed,
-some files may need to be deleted). That's it.
-
-**WARNING: Don't do this without reading the source.** This repository
-is and always has been _my_ configurations. If you blindly run this,
-your system may be changed in ways that you don't want. Read my source!
