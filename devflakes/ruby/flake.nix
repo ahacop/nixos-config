@@ -31,18 +31,36 @@
         );
     in
     {
-      devShells = forAllSystems (pkgs: {
-        default = pkgs.mkShell {
-          packages = with pkgs; [
-            (pkgs."ruby-4.0.5".override { docSupport = true; })
-            bundler
-            gnumake
-            libyaml
-            openssl
-            pkg-config
-          ];
-        };
-      });
+      devShells = forAllSystems (
+        pkgs:
+        let
+          rubyPkg = pkgs."ruby-4.0.5".override { docSupport = true; };
+          mkScript = name: text: pkgs.writeShellScriptBin name text;
+          gem-install-docs = mkScript "gem-install-docs" ''
+            unset GEM_HOME
+            gemdir=$(${rubyPkg}/bin/gem environment gemdir)
+            echo "Generating ri docs for new gems..."
+            ${rubyPkg}/bin/gem list --no-versions 2>/dev/null | while read -r name; do
+              if ! ls "$gemdir/doc/$name"-* &>/dev/null; then
+                ${rubyPkg}/bin/gem rdoc "$name" --ri --no-rdoc 2>/dev/null
+              fi
+            done
+          '';
+        in
+        {
+          default = pkgs.mkShell {
+            packages = with pkgs; [
+              bundler
+              gem-install-docs
+              gnumake
+              libyaml
+              openssl
+              pkg-config
+              rubyPkg
+            ];
+          };
+        }
+      );
 
       formatter = forAllSystems (pkgs: pkgs.nixfmt);
     };
