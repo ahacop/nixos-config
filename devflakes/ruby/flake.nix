@@ -36,7 +36,7 @@
       devShells = forAllSystems (pkgs: {
         default = pkgs.mkShell {
           packages = with pkgs; [
-            (pkgs."ruby-4.0.4".override { docSupport = true; })
+            (pkgs."ruby-4.0.5".override { docSupport = true; })
             bundler
             gnumake
             libyaml
