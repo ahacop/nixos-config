@@ -105,6 +105,10 @@
           path = ./devflakes/rust;
           description = "Rust dev shell (stable toolchain + clippy/rustfmt/rust-analyzer)";
         };
+        prolog = {
+          path = ./devflakes/prolog;
+          description = "Prolog dev shell (SWI-Prolog + GUI, prolog_ls, just)";
+        };
       };
 
       nixosConfigurations.default = nixpkgs.lib.nixosSystem {
