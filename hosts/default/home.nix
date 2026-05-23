@@ -1339,6 +1339,23 @@ in
             nil_ls = {
               enable = true;
             };
+            prolog_ls = {
+              enable = true;
+              # Use the swipl on PATH (the prolog devflake's, which has the
+              # lsp_server pack baked in) rather than a nixvim-provided one.
+              package = null;
+              cmd = [
+                "swipl"
+                "-g"
+                "use_module(library(lsp_server))."
+                "-g"
+                "lsp_server:main"
+                "-t"
+                "halt"
+                "--"
+                "stdio"
+              ];
+            };
             ruby_lsp = {
               enable = true;
               package = null;
@@ -1456,6 +1473,17 @@ in
               shfmt.enable = true;
             };
           };
+        };
+      };
+
+      # Vim maps .pl to perl by default; treat SWI-Prolog extensions as prolog
+      # so prolog_ls attaches. .plt is SWI's test-file extension, .pro is the
+      # Windows fallback when .pl conflicts with Perl.
+      filetype = {
+        extension = {
+          pl = "prolog";
+          plt = "prolog";
+          pro = "prolog";
         };
       };
 
