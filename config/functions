@@ -1,17 +1,3 @@
-function list-i3-keybindings() {
-  local config_file="$HOME/.config/i3/config"
-
-  # Calculate maximum key length for alignment
-  local max_key_length=$(grep '^bindsym' "$config_file" | awk '{print length($2)}' | sort -n | tail -1)
-
-  # Print keybindings with proper alignment
-  grep '^bindsym' "$config_file" | while read -r line; do
-    local key=$(echo "$line" | awk '{print $2}')
-    local command=$(echo "$line" | cut -d' ' -f3-)
-    printf "%-${max_key_length}s -> %s\n" "$key" "$command"
-  done
-}
-
 function git_pick_from_log() {
   # Check if the number of commits is provided
   if [ -z "$1" ]; then
@@ -172,35 +158,6 @@ open_changed_from_head_in_vim() {
   nvim -p $(changed_from_head)
 }
 
-p() {
-  local base_dir=${1:-~/code}
-  base_dir=$(realpath "$base_dir")  # Ensure we have the full path
-  local proj
-
-  echo $base_dir
-  while true; do
-    proj=$(find "$base_dir" -maxdepth 2 \( -type l -o -type d \) |
-           sed "s|^$base_dir/||" |
-           sk |
-           sed "s|^|$base_dir/|")
-    if [ -n "$proj" ]; then
-      cd "$proj"
-      break
-    fi
-  done
-}
-
-# Tab completion function remains the same
-_p_completion() {
-  local base_dir=${1:-~/code}
-  local projects
-  projects=($(find "$base_dir" -maxdepth 2 \( -type l -o -type d \) | sed "s|^$base_dir/||"))
-  _describe 'projects' projects
-}
-
-# Register the completion function
-compdef _p_completion p
-
 # Re-encode PDF
 reencode_pdf() {
   gs -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/$1 -sOutputFile="$3" "$2"
@@ -219,22 +176,6 @@ function edit_diff_files_in_vim() {
     [[ ${#files[@]} -eq 0 ]] && echo "No files found in commit $1" && return 1
 
     vim -p "${files[@]}"
-}
-
-watch-deploy() {
-  local selection=$(gh run list --status in_progress --limit 20 --json databaseId,headBranch,status,name \
-    --jq '.[] | "\(.databaseId)\t\(.headBranch)\t\(.status)\t\(.name)"' | sk)
-  [[ -z "$selection" ]] && return 0
-  local run_id=$(echo "$selection" | cut -f1)
-  local branch=$(echo "$selection" | cut -f2)
-  if gh run watch $run_id; then
-    notify-macos "$branch deployed"
-  else
-    (
-      conclusion=$(gh run view $run_id --json conclusion --jq '.conclusion')
-      [[ "$conclusion" == "failure" ]] && notify-macos "$branch failed"
-    ) &>/dev/null &
-  fi
 }
 
 mkdevenv() {
