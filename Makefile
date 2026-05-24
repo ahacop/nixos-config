@@ -16,6 +16,17 @@ STALE_DAYS ?= 30
 # Directories to scan for stale items
 CODE_DIRS ?= $(HOME)/code
 
+# Machine-local secrets file (untracked, outside the Nix store) and the
+# 1Password document it is backed up to/restored from. OP_VAULT is optional.
+# OP_ACCOUNT selects which signed-in 1Password account to use. Override on the
+# command line to target another one.
+SECRETS_FILE ?= $(HOME)/.config/secrets.env
+OP_SECRETS_ITEM ?= vm-secrets.env
+OP_ACCOUNT ?= personal
+OP_VAULT ?=
+OP_ACCOUNT_FLAG := $(if $(OP_ACCOUNT),--account $(OP_ACCOUNT),)
+OP_VAULT_FLAG := $(if $(OP_VAULT),--vault $(OP_VAULT),)
+
 # SSH options that are used. These aren't meant to be overridden but are
 # reused a lot so we just store them up here.
 SSH_OPTIONS := -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
@@ -28,6 +39,7 @@ CLAUDE_OVERLAY_API := https://api.github.com/repos/ryoppippi/nix-claude-code/con
 # Phony targets
 .PHONY: help clean optimize check-kernel check-claude-version upgrade-claude restart-walker switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
 .PHONY: disk-status gc-roots stale-results stale-direnvs bloated-direnvs clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean-all
+.PHONY: secrets/backup secrets/restore
 
 # Help target
 help: ## Show this help message
@@ -44,6 +56,9 @@ help: ## Show this help message
 	@echo ''
 	@echo 'System Info:'
 	@grep -E '^check-.*:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+	@echo ''
+	@echo 'Secrets:'
+	@grep -E '^secrets/.*:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 	@echo ''
 	@echo 'VM Management:'
 	@grep -E '^vm/.*:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
@@ -270,6 +285,30 @@ switch: ## Apply configuration changes (rebuilds and switches)
 
 test: ## Test configuration changes without switching
 	sudo nixos-rebuild test --flake ".#$(NIXNAME)"
+
+# =============================================================================
+# Secrets (machine-local env file, archived in 1Password — never committed)
+# =============================================================================
+
+secrets/backup: ## Back up local secrets.env to 1Password
+	@command -v op >/dev/null 2>&1 || { echo "op (1Password CLI) not found. Try: nix-shell -p _1password-cli"; exit 1; }
+	@if [ ! -f "$(SECRETS_FILE)" ]; then echo "No secrets file at $(SECRETS_FILE)"; exit 1; fi
+	@if op document get "$(OP_SECRETS_ITEM)" $(OP_ACCOUNT_FLAG) $(OP_VAULT_FLAG) >/dev/null 2>&1; then \
+		echo "Updating 1Password document '$(OP_SECRETS_ITEM)'..."; \
+		op document edit "$(OP_SECRETS_ITEM)" "$(SECRETS_FILE)" $(OP_ACCOUNT_FLAG) $(OP_VAULT_FLAG); \
+	else \
+		echo "Creating 1Password document '$(OP_SECRETS_ITEM)'..."; \
+		op document create "$(SECRETS_FILE)" --title "$(OP_SECRETS_ITEM)" $(OP_ACCOUNT_FLAG) $(OP_VAULT_FLAG); \
+	fi
+	@echo "Done."
+
+secrets/restore: ## Restore local secrets.env from 1Password
+	@command -v op >/dev/null 2>&1 || { echo "op (1Password CLI) not found. Try: nix-shell -p _1password-cli"; exit 1; }
+	@mkdir -p "$$(dirname "$(SECRETS_FILE)")"
+	@echo "Fetching 1Password document '$(OP_SECRETS_ITEM)' -> $(SECRETS_FILE)..."
+	@op document get "$(OP_SECRETS_ITEM)" $(OP_ACCOUNT_FLAG) $(OP_VAULT_FLAG) --out-file "$(SECRETS_FILE)"
+	@chmod 600 "$(SECRETS_FILE)"
+	@echo "Done. Run 'source $(SECRETS_FILE)' or open a new shell to load it."
 
 vm/bootstrap0: ## Bootstrap brand new VM with NixOS installation
 	ssh $(SSH_OPTIONS) -p$(NIXPORT) root@$(NIXADDR) " \
