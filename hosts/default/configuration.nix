@@ -262,7 +262,7 @@ in
     defaultLocale = "en_US.UTF-8";
   };
   services = {
-    # Enable desktop portal for applications like kitty
+    # Enable desktop portal for Wayland applications
     dbus.enable = true;
 
     # Enable the OpenSSH daemon.
@@ -445,19 +445,6 @@ in
         # Convert first 8 hex chars to decimal and modulo by number of sounds
         INDEX=$(( 0x''${HASH:0:8} % ''${#SOUNDS[@]} ))
         echo "''${SOUNDS[$INDEX]}"
-      '')
-
-      # Clipboard sync with host via shared filesystem
-      (writeShellScriptBin "pbcopy" ''
-        # Copy to both Wayland clipboard AND host file
-        ${pkgs.coreutils}/bin/tee /host/ahacop/clipboard.txt | ${pkgs.wl-clipboard}/bin/wl-copy -n
-      '')
-
-      (writeShellScriptBin "pbpaste" ''
-        # Always paste from host file (single source of truth)
-        if [ -f /host/ahacop/clipboard.txt ]; then
-          ${pkgs.coreutils}/bin/cat /host/ahacop/clipboard.txt
-        fi
       '')
 
       # Copy latest screenshot(s) from Desktop to current directory

@@ -60,11 +60,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    clipboard-txt-watcher = {
-      url = "github:ahacop/clipboard-txt-watcher";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     claude-code-overlay = {
       url = "github:ryoppippi/nix-claude-code";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -132,7 +127,6 @@
                 inputs.niri.homeModules.niri
                 inputs.niri.homeModules.stylix
                 inputs.walker.homeManagerModules.default
-                inputs.clipboard-txt-watcher.homeManagerModules.default
                 inputs.hunk.homeManagerModules.default
               ];
             };

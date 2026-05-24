@@ -105,12 +105,6 @@ in
     settings.default-timeout = 5000; # 5 seconds
   };
 
-  services.clipboard-txt-watcher = {
-    enable = true;
-    watchFile = "/host/ahacop/clipboard.txt";
-    clipboardBackend = "wayland";
-  };
-
   programs = {
     hunk.enable = true;
 
@@ -162,16 +156,6 @@ in
           ];
         };
       };
-    };
-
-    kitty = {
-      enable = true;
-      extraConfig = ''
-        # Use pbcopy/pbpaste for clipboard to sync with host
-        clipboard_control write-clipboard write-primary read-clipboard read-primary
-        clipboard_write pbcopy
-        clipboard_read pbpaste
-      '';
     };
 
     jujutsu = {
@@ -2180,7 +2164,6 @@ in
         "Mod+Shift+Slash".action = show-hotkey-overlay;
 
         "Mod+Return".action = spawn "ghostty";
-        "Mod+Shift+Return".action = spawn "kitty";
         "Mod+D".action = spawn "walker";
         "Mod+Shift+Backslash" = {
           action = spawn "whisper-dictate";
