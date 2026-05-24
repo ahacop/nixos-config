@@ -6,6 +6,11 @@
   ...
 }:
 let
+  # Identity, shared by the git and jujutsu configs below.
+  fullName = "Ara Hacopian";
+  primaryEmail = "ara@hacopian.de";
+  workEmail = "ara@changebot.ai";
+
   nur = import inputs.nur {
     inherit pkgs;
     nurpkgs = pkgs;
@@ -162,8 +167,8 @@ in
       enable = true;
       settings = {
         user = {
-          name = "Ara Hacopian";
-          email = "ara@hacopian.de";
+          name = fullName;
+          email = primaryEmail;
         };
         aliases = {
           # Common shortcuts
@@ -1846,15 +1851,15 @@ in
           condition = "gitdir:~/code/changebot-ai/";
           contents = {
             user = {
-              email = "ara@changebot.ai";
+              email = workEmail;
             };
           };
         }
       ];
       settings = {
         user = {
-          name = "Ara Hacopian";
-          email = "ara@hacopian.de";
+          name = fullName;
+          email = primaryEmail;
         };
         alias = {
           aa = "add --all";
