@@ -6,10 +6,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Configuration Management
 
-- `make switch` - Apply configuration changes (rebuilds and switches to new configuration)
+- `make` / `make help` - List available targets grouped by category
+- `make switch` - Apply configuration changes (`sudo nixos-rebuild switch --flake .#default`)
 - `make test` - Test configuration changes without switching (rebuilds but doesn't activate)
-- `make clean` - Clean old generations and garbage collect
-- `make optimize` - Optimize nix store
+- `make clean` - Delete old generations, garbage collect, prune docker, rebuild boot
+- `make optimize` - Optimize nix store (dedupe via hard links)
+- `make restart-walker` - Restart the Walker and Elephant launcher services
+
+There is no application test suite or lint target — this is a system configuration. "Testing" means `make test` (a non-activating `nixos-rebuild`). The single buildable target is `nixosConfigurations.default` (`NIXNAME=default`); commands rebuild `.#default`.
+
+### Disk Cleanup
+
+The Makefile has a dedicated cleanup group. Override `STALE_DAYS=N` (default 30) and `CODE_DIRS` (default `~/code`) to tune scanning.
+
+- `make disk-status` - Disk/nix-store/cache/docker usage overview
+- `make gc-roots` - List GC roots, flagging broken ones
+- `make stale-results` / `make clean-results` - Find/remove old `result` symlinks
+- `make stale-direnvs` / `make clean-direnvs` - Find/remove `.direnv` in inactive projects
+- `make bloated-direnvs` / `make clean-direnv-profiles` - Find/trim extra flake profiles in `.direnv`
+- `make clean-caches` - Remove re-downloadable tool caches (allow-list in `SAFE_CACHE_DIRS`)
+- `make clean-stores` - Prune pnpm/gem content-addressable stores
+- `make clean-all` - Full sweep (stale items + caches + stores + `clean`)
 
 ### System Information
 
@@ -34,10 +51,12 @@ This is a flake-based NixOS configuration for a VMware Fusion VM running on Appl
 
 ### Key Files
 
-- `flake.nix` - Main flake definition with inputs (nixpkgs, home-manager, stylix, nixvim, niri, walker, claude-code-overlay)
-- `hosts/default/configuration.nix` - System-level NixOS configuration (boot, networking, services, system packages, Stylix theming)
-- `hosts/default/home.nix` - User-level configuration via Home Manager (shell, git, nixvim, window manager, application launchers)
+- `flake.nix` - Main flake definition with inputs (nixpkgs, home-manager, stylix, nixvim, niri, walker, claude-code-overlay) and the `devflakes/` dev-shell `templates`
+- `hosts/default/configuration.nix` - System-level NixOS configuration (boot, networking, services, system packages, Stylix theming). Inline package derivations live here (e.g. `moby-thesaurus`, `thes`, `notify-macos`, `copy-screenshot`)
+- `hosts/default/home.nix` - User-level configuration via Home Manager. ~2400 lines; the entire Nixvim setup (LSP servers, keymaps, embedded Lua) is inline here, along with shell, git, jujutsu, and Walker config
+- `hosts/default/hardware-configuration.nix` - Generated hardware scan (don't hand-edit)
 - `modules/vmware-guest.nix` - Custom VMware guest module modified for aarch64 support
+- `config/` - Raw shell files sourced into zsh via `home.nix` (`zshrc`, `functions`, `githelpers`, `sshconfig`)
 
 ### Configuration Workflow
 
@@ -63,8 +82,13 @@ Uses Niri (scrollable-tiling Wayland compositor) with:
 
 - **Nixvim** - Neovim configured via Nix with LSP support (Ruby, Go, TypeScript, Bash, Nix, etc.)
 - **direnv + nix-direnv** - Automatic environment switching for project-specific shells
-- **devflakes/** - Language-specific development environments:
-  - `devflakes/ruby/` - Ruby development environment with specific Ruby version, bundler, postgres, redis, docker, etc.
+- **devflakes/** - Language-specific dev shells, also exposed as flake `templates` (use `nix flake init -t ~/nixos-config#<name>` in a new project):
+  - `ruby` - Pinned Ruby + bundler/gem build deps
+  - `rails` - Ruby + postgres, node, vips, flyctl, etc.
+  - `rust` - Stable toolchain + clippy/rustfmt/rust-analyzer
+  - `prolog` - SWI-Prolog + GUI, `prolog_ls` (wired into Nixvim via the swipl on PATH), `just`
+
+When formatting Nix in this repo, match the existing two-space style; Nixvim formats Nix on save via none-ls (`alejandra`) with `statix` diagnostics.
 
 ### VMware Integration
 
