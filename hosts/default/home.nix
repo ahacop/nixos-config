@@ -332,26 +332,33 @@ in
           vim.cmd(string.format("digraph %s %d", name, code))
         end
 
-        -- Standard Ebooks insert-mode group: all digraphs start with comma
-        -- (parallel to the <leader>s normal-mode group for `se` commands)
-
-        -- Curly quotes
-        dig(",l", 8216)  -- ‘ left single
-        dig(",r", 8217)  -- ’ right single
-        dig(",L", 8220)  -- “ left double
-        dig(",R", 8221)  -- ” right double
-
-        -- Spaces
-        dig(",s", 160)   -- no-break space
-        dig(",t", 8201)  -- thin space
-        dig(",h", 8202)  -- hair space
-
-        -- Dashes
-        dig(",n", 8211)  -- – en dash
-        dig(",m", 8212)  -- — em dash
-
-        -- Ellipsis
-        dig(",.", 8230)  -- … ellipsis
+        -- Standard Ebooks typography. One table drives two things per char:
+        --   * an insert-mode digraph   (Ctrl-K ,x)  for typing mid-prose
+        --   * a normal-mode keymap     (<leader>s,x) that drops it at cursor
+        -- Comma is the shared mnemonic between both.
+        local se_chars = {
+          -- Curly quotes
+          { "l", 8216, "‘ left single quote" },
+          { "r", 8217, "’ right single quote" },
+          { "L", 8220, "“ left double quote" },
+          { "R", 8221, "” right double quote" },
+          -- Spaces
+          { "s", 160, "no-break space" },
+          { "t", 8201, "thin space" },
+          { "h", 8202, "hair space" },
+          -- Dashes
+          { "n", 8211, "– en dash" },
+          { "m", 8212, "— em dash" },
+          -- Ellipsis
+          { ".", 8230, "… ellipsis" },
+        }
+        for _, e in ipairs(se_chars) do
+          local key, code, desc = e[1], e[2], e[3]
+          dig("," .. key, code)
+          vim.keymap.set("n", "<leader>s," .. key, function()
+            vim.api.nvim_put({ vim.fn.nr2char(code, 1) }, "c", true, true)
+          end, { desc = desc })
+        end
 
         -- WordNet thesaurus functions
         local function wordnet_lookup(word)
@@ -1213,6 +1220,10 @@ in
             {
               __unkeyed-1 = "<leader>s";
               group = "standard ebooks";
+            }
+            {
+              __unkeyed-1 = "<leader>s,";
+              group = "typography";
             }
           ];
         };
