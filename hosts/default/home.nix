@@ -1012,6 +1012,31 @@ in
           };
         }
         {
+          mode = "x";
+          key = "<leader>sp";
+          action.__raw = ''
+            function()
+              -- Yank selection to register z
+              vim.cmd([[normal! "zy]])
+              local selection = vim.fn.getreg([[z]])
+
+              -- Strip HTML tags and surrounding whitespace
+              local search_text = selection:gsub([[<[^>]+>]], [[]]):gsub([[^%s+]], [[]]):gsub([[%s+''$]], [[]])
+              if search_text == [[]] then
+                print("No text selected")
+                return
+              end
+
+              print("Opening page scans for: " .. search_text)
+              vim.fn.jobstart({[[se-ext]], [[page-scans]], [[-s]], search_text}, {detach = true})
+            end
+          '';
+          options = {
+            silent = false;
+            desc = "SE page scans for selection";
+          };
+        }
+        {
           action.__raw = "function() require('aoc').input() end";
           key = "<leader>ai";
           mode = "n";
