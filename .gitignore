@@ -4,3 +4,6 @@ result
 iso/nixos.iso
 .aider*
 devflakes/*/flake.lock
+
+# Templates ship a passthrough .envrc; override the global `.envrc` ignore.
+!devflakes/standardebooks/.envrc
