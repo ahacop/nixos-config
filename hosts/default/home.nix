@@ -2375,8 +2375,6 @@ in
     };
   };
 
-  gtk.gtk4.theme = config.gtk.theme;
-
   home = {
     username = "ahacop";
     homeDirectory = "/home/ahacop";

@@ -110,6 +110,10 @@ in
     image = config.lib.stylix.pixel "base00";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-soft.yaml";
 
+    # Stylix still sets the removed `services.kmscon.fonts` option; kmscon
+    # isn't used here, so disable the target until stylix catches up.
+    targets.kmscon.enable = false;
+
     fonts = {
       serif = {
         package = pkgs.dejavu_fonts;
