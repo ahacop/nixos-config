@@ -268,6 +268,9 @@ in
         ];
         settings = {
           "extensions.autoDisableScopes" = 0;
+          # Override inherited Wayland DPR (niri output scale = 1.5) so more
+          # content fits at Firefox 100% zoom. Lower = smaller (1.0 ≈ standard DPI).
+          "layout.css.devicePixelRatio" = "1.25";
           # Video decode: software only (VMware GPU has no VA-API)
           "media.ffmpeg.vaapi.enabled" = false;
           "media.ffvpx.enabled" = true;
