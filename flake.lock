@@ -141,11 +141,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1781482524,
-        "narHash": "sha256-JFb7Rn+8iqHMQlc3VDalg7nRn7S6hxs/Ttsr+fFgq3Q=",
+        "lastModified": 1781813459,
+        "narHash": "sha256-PI2FSlyYWVV7bs9dS209EKRWfobKi+m+LwBQf5sqEEQ=",
         "owner": "tomasz-tomczyk",
         "repo": "crit",
-        "rev": "98bb3ad71eace5c16f9b18fffea72bc9bc5342d2",
+        "rev": "5d747d79423f7bca35a5e4ab9ab6b82d100ea470",
         "type": "github"
       },
       "original": {
