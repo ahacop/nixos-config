@@ -78,6 +78,63 @@ At this point, I never use Mac terminals ever again. I clone this repository
 in my VM and I use the other Make tasks such as `make test`, `make switch`, etc.
 to make changes my VM.
 
+## Dev Shells (devflakes)
+
+The `devflakes/` directory holds language-specific Nix dev shells that are also
+exposed as flake `templates`. Use them to get a reproducible, project-local
+toolchain without polluting your system configuration.
+
+Available templates:
+
+- `ruby` — pinned Ruby + bundler/gem build deps
+- `rails` — Ruby + postgres, node, vips, flyctl, etc.
+- `rust` — stable toolchain + clippy/rustfmt/rust-analyzer
+- `prolog` — SWI-Prolog + GUI, `prolog_ls` (wired into Nixvim via the `swipl` on
+  PATH), `just`
+- `standardebooks` — direnv passthrough (`.envrc` only, no `flake.nix`) that
+  drops in `use flake github:ahacop/standardebooks-nix` to activate the Standard
+  Ebooks `se`/`se-ext` devShell
+
+### Initialize a new project
+
+In an empty (or existing) project directory, use the `mkdevenv` shell helper
+(defined in `config/functions`):
+
+```
+mkdevenv ruby
+```
+
+This runs `nix flake init -t ~/nixos-config#ruby` to copy the template's
+`flake.nix` into the current directory, and writes an `.envrc` containing
+`use flake` if one doesn't already exist. Swap `ruby` for `rails`, `rust`,
+`prolog`, or `standardebooks`. Run `mkdevenv` with no arguments (or `-h`) to list
+the available templates.
+
+### Enter the shell
+
+With [direnv](https://direnv.net/) + nix-direnv (both enabled in this config),
+the environment activates automatically once you allow the `.envrc` `mkdevenv`
+wrote:
+
+```
+direnv allow
+```
+
+Without direnv, drop into the shell manually:
+
+```
+nix develop
+```
+
+### Use without initializing (one-off shell)
+
+You can enter any of these shells ad hoc, straight from this config, without
+copying files into your project:
+
+```
+nix develop ~/nixos-config/devflakes/ruby
+```
+
 ## Secrets
 
 Machine-local secrets that shouldn't live in the Nix store or in git (a
