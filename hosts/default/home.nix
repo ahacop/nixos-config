@@ -294,11 +294,19 @@ in
     ghostty = {
       enable = true;
       enableZshIntegration = true;
+      # The systemd user service ghostty 1.3.1 ships exits immediately when it
+      # can't become the primary instance (notify handshake never completes),
+      # so it just fails. Single-instance mode below covers warm launches: the
+      # first window owns the D-Bus name and later launches fork into it.
+      systemd.enable = false;
       settings = {
         cursor-style = "block";
         font-size = 18;
         font-family = "Intel One Mono";
         window-decoration = "none";
+        # Reuse the running process for new windows instead of cold-starting a
+        # fresh GTK app on every Mod+Return.
+        gtk-single-instance = true;
         keybind = [
           "ctrl+equal=increase_font_size:1"
           "ctrl+minus=decrease_font_size:1"
