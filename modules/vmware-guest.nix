@@ -37,6 +37,14 @@ in
 
     environment.systemPackages = [ open-vm-tools ];
 
+    # Both VMware fuse mounts need helpers in the system path: the vmblock
+    # mount below is Type=fuse so `mount` needs `mount.fuse` (fuse2), and the
+    # /host HGFS mount uses `auto_unmount` so the libfuse3 `vmhgfs-fuse` daemon
+    # needs `fusermount3` (fuse3) at mount time. Declare both explicitly rather
+    # than relying on them being pulled in transitively — a nixpkgs bump dropped
+    # them, which broke the mounts on reboot (dropping boot into emergency mode).
+    system.fsPackages = [ pkgs.fuse pkgs.fuse3 ];
+
     systemd.services.vmware =
       { description = "VMWare Guest Service";
         wantedBy = [ "multi-user.target" ];
