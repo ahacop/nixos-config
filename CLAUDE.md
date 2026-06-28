@@ -30,7 +30,6 @@ The Makefile has a dedicated cleanup group. Override `STALE_DAYS=N` (default 30)
 
 ### System Information
 
-- `make check-kernel` - Compare current vs available kernel versions
 - `make check-claude-version` - Compare current vs latest Claude Code version
 
 ### Package Updates

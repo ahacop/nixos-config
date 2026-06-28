@@ -37,7 +37,7 @@ CLAUDE_OVERLAY_API := https://api.github.com/repos/ryoppippi/nix-claude-code/con
 .DEFAULT_GOAL := help
 
 # Phony targets
-.PHONY: help clean optimize check-kernel check-claude-version upgrade-claude restart-walker switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
+.PHONY: help clean optimize check-claude-version upgrade-claude restart-walker switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
 .PHONY: disk-status gc-roots stale-results stale-direnvs bloated-direnvs clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean-all
 .PHONY: secrets/backup secrets/restore
 
@@ -261,11 +261,6 @@ clean-stores: ## Prune content-addressable package stores (pnpm, gem)
 clean-all: clean-results clean-direnvs clean-caches clean-stores clean ## Full cleanup (stale items + caches + stores + gc)
 	@echo ""
 	@echo "=== Full cleanup complete ==="
-
-check-kernel: ## Check current vs available kernel versions
-	@echo "Current kernel: $$(uname -r)"
-	@echo "Latest nixpkgs kernel: $$(nix eval --raw nixpkgs#linuxPackages_latest.kernel.version)"
-	@echo "Pinned 6.15.2 kernel: $$(nix eval --raw .#nixosConfigurations.${NIXNAME}.config.boot.kernelPackages.kernel.version)"
 
 check-claude-version: ## Check current vs latest Claude Code version
 	@echo "Installed: $$(claude --version)"
