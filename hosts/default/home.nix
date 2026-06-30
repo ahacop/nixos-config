@@ -324,6 +324,11 @@ in
       vimAlias = true;
       withRuby = false;
 
+      # Nixvim pins its own tested nixpkgs, but we build it against the system
+      # nixpkgs (single nixpkgs across the whole config). Set the source
+      # explicitly to silence nixvim's follows/skew warning.
+      nixpkgs.source = pkgs.path;
+
       diagnostic = {
         settings = {
           virtual_lines.only_current_line = true;
