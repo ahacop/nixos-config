@@ -1779,7 +1779,6 @@ in
         }
       ];
       shellAliases = {
-        bf = "bun format";
         br = "bin/rubocop -A";
         bt = "bin/rails test";
         bs = "bin/rails test:system";
