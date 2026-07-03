@@ -97,6 +97,11 @@
         "hunk"
         "pi"
       ];
+      # The llm-agents.nix package set for our system, resolved once and shared
+      # by the llmAgents output (for the Makefile) and home.nix (the installed
+      # CLIs, passed in via extraSpecialArgs) so the flake owns all the wiring.
+      llmAgentPkgs = inputs.llm-agents.packages.${system};
+      llmAgentPackages = map (n: llmAgentPkgs.${n}) llmAgentNames;
     in
     {
       # Installed llm-agents CLIs as an attrset of package name -> main-program
@@ -107,7 +112,7 @@
       llmAgents = builtins.listToAttrs (
         map (n: {
           name = n;
-          value = inputs.llm-agents.packages.${system}.${n}.meta.mainProgram or n;
+          value = llmAgentPkgs.${n}.meta.mainProgram or n;
         }) llmAgentNames
       );
 
@@ -143,12 +148,11 @@
           {
             nixpkgs.overlays = [
               inputs.niri.overlays.niri
-              inputs.llm-agents.overlays.default
             ];
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              extraSpecialArgs = { inherit inputs llmAgentNames; };
+              extraSpecialArgs = { inherit inputs llmAgentPackages; };
               users.${user}.imports = [
                 ./hosts/default/home.nix
                 inputs.nixvim.homeModules.nixvim

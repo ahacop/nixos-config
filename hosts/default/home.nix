@@ -2,7 +2,7 @@
   config,
   lib,
   inputs,
-  llmAgentNames,
+  llmAgentPackages,
   pkgs,
   ...
 }:
@@ -2431,10 +2431,10 @@ in
     stateVersion = "24.05";
 
     packages =
-      # LLM agent CLIs from the numtide llm-agents.nix overlay, derived from
-      # the llmAgentNames list in flake.nix (single source of truth; the
-      # Makefile reads the same list via the llmAgentBins flake output).
-      map (n: pkgs.llm-agents.${n}) llmAgentNames
+      # LLM agent CLIs from the numtide llm-agents.nix flake, resolved in
+      # flake.nix from the llmAgentNames single source of truth and passed in
+      # via extraSpecialArgs.
+      llmAgentPackages
       ++ (with pkgs; [
         (calibre.override { speechSupport = false; })
         circumflex
