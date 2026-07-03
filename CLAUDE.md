@@ -30,12 +30,12 @@ The Makefile has a dedicated cleanup group. Override `STALE_DAYS=N` (default 30)
 
 ### System Information
 
-- `make check-claude-version` - Compare current vs latest Claude Code version
+- `make check-versions` - Compare each installed LLM agent CLI (claude, codex, amp, pi, opencode, hunk, ccusage) against the version the `llm-agents` flake currently ships, flagging any that are behind, plus whether the flake pin itself is behind upstream
 
 ### Package Updates
 
-- `make upgrade-claude` - Update Claude Code flake input to latest version
-- After updating Claude, run `make switch` to apply
+- `make upgrade-agents` - Update the `llm-agents` flake input (bumps claude, codex, amp, pi, opencode, hunk, ccusage together)
+- After updating, run `make switch` to apply
 
 ### VM Management (for remote bootstrap from host machine)
 
@@ -50,7 +50,7 @@ This is a flake-based NixOS configuration for a VMware Fusion VM running on Appl
 
 ### Key Files
 
-- `flake.nix` - Main flake definition with inputs (nixpkgs, home-manager, stylix, nixvim, niri, walker, claude-code-overlay) and the `devflakes/` dev-shell `templates`
+- `flake.nix` - Main flake definition with inputs (nixpkgs, home-manager, stylix, nixvim, niri, walker, llm-agents) and the `devflakes/` dev-shell `templates`
 - `hosts/default/configuration.nix` - System-level NixOS configuration (boot, networking, services, system packages, Stylix theming). Inline package derivations live here (e.g. `moby-thesaurus`, `thes`, `notify-macos`, `copy-screenshot`)
 - `hosts/default/home.nix` - User-level configuration via Home Manager. ~2400 lines; the entire Nixvim setup (LSP servers, keymaps, embedded Lua) is inline here, along with shell, git, jujutsu, and Walker config
 - `hosts/default/hardware-configuration.nix` - Generated hardware scan (don't hand-edit)
@@ -64,9 +64,9 @@ This is a flake-based NixOS configuration for a VMware Fusion VM running on Appl
 3. Run `make switch` to build and activate the new configuration
 4. System will rebuild based on flake configuration and switch to new generation
 
-### Claude Code
+### LLM Coding Agents
 
-Claude Code is provided via the `claude-code-overlay` flake input ([ryoppippi/claude-code-overlay](https://github.com/ryoppippi/claude-code-overlay)), which supplies pre-built official binaries. Update with `make upgrade-claude`, then `make switch`.
+LLM CLI tools (`claude-code`, `codex`, `amp`, `pi`, `hunk`, `ccusage`, `opencode`) come from the `llm-agents` flake input ([numtide/llm-agents.nix](https://github.com/numtide/llm-agents.nix)), whose `overlays.default` exposes them under `pkgs.llm-agents.<name>` (installed in `home.nix`). It ships prebuilt binaries via the `cache.numtide.com` substituter and is updated daily upstream. Bump the pin with `make upgrade-agents` (updates the whole `llm-agents` input), then `make switch`. `make check-versions` shows each tool's installed version next to the latest the flake ships (marking any that are behind) and flags when the pin is behind upstream `main`.
 
 ### Window Manager (Wayland)
 

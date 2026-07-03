@@ -65,13 +65,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    claude-code-overlay = {
-      url = "github:ryoppippi/nix-claude-code";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    hunk = {
-      url = "github:modem-dev/hunk";
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -90,8 +85,34 @@
     }@inputs:
     let
       user = "ahacop";
+      system = "aarch64-linux";
+      # Single source of truth for the LLM agent CLIs pulled from the numtide
+      # llm-agents flake. Consumed by home.nix (to install them) and, via the
+      # llmAgentBins output below, by the Makefile (to check versions) — so the
+      # list lives in exactly one place.
+      llmAgentNames = [
+        "amp"
+        "ccusage"
+        "claude-code"
+        "codex"
+        "hunk"
+        "opencode"
+        "pi"
+      ];
     in
     {
+      # Installed llm-agents CLIs as an attrset of package name -> main-program
+      # (binary) name, e.g. { claude-code = "claude"; ... }, derived from
+      # llmAgentNames via each package's meta.mainProgram. `make check-versions`
+      # reads this to map packages to binaries and to know which packages to
+      # look up upstream, so the tool list only lives in llmAgentNames above.
+      llmAgents = builtins.listToAttrs (
+        map (n: {
+          name = n;
+          value = inputs.llm-agents.packages.${system}.${n}.meta.mainProgram or n;
+        }) llmAgentNames
+      );
+
       templates = {
         ruby = {
           path = ./devflakes/ruby;
@@ -124,19 +145,18 @@
           {
             nixpkgs.overlays = [
               inputs.niri.overlays.niri
-              inputs.claude-code-overlay.overlays.default
+              inputs.llm-agents.overlays.default
             ];
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              extraSpecialArgs = { inherit inputs; };
+              extraSpecialArgs = { inherit inputs llmAgentNames; };
               users.${user}.imports = [
                 ./hosts/default/home.nix
                 inputs.nixvim.homeModules.nixvim
                 inputs.niri.homeModules.niri
                 inputs.niri.homeModules.stylix
                 inputs.walker.homeManagerModules.default
-                inputs.hunk.homeManagerModules.default
               ];
             };
           }

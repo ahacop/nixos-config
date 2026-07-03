@@ -2,6 +2,7 @@
   config,
   lib,
   inputs,
+  llmAgentNames,
   pkgs,
   ...
 }:
@@ -111,8 +112,6 @@ in
   };
 
   programs = {
-    hunk.enable = true;
-
     walker = {
       enable = true;
       runAsService = true;
@@ -2430,31 +2429,34 @@ in
 
     stateVersion = "24.05";
 
-    packages = with pkgs; [
-      claude-code
-      (calibre.override { speechSupport = false; })
-      circumflex
-      devenv
-      duckdb
-      foliate
-      glow
-      inputs.aoc-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
-      inputs.crit.packages.${pkgs.stdenv.hostPlatform.system}.default
-      inputs.erwindb.packages.${pkgs.stdenv.hostPlatform.system}.default
-      inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
-      inputs.opdsview.packages.${pkgs.stdenv.hostPlatform.system}.default
-      # inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
-      mermaid-cli
-      opencode
-      pomodoro
-      presenterm
-      sdcv
-      vale
-      waybar
-      websters-1913-stardict
-      whisper-dictate
-      zathura
-    ];
+    packages =
+      # LLM agent CLIs from the numtide llm-agents.nix overlay, derived from
+      # the llmAgentNames list in flake.nix (single source of truth; the
+      # Makefile reads the same list via the llmAgentBins flake output).
+      map (n: pkgs.llm-agents.${n}) llmAgentNames
+      ++ (with pkgs; [
+        (calibre.override { speechSupport = false; })
+        circumflex
+        devenv
+        duckdb
+        foliate
+        glow
+        inputs.aoc-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
+        inputs.crit.packages.${pkgs.stdenv.hostPlatform.system}.default
+        inputs.erwindb.packages.${pkgs.stdenv.hostPlatform.system}.default
+        inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
+        inputs.opdsview.packages.${pkgs.stdenv.hostPlatform.system}.default
+        # inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
+        mermaid-cli
+        pomodoro
+        presenterm
+        sdcv
+        vale
+        waybar
+        websters-1913-stardict
+        whisper-dictate
+        zathura
+      ]);
     sessionVariables = {
       PAGER = "less -FirSwX";
       # Ollama runs on the Mac host. Resolved via mDNS (avahi enabled in

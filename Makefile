@@ -31,13 +31,18 @@ OP_VAULT_FLAG := $(if $(OP_VAULT),--vault $(OP_VAULT),)
 # reused a lot so we just store them up here.
 SSH_OPTIONS := -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
 
-CLAUDE_OVERLAY_API := https://api.github.com/repos/ryoppippi/nix-claude-code/contents/versions
+# LLM agent CLIs come from the numtide llm-agents flake input. The list of
+# tools lives once in flake.nix (llmAgentNames), exposed as the llmAgents
+# output (package name -> binary name), so check-versions derives it rather
+# than duplicating it.
+LLM_AGENTS_REPO := numtide/llm-agents.nix
+LLM_AGENTS_SYSTEM := aarch64-linux
 
 # Default target
 .DEFAULT_GOAL := help
 
 # Phony targets
-.PHONY: help clean optimize check-claude-version upgrade-claude restart-walker switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
+.PHONY: help clean optimize check-versions upgrade-agents restart-walker switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
 .PHONY: disk-status gc-roots stale-results stale-direnvs bloated-direnvs clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean-all
 .PHONY: secrets/backup secrets/restore
 
@@ -262,14 +267,34 @@ clean-all: clean-results clean-direnvs clean-caches clean-stores clean ## Full c
 	@echo ""
 	@echo "=== Full cleanup complete ==="
 
-check-claude-version: ## Check current vs latest Claude Code version
-	@echo "Installed: $$(claude --version)"
-	@echo "Pinned:    $$(REV=$$(nix flake metadata --json 2>/dev/null | jq -r '.locks.nodes["claude-code-overlay"].locked.rev // empty'); \
-		curl -sf "$(CLAUDE_OVERLAY_API)?ref=$$REV" | jq -r '[.[].name | select(endswith(".json")) | rtrimstr(".json")] | sort_by(split(".") | map(tonumber)) | last')"
-	@echo "Latest:    $$(curl -sf '$(CLAUDE_OVERLAY_API)' | jq -r '[.[].name | select(endswith(".json")) | rtrimstr(".json")] | sort_by(split(".") | map(tonumber)) | last')"
+check-versions: ## Compare installed LLM agent CLI versions with the latest the llm-agents flake ships
+	@MAP=$$(nix eval --json .#llmAgents 2>/dev/null); \
+	LATEST=$$(nix eval --impure --json --expr "let f = builtins.getFlake \"github:$(LLM_AGENTS_REPO)\"; p = f.packages.$(LLM_AGENTS_SYSTEM); names = builtins.attrNames (builtins.fromJSON ''$$MAP''); in builtins.listToAttrs (map (n: { name = n; value = p.\$${n}.version or \"?\"; }) names)" 2>/dev/null); \
+	printf '%-12s %-26s %s\n' TOOL INSTALLED 'LATEST (flake)'; \
+	for n in $$(printf '%s' "$$MAP" | jq -r 'keys[]'); do \
+		bin=$$(printf '%s' "$$MAP" | jq -r --arg n "$$n" '.[$$n]'); \
+		latest=$$(printf '%s' "$$LATEST" | jq -r --arg n "$$n" '.[$$n]'); \
+		if command -v $$bin >/dev/null 2>&1; then \
+			inst=$$($$bin --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+[0-9a-zA-Z.+_-]*' | head -n1); \
+			[ -z "$$inst" ] && inst='?'; \
+			if [ "$$inst" = "$$latest" ]; then mark=''; else mark='  <- update'; fi; \
+		else \
+			inst='(not on PATH)'; mark=''; \
+		fi; \
+		printf '%-12s %-26s %s%s\n' "$$bin" "$$inst" "$$latest" "$$mark"; \
+	done
+	@PINNED=$$(nix flake metadata --json 2>/dev/null | jq -r '.locks.nodes["llm-agents"].locked.rev'); \
+	DATE=$$(nix flake metadata --json 2>/dev/null | jq -r '.locks.nodes["llm-agents"].locked.lastModified | todate'); \
+	UPSTREAM=$$(curl -sf 'https://api.github.com/repos/$(LLM_AGENTS_REPO)/commits/main' | jq -r '.sha // empty'); \
+	printf '\n%-12s pinned %s (%s)\n' llm-agents "$$(printf '%s' "$$PINNED" | cut -c1-12)" "$$DATE"; \
+	if [ -n "$$UPSTREAM" ] && [ "$$PINNED" != "$$UPSTREAM" ]; then \
+		printf '%-12s upstream %s available — run: make upgrade-agents\n' '' "$$(printf '%s' "$$UPSTREAM" | cut -c1-12)"; \
+	elif [ -n "$$UPSTREAM" ]; then \
+		printf '%-12s pin is current with upstream main\n' ''; \
+	fi
 
-upgrade-claude: ## Update Claude Code overlay to latest version
-	nix flake update claude-code-overlay
+upgrade-agents: ## Update the numtide llm-agents flake (claude, codex, amp, pi, opencode, hunk, ccusage)
+	nix flake update llm-agents
 
 restart-walker: ## Restart Walker and Elephant services
 	systemctl --user restart elephant.service
