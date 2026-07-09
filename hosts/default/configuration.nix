@@ -206,9 +206,60 @@ in
     # replicates the default behaviour.
     useDHCP = false;
 
+    # DHCP is done by systemd-networkd, not by dhcpcd, so that resolved below
+    # gets every DNS server a network hands out. networkd keeps one list per
+    # link holding the servers from all protocols, and resolved reads it
+    # directly.
+    #
+    # dhcpcd instead reports to resolved one protocol at a time (enp2s0.dhcp,
+    # enp2s0.ra), and resolved reads each report as the link's whole list, so
+    # only the protocol that renewed last survives. A router handing out both
+    # an IPv4 and an IPv6 resolver keeps just one of them. Drop the IPv4 one
+    # and containers can resolve nothing, since they have no IPv6 address, and
+    # `docker build` fails. The machine keeps working, because it has IPv6 and
+    # FallbackDNS.
+    #
+    # Setting this turns dhcpcd off on its own.
+    useNetworkd = true;
+
     # Disable the firewall since we're in a VM and we want to make it
     # easy to visit stuff in here. We only use NAT networking anyways.
     firewall.enable = false;
+  };
+
+  # Don't block boot or a rebuild waiting for a DHCP lease.
+  systemd.network.wait-online.enable = false;
+
+  # DNS. This VM roams between networks, so resolution goes through
+  # systemd-resolved rather than a plain resolv.conf written from DHCP.
+  #
+  # - networkd hands every DHCP-provided resolver to resolved as this link's
+  #   DNS. On VMware NAT that resolver is the NAT gateway (192.168.169.2), which
+  #   forwards to whatever DNS the host Mac is using now. So we follow the host
+  #   as it moves, and we can resolve names that only the local network knows.
+  # - That NAT forwarder is primitive: given an EDNS0 query it returns a broken
+  #   packet, and glibc reads that as "no such name" without trying another
+  #   server. resolved probes each server and turns EDNS0 off per-server by
+  #   itself, so it just works. We do not have to disable EDNS0 for the whole
+  #   system.
+  # - FallbackDNS is only used when a network hands out no DNS at all, so a
+  #   network with no resolver still resolves names instead of going dark.
+  # - resolv.conf points at the local stub at 127.0.0.53, which is always up, so
+  #   the machine can always rebuild even when a network's DNS is misbehaving.
+  #
+  # We do not set networking.nameservers on purpose. Under resolved that becomes
+  # a global DNS server and would compete with the host-following link resolver.
+  services.resolved = {
+    enable = true;
+    settings.Resolve = {
+      FallbackDNS = [
+        "1.1.1.1"
+        "8.8.8.8"
+      ];
+      # The NAT forwarder can't do DNSSEC. Leave validation off so it does not
+      # break resolution behind that proxy.
+      DNSSEC = false;
+    };
   };
 
   # Set your time zone.
