@@ -72,10 +72,7 @@ clean: ## Clean old generations and garbage collect
 	sudo nix-env -p /nix/var/nix/profiles/system --delete-generations old
 	nix-collect-garbage -d
 	sudo nixos-rebuild boot --flake ".#${NIXNAME}"
-	-docker builder prune -f
-	-docker image prune -f
-	-docker volume prune -f
-	-docker system prune -a --volumes
+	-docker system prune -a --volumes -f
 
 optimize: ## Optimize nix store
 	nix-store --optimize
