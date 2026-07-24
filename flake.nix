@@ -91,7 +91,6 @@
       # llmAgentBins output below, by the Makefile (to check versions) — so the
       # list lives in exactly one place.
       llmAgentNames = [
-        "amp"
         "ccusage"
         "claude-code"
         "codex"
