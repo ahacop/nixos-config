@@ -25,8 +25,8 @@ The Makefile has a dedicated cleanup group. Override `STALE_DAYS=N` (default 30)
 - `make stale-direnvs` / `make clean-direnvs` - Find/remove `.direnv` in inactive projects
 - `make bloated-direnvs` / `make clean-direnv-profiles` - Find/trim extra flake profiles in `.direnv`
 - `make clean-caches` - Remove re-downloadable tool caches (allow-list in `SAFE_CACHE_DIRS`)
-- `make clean-stores` - Prune pnpm/gem content-addressable stores
-- `make clean-all` - Full sweep (stale items + caches + stores + `clean`)
+- `make clean-stores` - Remove the pnpm store and user gem home (both re-downloadable)
+- `make clean-all` - Full sweep (stale items + old flake profiles + caches + stores + `clean`)
 
 ### System Information
 

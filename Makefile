@@ -10,11 +10,20 @@ MAKEFILE_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 # The name of the nixosConfiguration in the flake
 NIXNAME ?= default
 
+# Recipes use bash features (process substitution), not plain POSIX sh.
+SHELL := bash
+
 # Stale threshold in days for cleanup targets
 STALE_DAYS ?= 30
 
 # Directories to scan for stale items
 CODE_DIRS ?= $(HOME)/code
+
+# Re-downloadable tool caches safe to nuke. Listed explicitly so adding a new
+# one is a deliberate review (don't add ~/.cache/mozilla without thinking).
+# disk-status reports these; clean-caches deletes them.
+SAFE_CACHE_DIRS := nix trivy ms-playwright puppeteer chrome-devtools-mcp \
+	pip deno bundix go-build bun pnpm chromium informers
 
 # Machine-local secrets file (untracked, outside the Nix store) and the
 # 1Password document it is backed up to/restored from. OP_VAULT is optional.
@@ -92,12 +101,16 @@ disk-status: ## Show disk usage overview (nix store, caches, docker)
 	@echo "  GC roots: $$(ls /nix/var/nix/gcroots/auto/ 2>/dev/null | wc -l)"
 	@echo ""
 	@echo "Caches:"
-	@for dir in nix mozilla trivy ms-playwright pip bundix; do \
-		if [ -d "$(HOME)/.cache/$$dir" ]; then \
-			size=$$(du -sh "$(HOME)/.cache/$$dir" 2>/dev/null | cut -f1); \
-			printf "  ~/.cache/%-15s %s\n" "$$dir" "$$size"; \
+	@for name in $(SAFE_CACHE_DIRS); do \
+		if [ -d "$(HOME)/.cache/$$name" ]; then \
+			size=$$(du -sh "$(HOME)/.cache/$$name" 2>/dev/null | cut -f1); \
+			printf "  ~/.cache/%-22s %s\n" "$$name" "$$size"; \
 		fi; \
 	done
+	@if [ -d "$(HOME)/.cache/mozilla" ]; then \
+		size=$$(du -sh "$(HOME)/.cache/mozilla" 2>/dev/null | cut -f1); \
+		printf "  ~/.cache/%-22s %s (not cleaned by clean-caches)\n" "mozilla" "$$size"; \
+	fi
 	@echo ""
 	@echo "Docker:"
 	@if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then \
@@ -122,117 +135,98 @@ gc-roots: ## List all GC roots with status
 stale-results: ## Find result symlinks older than STALE_DAYS
 	@echo "=== Result symlinks older than $(STALE_DAYS) days ==="
 	@echo ""
-	@found=0; \
-	for dir in $(CODE_DIRS) $(HOME)/nixos-config; do \
-		if [ -d "$$dir" ]; then \
-			while IFS= read -r link; do \
-				if [ -n "$$link" ]; then \
-					mdate=$$(stat -c %y "$$link" 2>/dev/null | cut -d' ' -f1); \
-					printf "%s  %s\n" "$$mdate" "$$link"; \
-					found=1; \
-				fi; \
-			done < <(find "$$dir" -name "result" -type l -mtime +$(STALE_DAYS) 2>/dev/null); \
-		fi; \
-	done; \
-	if [ "$$found" = "0" ]; then echo "(none found)"; fi
+	@out=$$(for dir in $(CODE_DIRS) $(MAKEFILE_DIR); do \
+		[ -d "$$dir" ] || continue; \
+		while IFS= read -r link; do \
+			mdate=$$(stat -c %y "$$link" 2>/dev/null | cut -d' ' -f1); \
+			printf "%s  %s\n" "$$mdate" "$$link"; \
+		done < <(find "$$dir" \( -name "result" -o -name "result-*" \) -type l -mtime +$(STALE_DAYS) 2>/dev/null); \
+	done | sort); \
+	if [ -n "$$out" ]; then printf '%s\n' "$$out"; else echo "(none found)"; fi
 
+# A project is stale when its repo shows no activity for STALE_DAYS: no commit
+# in the window, and .git/HEAD and .git/index untouched. Checkouts, staging,
+# and fresh clones update HEAD/index, so a newly cloned repo counts as active.
+# stale-direnvs previews exactly what clean-direnvs deletes; keep their
+# staleness tests identical.
 stale-direnvs: ## Find .direnv in projects with no git activity in STALE_DAYS
 	@echo "=== .direnv in projects inactive for $(STALE_DAYS)+ days ==="
 	@echo ""
-	@found=0; \
-	for dir in $(CODE_DIRS); do \
-		if [ -d "$$dir" ]; then \
-			while IFS= read -r denv; do \
-				if [ -n "$$denv" ]; then \
-					proj=$$(dirname "$$denv"); \
-					if [ -d "$$proj/.git" ]; then \
-						latest=$$(find "$$proj" -maxdepth 2 \( -name "*.rb" -o -name "*.nix" -o -name "*.go" -o -name "*.ts" -o -name "*.js" -o -name "*.ex" -o -name "Gemfile.lock" \) -mtime -$(STALE_DAYS) 2>/dev/null | head -1); \
-						if [ -z "$$latest" ]; then \
-							git_date=$$(git -C "$$proj" log -1 --format=%ci 2>/dev/null | cut -d' ' -f1); \
-							size=$$(du -sh "$$denv" 2>/dev/null | cut -f1); \
-							printf "%-12s %-8s %s\n" "$${git_date:-(unknown)}" "$$size" "$$proj"; \
-							found=1; \
-						fi; \
-					fi; \
-				fi; \
-			done < <(find "$$dir" -name ".direnv" -type d 2>/dev/null); \
-		fi; \
-	done | sort; \
-	if [ "$$found" = "0" ]; then echo "(none found)"; fi
+	@out=$$(for dir in $(CODE_DIRS); do \
+		[ -d "$$dir" ] || continue; \
+		while IFS= read -r denv; do \
+			proj=$$(dirname "$$denv"); \
+			[ -d "$$proj/.git" ] || continue; \
+			[ -z "$$(git -C "$$proj" log -1 --since='$(STALE_DAYS) days ago' --format=%h 2>/dev/null)" ] || continue; \
+			[ -z "$$(find "$$proj/.git/HEAD" "$$proj/.git/index" -mtime -$(STALE_DAYS) 2>/dev/null)" ] || continue; \
+			git_date=$$(git -C "$$proj" log -1 --format=%ci 2>/dev/null | cut -d' ' -f1); \
+			size=$$(du -sh "$$denv" 2>/dev/null | cut -f1); \
+			printf "%-12s %-8s %s\n" "$${git_date:-(unknown)}" "$$size" "$$proj"; \
+		done < <(find "$$dir" -name ".direnv" -type d 2>/dev/null); \
+	done | sort); \
+	if [ -n "$$out" ]; then printf '%s\n' "$$out"; else echo "(none found)"; fi
 
-bloated-direnvs: ## Find .direnv with multiple old flake profiles
+# nix-direnv names each profile flake-profile-<hash> with a matching .rc file
+# and creates a new pair whenever the flake inputs change; old pairs pile up
+# as GC roots. The newest pair backs the current environment.
+bloated-direnvs: ## Find .direnv with multiple flake profiles
 	@echo "=== .direnv folders with multiple profiles ==="
 	@echo ""
-	@found=0; \
-	for dir in $(CODE_DIRS); do \
-		if [ -d "$$dir" ]; then \
-			find "$$dir" -name ".direnv" -type d 2>/dev/null | while read -r denv; do \
-				count=$$(ls -1 "$$denv"/flake-profile-* 2>/dev/null | grep -v '\.rc$$' | wc -l); \
-				if [ "$$count" -gt 1 ]; then \
-					current=$$(readlink "$$denv/flake-profile" 2>/dev/null | xargs basename 2>/dev/null); \
-					size=$$(du -sh "$$denv" 2>/dev/null | cut -f1); \
-					printf "%-8s %2d profiles  %s  (current: %s)\n" "$$size" "$$count" "$$denv" "$$current"; \
-					found=1; \
-				fi; \
-			done; \
-		fi; \
-	done; \
-	if [ "$$found" = "0" ]; then echo "(none found)"; fi
+	@out=$$(for dir in $(CODE_DIRS); do \
+		[ -d "$$dir" ] || continue; \
+		while IFS= read -r denv; do \
+			count=$$(ls -1 "$$denv"/flake-profile-* 2>/dev/null | grep -cv '\.rc$$'); \
+			[ "$$count" -gt 1 ] || continue; \
+			newest=$$(ls -1t "$$denv"/flake-profile-* 2>/dev/null | grep -v '\.rc$$' | head -1); \
+			size=$$(du -sh "$$denv" 2>/dev/null | cut -f1); \
+			printf "%-8s %2d profiles  %s  (newest: %s)\n" "$$size" "$$count" "$$denv" "$$(basename "$$newest")"; \
+		done < <(find "$$dir" -name ".direnv" -type d 2>/dev/null); \
+	done); \
+	if [ -n "$$out" ]; then printf '%s\n' "$$out"; else echo "(none found)"; fi
 
-clean-direnv-profiles: ## Remove old flake profiles, keeping only current
+# Keeps the newest flake-profile-<hash> pair per .direnv and deletes the rest.
+# If the kept guess is ever wrong, direnv just rebuilds the environment on the
+# next load — nothing breaks.
+clean-direnv-profiles: ## Remove old flake profiles, keeping the newest
 	@echo "Cleaning old flake profiles from .direnv folders..."
 	@for dir in $(CODE_DIRS); do \
-		if [ -d "$$dir" ]; then \
-			find "$$dir" -name ".direnv" -type d 2>/dev/null | while read -r denv; do \
-				current=$$(readlink "$$denv/flake-profile" 2>/dev/null); \
-				if [ -n "$$current" ]; then \
-					for profile in "$$denv"/flake-profile-*; do \
-						case "$$profile" in \
-							*.rc) ;; \
-							"$$current") ;; \
-							*) \
-								echo "  Removing $$(basename $$profile) from $$denv"; \
-								rm -f "$$profile" "$${profile}.rc" 2>/dev/null; \
-								;; \
-						esac; \
-					done; \
-				fi; \
+		[ -d "$$dir" ] || continue; \
+		while IFS= read -r denv; do \
+			keep=$$(ls -1t "$$denv"/flake-profile-* 2>/dev/null | grep -v '\.rc$$' | head -1); \
+			[ -n "$$keep" ] || continue; \
+			for profile in "$$denv"/flake-profile-*; do \
+				case "$$profile" in *.rc) continue ;; esac; \
+				[ "$$profile" = "$$keep" ] && continue; \
+				echo "  Removing $$(basename "$$profile") from $$denv"; \
+				rm -f "$$profile" "$${profile}.rc"; \
 			done; \
-		fi; \
+		done < <(find "$$dir" -name ".direnv" -type d 2>/dev/null); \
 	done
 	@echo "Done."
 
 clean-results: ## Remove result symlinks older than STALE_DAYS
 	@echo "Removing result symlinks older than $(STALE_DAYS) days..."
-	@for dir in $(CODE_DIRS) $(HOME)/nixos-config; do \
-		if [ -d "$$dir" ]; then \
-			find "$$dir" -name "result" -type l -mtime +$(STALE_DAYS) -print -delete 2>/dev/null; \
-		fi; \
+	@for dir in $(CODE_DIRS) $(MAKEFILE_DIR); do \
+		[ -d "$$dir" ] || continue; \
+		find "$$dir" \( -name "result" -o -name "result-*" \) -type l -mtime +$(STALE_DAYS) -print -delete 2>/dev/null; \
 	done
 	@echo "Done."
 
-clean-direnvs: ## Remove .direnv from projects inactive for STALE_DAYS
+# The staleness test matches stale-direnvs; keep them identical.
+clean-direnvs: ## Remove .direnv from projects with no git activity in STALE_DAYS
 	@echo "Removing .direnv from projects inactive for $(STALE_DAYS)+ days..."
 	@for dir in $(CODE_DIRS); do \
-		if [ -d "$$dir" ]; then \
-			find "$$dir" -name ".direnv" -type d 2>/dev/null | while read -r denv; do \
-				proj=$$(dirname "$$denv"); \
-				if [ -d "$$proj/.git" ]; then \
-					latest=$$(find "$$proj" -maxdepth 2 \( -name "*.rb" -o -name "*.nix" -o -name "*.go" -o -name "*.ts" -o -name "*.js" -o -name "*.ex" -o -name "Gemfile.lock" \) -mtime -$(STALE_DAYS) 2>/dev/null | head -1); \
-					if [ -z "$$latest" ]; then \
-						echo "  Removing $$denv"; \
-						rm -rf "$$denv"; \
-					fi; \
-				fi; \
-			done; \
-		fi; \
+		[ -d "$$dir" ] || continue; \
+		while IFS= read -r denv; do \
+			proj=$$(dirname "$$denv"); \
+			[ -d "$$proj/.git" ] || continue; \
+			[ -z "$$(git -C "$$proj" log -1 --since='$(STALE_DAYS) days ago' --format=%h 2>/dev/null)" ] || continue; \
+			[ -z "$$(find "$$proj/.git/HEAD" "$$proj/.git/index" -mtime -$(STALE_DAYS) 2>/dev/null)" ] || continue; \
+			echo "  Removing $$denv"; \
+			rm -rf "$$denv"; \
+		done < <(find "$$dir" -name ".direnv" -type d 2>/dev/null); \
 	done
 	@echo "Done."
-
-# Re-downloadable tool caches safe to nuke. Listed explicitly so adding a new
-# one is a deliberate review (don't add ~/.cache/mozilla without thinking).
-SAFE_CACHE_DIRS := nix trivy ms-playwright puppeteer chrome-devtools-mcp \
-	pip deno bundix go-build bun pnpm chromium informers
 
 clean-caches: ## Clean nix and other re-downloadable tool caches
 	@echo "Cleaning caches..."
@@ -246,8 +240,8 @@ clean-caches: ## Clean nix and other re-downloadable tool caches
 	done
 	@echo "Done."
 
-clean-stores: ## Prune content-addressable package stores (pnpm, gem)
-	@echo "Pruning package stores..."
+clean-stores: ## Remove pnpm store and user-installed gems (re-downloadable)
+	@echo "Removing package stores..."
 	@if [ -d "$(HOME)/.local/share/pnpm/store" ]; then \
 		size=$$(du -sh "$(HOME)/.local/share/pnpm/store" 2>/dev/null | cut -f1); \
 		rm -rf "$(HOME)/.local/share/pnpm/store"; \
@@ -260,7 +254,7 @@ clean-stores: ## Prune content-addressable package stores (pnpm, gem)
 	fi
 	@echo "Done."
 
-clean-all: clean-results clean-direnvs clean-caches clean-stores clean ## Full cleanup (stale items + caches + stores + gc)
+clean-all: clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean ## Full cleanup (stale items + old profiles + caches + stores + gc)
 	@echo ""
 	@echo "=== Full cleanup complete ==="
 
