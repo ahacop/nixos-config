@@ -95,7 +95,6 @@
         "claude-code"
         "codex"
         "hunk"
-        "opencode"
         "pi"
       ];
     in
