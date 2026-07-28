@@ -280,7 +280,26 @@ in
   virtualisation.docker.enable = true;
 
   # Enable Niri window manager
-  programs.niri.enable = true;
+  programs.niri = {
+    enable = true;
+    # niri vendors the libdisplay-info-sys 0.3.0 crate, whose build script asks
+    # pkg-config for `libdisplay-info < 0.4.0`. nixpkgs ships 0.4.0 as the
+    # default, so niri gets a 0.3.0 build of its own; nothing else in the system
+    # changes. nixpkgs master does the same thing via `libdisplay-info_0_3`, so
+    # drop this override once that attribute reaches this nixpkgs pin.
+    package = pkgs.niri.override {
+      libdisplay-info = pkgs.libdisplay-info.overrideAttrs (_: {
+        version = "0.3.0";
+        src = pkgs.fetchFromGitLab {
+          domain = "gitlab.freedesktop.org";
+          owner = "emersion";
+          repo = "libdisplay-info";
+          rev = "0.3.0";
+          sha256 = "sha256-nXf2KGovNKvcchlHlzKBkAOeySMJXgxMpbi5z9gLrdc=";
+        };
+      });
+    };
+  };
 
   # Enable greetd with tuigreet
   services.greetd = {
