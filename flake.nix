@@ -69,11 +69,6 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    crit = {
-      url = "github:tomasz-tomczyk/crit";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
@@ -94,6 +89,7 @@
         "ccusage"
         "claude-code"
         "codex"
+        "crit"
         "hunk"
         "pi"
       ];
