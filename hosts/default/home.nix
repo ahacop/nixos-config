@@ -2114,6 +2114,12 @@ in
       };
     };
 
+    # The home-manager niri module builds a niri of its own solely to run
+    # `niri validate` over the config generated below. Point it at the package
+    # the system actually runs so the config is checked against the compositor
+    # that reads it, and only one niri gets built.
+    niri.package = pkgs.niri;
+
     niri.settings = {
       # Environment variables
       environment = {
