@@ -29,19 +29,31 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # aoc-cli, erwindb and opdsview each declare their own rust-overlay. They all
+    # follow this one so the lock holds a single copy, and so a single update
+    # here moves all three off any rust-overlay that trips nixpkgs deprecation
+    # warnings during evaluation.
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     aoc-cli = {
       url = "github:ahacop/aoc-cli";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.rust-overlay.follows = "rust-overlay";
     };
 
     erwindb = {
       url = "github:ahacop/erwindb";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.rust-overlay.follows = "rust-overlay";
     };
 
     opdsview = {
       url = "github:ahacop/opdsview";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.rust-overlay.follows = "rust-overlay";
     };
 
     niri = {
