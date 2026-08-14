@@ -222,8 +222,9 @@ in
     # Setting this turns dhcpcd off on its own.
     useNetworkd = true;
 
-    # Disable the firewall since we're in a VM and we want to make it
-    # easy to visit stuff in here. We only use NAT networking anyways.
+    # The firewall is off so anything listening in the VM is reachable without
+    # opening ports one at a time. The VM is bridged onto the local network, so
+    # that means every host on that network, not just the Mac running it.
     firewall.enable = false;
   };
 
@@ -234,21 +235,21 @@ in
   # systemd-resolved rather than a plain resolv.conf written from DHCP.
   #
   # - networkd hands every DHCP-provided resolver to resolved as this link's
-  #   DNS. On VMware NAT that resolver is the NAT gateway (192.168.169.2), which
-  #   forwards to whatever DNS the host Mac is using now. So we follow the host
-  #   as it moves, and we can resolve names that only the local network knows.
-  # - That NAT forwarder is primitive: given an EDNS0 query it returns a broken
-  #   packet, and glibc reads that as "no such name" without trying another
-  #   server. resolved probes each server and turns EDNS0 off per-server by
-  #   itself, so it just works. We do not have to disable EDNS0 for the whole
-  #   system.
+  #   DNS. The VM is bridged, so those are the resolvers the local router hands
+  #   out, and names that only the local network knows still resolve.
+  # - Those resolvers vary in quality. A forwarder that answers an EDNS0 query
+  #   with a broken packet takes glibc down with it, because glibc reads the
+  #   broken answer as "no such name" and never tries another server. resolved
+  #   probes each server and turns EDNS0 off per-server by itself, so one bad
+  #   resolver does not cost us the others, and we do not have to disable EDNS0
+  #   for the whole system.
   # - FallbackDNS is only used when a network hands out no DNS at all, so a
   #   network with no resolver still resolves names instead of going dark.
   # - resolv.conf points at the local stub at 127.0.0.53, which is always up, so
   #   the machine can always rebuild even when a network's DNS is misbehaving.
   #
   # We do not set networking.nameservers on purpose. Under resolved that becomes
-  # a global DNS server and would compete with the host-following link resolver.
+  # a global DNS server and would compete with the link's own resolvers.
   services.resolved = {
     enable = true;
     settings.Resolve = {
@@ -256,8 +257,8 @@ in
         "1.1.1.1"
         "8.8.8.8"
       ];
-      # The NAT forwarder can't do DNSSEC. Leave validation off so it does not
-      # break resolution behind that proxy.
+      # Router and hotspot forwarders often can't do DNSSEC. Leave validation
+      # off so it does not break resolution behind them.
       DNSSEC = false;
     };
   };
