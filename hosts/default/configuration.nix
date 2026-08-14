@@ -465,9 +465,9 @@ in
       fish
       gum
 
-      # macOS notification bridge
+      # macOS notification bridge.
       (writeShellScriptBin "notify-macos" ''
-        export MACOS_HOST_IP="''${MACOS_HOST_IP:-192.168.178.149}"
+        export MACOS_HOST_IP="''${MACOS_HOST_IP:-chunky-peanut-butter.local}"
         exec ${
           inputs.macos-notifier-bridge.packages.${pkgs.stdenv.hostPlatform.system}.notify-macos
         }/bin/notify-macos "$@"
