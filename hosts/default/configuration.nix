@@ -369,8 +369,8 @@ in
       ibm-plex
       inconsolata
       intel-one-mono
-      jetbrains-mono
       meslo-lgs-nf
+      nerd-fonts.jetbrains-mono
       nerd-fonts.terminess-ttf
       noto-fonts
       noto-fonts-color-emoji
