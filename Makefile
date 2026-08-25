@@ -51,7 +51,7 @@ LLM_AGENTS_SYSTEM := aarch64-linux
 .DEFAULT_GOAL := help
 
 # Phony targets
-.PHONY: help clean optimize check-versions upgrade-agents restart-walker switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
+.PHONY: help clean optimize check-versions upgrade-agents reload-shell switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
 .PHONY: disk-status gc-roots stale-results stale-direnvs bloated-direnvs clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean-all
 .PHONY: secrets/backup secrets/restore
 
@@ -60,7 +60,7 @@ help: ## Show this help message
 	@echo 'Usage: make [target]'
 	@echo ''
 	@echo 'Configuration Management:'
-	@grep -E '^(switch|test|optimize|clean|restart-walker):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+	@grep -E '^(switch|test|optimize|clean|reload-shell):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 	@echo ''
 	@echo 'Disk Cleanup (use STALE_DAYS=N to adjust threshold, default 30):'
 	@grep -E '^(disk-status|gc-roots|stale-[a-z]+|bloated-[a-z]+|clean-[a-z-]+):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
@@ -287,9 +287,8 @@ check-versions: ## Compare installed LLM agent CLI versions with the latest the 
 upgrade-agents: ## Update the numtide llm-agents flake (claude, codex, amp, pi, opencode, hunk, ccusage)
 	nix flake update llm-agents
 
-restart-walker: ## Restart Walker and Elephant services
-	systemctl --user restart elephant.service
-	systemctl --user restart walker.service
+reload-shell: ## Reload the Noctalia shell config without restarting it
+	noctalia msg config-reload
 
 switch: ## Apply configuration changes (rebuilds and switches)
 	sudo nixos-rebuild switch --flake ".#${NIXNAME}"

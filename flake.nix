@@ -61,17 +61,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    elephant = {
-      url = "github:abenz1267/elephant";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    walker = {
-      url = "github:abenz1267/walker";
-      inputs.elephant.follows = "elephant";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     nur = {
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -166,7 +155,6 @@
                 inputs.nixvim.homeModules.nixvim
                 inputs.niri.homeModules.niri
                 inputs.niri.homeModules.stylix
-                inputs.walker.homeManagerModules.default
               ];
             };
           }

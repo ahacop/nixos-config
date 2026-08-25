@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `make test` - Test configuration changes without switching (rebuilds but doesn't activate)
 - `make clean` - Delete old generations, garbage collect, prune docker, rebuild boot
 - `make optimize` - Optimize nix store (dedupe via hard links)
-- `make restart-walker` - Restart the Walker and Elephant launcher services
+- `make reload-shell` - Reload the Noctalia shell config without restarting it
 
 There is no application test suite or lint target — this is a system configuration. "Testing" means `make test` (a non-activating `nixos-rebuild`). The single buildable target is `nixosConfigurations.default` (`NIXNAME=default`); commands rebuild `.#default`.
 
@@ -50,9 +50,9 @@ This is a flake-based NixOS configuration for a VMware Fusion VM running on Appl
 
 ### Key Files
 
-- `flake.nix` - Main flake definition with inputs (nixpkgs, home-manager, stylix, nixvim, niri, walker, llm-agents) and the `devflakes/` dev-shell `templates`
+- `flake.nix` - Main flake definition with inputs (nixpkgs, home-manager, stylix, nixvim, niri, llm-agents) and the `devflakes/` dev-shell `templates`
 - `hosts/default/configuration.nix` - System-level NixOS configuration (boot, networking, services, system packages, Stylix theming). Inline package derivations live here (e.g. `moby-thesaurus`, `thes`, `notify-macos`, `copy-screenshot`)
-- `hosts/default/home.nix` - User-level configuration via Home Manager. ~2400 lines; the entire Nixvim setup (LSP servers, keymaps, embedded Lua) is inline here, along with shell, git, jujutsu, and Walker config
+- `hosts/default/home.nix` - User-level configuration via Home Manager. ~2400 lines; the entire Nixvim setup (LSP servers, keymaps, embedded Lua) is inline here, along with shell, git, jujutsu, and Noctalia config
 - `hosts/default/hardware-configuration.nix` - Generated hardware scan (don't hand-edit)
 - `modules/vmware-guest.nix` - Custom VMware guest module modified for aarch64 support
 - `config/` - Raw shell files sourced into zsh via `home.nix` (`zshrc`, `functions`, `githelpers`, `sshconfig`)
@@ -72,10 +72,8 @@ LLM CLI tools (`claude-code`, `codex`, `amp`, `pi`, `hunk`, `ccusage`, `opencode
 
 Uses Niri (scrollable-tiling Wayland compositor) with:
 
-- **Waybar** - Status bar
-- **Walker** - Application launcher with clipboard history integration, custom runners for clipboard sync, and web search providers
+- **Noctalia** - The whole shell layer in one process: bar, launcher, notification daemon, control center, clipboard history, OSDs and lock screen. Configured as a Nix attrset under `programs.noctalia.settings` in `home.nix`, rendered to TOML and validated during the build by `noctalia config validate`. Started by niri `spawn-at-startup`, not systemd. Replaced Waybar, Walker, Mako and cliphist.
 - **Ghostty** - Terminal emulator
-- **Mako** - Notification daemon
 
 ### Development Environment
 
@@ -94,7 +92,7 @@ When formatting Nix in this repo, match the existing two-space style; Nixvim for
 
 - Custom `vmware-guest.nix` module (based on official module, modified for aarch64)
 - Host filesystem mounted at `/host` for file sharing
-- Walker clipboard sync commands ("sf"/"st") move the clipboard to/from the host file (`/host/ahacop/clipboard.txt`) on demand
+- Clipboard sync commands ("sf"/"st") move the clipboard to/from the host file (`/host/ahacop/clipboard.txt`) on demand; they live in the Noctalia launcher, reachable by typing sf/st or under the `/cmd` prefix
 
 ### Theme System (Stylix)
 

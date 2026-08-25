@@ -110,6 +110,12 @@ in
     image = config.lib.stylix.pixel "base00";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-soft.yaml";
 
+    # The scheme above is dark, and targets that branch on polarity need to be
+    # told. Left at the default "either", stylix hands noctalia
+    # `theme.mode = "light"` while writing only a dark custom palette, so the
+    # shell looks for a light palette that was never generated.
+    polarity = "dark";
+
     # Stylix still sets the removed `services.kmscon.fonts` option; kmscon
     # isn't used here, so disable the target until stylix catches up.
     targets.kmscon.enable = false;

@@ -101,67 +101,7 @@ in
 {
   stylix.targets.firefox.profileNames = [ "default" ];
 
-  services.cliphist = {
-    enable = true;
-    allowImages = true;
-  };
-
-  services.mako = {
-    enable = true;
-    settings.default-timeout = 5000; # 5 seconds
-  };
-
   programs = {
-    walker = {
-      enable = true;
-      runAsService = true;
-      config = {
-        keybinds = {
-          next = [
-            "Down"
-            "ctrl n"
-            "ctrl j"
-          ];
-          previous = [
-            "Up"
-            "ctrl k"
-          ];
-        };
-      };
-      elephant = {
-        provider.websearch.settings = {
-          always_show_default = false;
-          entries = [
-            {
-              name = "DuckDuckGo";
-              url = "https://duckduckgo.com/?q=%TERM%";
-              default = true;
-            }
-            {
-              name = "Google";
-              url = "https://www.google.com/search?q=%TERM%";
-              prefix = "g:";
-            }
-            {
-              name = "Wikipedia";
-              url = "https://en.wikipedia.org/wiki/Special:Search?search=%TERM%";
-              prefix = "w:";
-            }
-            {
-              name = "NixOS Options";
-              url = "https://search.nixos.org/options?query=%TERM%";
-              prefix = "no:";
-            }
-            {
-              name = "Home Manager Options";
-              url = "https://home-manager-options.extranix.com/?query=%TERM%";
-              prefix = "hm:";
-            }
-          ];
-        };
-      };
-    };
-
     jujutsu = {
       enable = true;
       settings = {
@@ -2027,88 +1967,144 @@ in
       enableZshIntegration = true;
     };
 
-    waybar = {
+    # Noctalia is the whole shell layer: bar, launcher, notification daemon,
+    # control center, clipboard history, OSDs and lock screen in one process.
+    # It replaces waybar, mako, walker and cliphist, so none of those are
+    # installed. Colors, fonts and opacity arrive from stylix via
+    # `stylix.targets.noctalia`, which writes a custom palette and points the
+    # theme at it — the scheme itself stays set in configuration.nix.
+    #
+    # `settings` is an attrset rendered to TOML. `checkConfig` (on by default)
+    # runs `noctalia config validate` over the result during the build, so a
+    # bad key or widget name fails `make test` rather than at login.
+    noctalia = {
       enable = true;
       systemd.enable = false; # Started directly by niri spawn-at-startup
-      # style = ''
-      #   * {
-      #     font-family: monospace;
-      #     font-size: 16px;
-      #     font-weight: bold;
-      #   }
-      #
-      #   #network,
-      #   #disk,
-      #   #memory,
-      #   #cpu,
-      #   #battery {
-      #     padding-left: 12px;
-      #     padding-right: 12px;
-      #     border-right: 2px solid rgba(255, 255, 255, 0.3);
-      #   }
-      #
-      #   #clock {
-      #     padding-left: 12px;
-      #     padding-right: 12px;
-      #   }
-      # '';
+
       settings = {
-        mainBar = {
-          position = "bottom";
-          layer = "top";
-          height = 35;
-          modules-left = [ ];
-          modules-center = [ ];
-          modules-right = [
+        # Panels and menus fade in and out by default, which reads as lag.
+        shell.animation.enabled = false;
+
+        # Noctalia draws a wallpaper of its own, falling back to the image
+        # bundled in its package. With it off, the niri layout background-color
+        # set below is what shows behind the windows. A wallpaper picked in the
+        # Noctalia UI is written to ~/.local/state/noctalia/settings.toml, and
+        # that file takes precedence over this one, so setting a path here
+        # would not survive the first pick.
+        wallpaper.enabled = false;
+
+        # This VM has no wifi radio and no bluetooth adapter. VMware bridges
+        # the Mac's connection and passes through an emulated ethernet NIC, so
+        # the network and bluetooth surfaces have nothing to list. Hide the two
+        # control center tabs, drop their quick shortcuts, and stop their OSDs.
+        # Throughput still shows in the bar via the sysmon widgets below.
+        control_center = {
+          hidden_tabs = [
             "network"
-            "disk"
-            "memory"
-            "cpu"
-            "battery"
-            "clock"
+            "bluetooth"
           ];
+          shortcuts = [
+            { type = "caffeine"; }
+            { type = "nightlight"; }
+            { type = "notification"; }
+            { type = "power_profile"; }
+          ];
+        };
 
-          network = {
-            interval = 5;
-            format-ethernet = "E: {ipaddr} ({bandwidthDownBits})";
-            format-wifi = "W: {essid} {ipaddr}";
-            format-disconnected = "E: down";
-            tooltip-format = "{ifname}: {ipaddr}/{cidr}";
+        osd.kinds = {
+          wifi = false;
+          bluetooth = false;
+        };
+
+        bar = {
+          order = [ "default" ];
+          default = {
+            position = "bottom";
+            enabled = true;
+            thickness = 35;
+
+            # A plain bar edge to edge. The defaults float it: margin_ends
+            # insets it 100px at each end, and radius rounds the corners.
+            margin_ends = 0;
+            radius = 0;
+            shadow = false;
+            start = [
+              "launcher"
+              "workspaces"
+              "active_window"
+            ];
+            center = [ ];
+            # The old waybar right side, minus battery: this VM has no
+            # /sys/class/power_supply entry, so a battery readout is blank.
+            end = [
+              "netrx"
+              "nettx"
+              "disk"
+              "ram"
+              "cpu"
+              "volume"
+              "tray"
+              "notifications"
+              "clipboard"
+              "clock"
+              "control_center"
+            ];
           };
+        };
 
+        # Named widget instances referenced by the bar sections above. Several
+        # are the one `sysmon` widget pinned to a different stat.
+        widget = {
+          cpu = {
+            type = "sysmon";
+            stat = "cpu_usage";
+          };
+          ram = {
+            type = "sysmon";
+            stat = "ram_used";
+          };
           disk = {
-            interval = 30;
-            format = "/ {free}";
+            type = "sysmon";
+            stat = "disk_used_pct";
             path = "/";
           };
-
-          memory = {
-            interval = 5;
-            format = "M: {percentage}%";
-            tooltip-format = "Memory: {used:0.1f}G / {total:0.1f}G";
+          # enp2s0 is the bridged VMware interface set up in configuration.nix.
+          netrx = {
+            type = "sysmon";
+            stat = "net_rx";
+            interface = "enp2s0";
+            network_speed_compact = true;
           };
-
-          cpu = {
-            interval = 5;
-            format = "C: {usage}%";
-            tooltip-format = "CPU: {usage}%";
+          nettx = {
+            type = "sysmon";
+            stat = "net_tx";
+            interface = "enp2s0";
+            network_speed_compact = true;
           };
-
-          battery = {
-            interval = 60;
-            states = {
-              warning = 30;
-              critical = 15;
-            };
-            format = "B: {capacity}%";
-            format-charging = "B: {capacity}% ⚡";
-            format-plugged = "B: {capacity}% ";
-            tooltip-format = "Battery: {capacity}% - {time}";
-          };
-
           clock = {
+            type = "clock";
             format = "{:%Y-%m-%d %H:%M:%S}";
-            tooltip-format = "{:%A, %B %d, %Y}";
+            tooltip_format = "{:%A, %B %d, %Y}";
+          };
+        };
+
+        shell.launcher = {
+          provider_prefix = "/";
+
+          # A flat command palette reached with `/cmd`, or from the global
+          # search because `global` is set. `command` prints the choices, one
+          # per line; `exec` receives the picked line as {selection} and runs
+          # detached, with no terminal attached.
+          dmenu.entry.cmd = {
+            label = "Commands";
+            prefix = "/cmd";
+            glyph = "terminal";
+            global = true;
+            # The two clipboard lines keep the "(sf)" and "(st)" suffixes the
+            # old .desktop files carried, so typing sf or st still selects
+            # them. `global` puts them in the unprefixed search as well.
+            command = "printf '%s\\n' 'Clipboard: Sync from Host (sf)' 'Clipboard: Sync to Host (st)' 'Display: 1920x1080' 'Display: 7680x3200' 'Dictate: toggle'";
+            exec = ''case "{selection}" in "Clipboard: Sync from Host (sf)") wl-copy -n < /host/ahacop/clipboard.txt && notify-send "Clipboard synced from host" ;; "Clipboard: Sync to Host (st)") wl-paste -n > /host/ahacop/clipboard.txt && notify-send "Clipboard synced to host" ;; "Display: 1920x1080") niri msg output Virtual-1 mode 1920x1080@60.000 ;; "Display: 7680x3200") niri msg output Virtual-1 mode 7680x3200@60.000 ;; "Dictate: toggle") whisper-dictate ;; esac'';
           };
         };
       };
@@ -2171,6 +2167,11 @@ in
       layout = {
         gaps = 0;
 
+        # The desktop background: everything niri does not cover with a window
+        # is painted this color. Noctalia's wallpaper is off, so nothing draws
+        # on top of it.
+        background-color = config.lib.stylix.colors.withHashtag.base00;
+
         # center-focused-column = "on-overflow";
 
         # Make windows share space (two windows visible side by side)
@@ -2197,7 +2198,7 @@ in
             "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
           ];
         }
-        { command = [ "waybar" ]; }
+        { command = [ "noctalia" ]; }
       ];
 
       window-rules = [
@@ -2226,7 +2227,15 @@ in
         "Mod+Shift+Slash".action = show-hotkey-overlay;
 
         "Mod+Return".action = spawn "ghostty";
-        "Mod+D".action = spawn "walker";
+
+        # Noctalia surfaces. Every one is a toggle, so the same key closes it.
+        "Mod+D".action = spawn-sh "noctalia msg panel-toggle launcher";
+        "Mod+Space".action = spawn-sh "noctalia msg panel-toggle control-center";
+        "Mod+Shift+C".action = spawn-sh "noctalia msg panel-toggle clipboard";
+        "Mod+Shift+Comma".action = spawn-sh "noctalia msg settings-toggle";
+        "Mod+Tab".action = spawn-sh "noctalia msg window-switcher";
+        "Mod+Shift+Escape".action = spawn-sh "noctalia msg session lock";
+
         "Mod+Shift+Backslash" = {
           action = spawn "whisper-dictate";
           repeat = false;
@@ -2407,31 +2416,6 @@ in
         bind generic Y !sh -c 'commit=%(commit); echo $commit | /run/current-system/sw/bin/wl-copy -n & echo $commit | /run/current-system/sw/bin/tmux load-buffer -'
         set main-view = line-number:no id:yes date:custom,format="%Y-%m-%d %H:%M" author:full commit-title:yes,graph,refs,overflow=no
       '';
-
-      # Walker-accessible clipboard sync scripts
-      ".local/share/applications/clipboard-sync-from-host.desktop".text = ''
-        [Desktop Entry]
-        Type=Application
-        Icon=edit-copy
-        Name=Clipboard: Sync from Host (sf)
-        Comment=Sync clipboard from host file to Wayland clipboard
-        Exec=sh -c 'cat /host/ahacop/clipboard.txt | wl-copy -n && notify-send "Clipboard synced from host"'
-        Terminal=false
-        Categories=Utility;
-        NoDisplay=false
-      '';
-
-      ".local/share/applications/clipboard-sync-to-host.desktop".text = ''
-        [Desktop Entry]
-        Type=Application
-        Icon=edit-copy
-        Name=Clipboard: Sync to Host (st)
-        Comment=Sync Wayland clipboard to host file
-        Exec=sh -c 'wl-paste -n > /host/ahacop/clipboard.txt && notify-send "Clipboard synced to host"'
-        Terminal=false
-        Categories=Utility;
-        NoDisplay=false
-      '';
     };
 
     stateVersion = "24.05";
@@ -2458,7 +2442,6 @@ in
         presenterm
         sdcv
         vale
-        waybar
         websters-1913-stardict
         whisper-dictate
         zathura
