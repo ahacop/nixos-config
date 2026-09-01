@@ -51,7 +51,7 @@ LLM_AGENTS_SYSTEM := aarch64-linux
 .DEFAULT_GOAL := help
 
 # Phony targets
-.PHONY: help clean optimize check-versions upgrade-agents reload-shell switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
+.PHONY: help clean optimize check-versions upgrade-agents upgrade-all reload-shell switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
 .PHONY: disk-status gc-roots stale-results stale-direnvs bloated-direnvs clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean-all
 .PHONY: secrets/backup secrets/restore
 
@@ -286,6 +286,12 @@ check-versions: ## Compare installed LLM agent CLI versions with the latest the 
 
 upgrade-agents: ## Update the numtide llm-agents flake (claude, codex, amp, pi, opencode, hunk, ccusage)
 	nix flake update llm-agents
+
+# Rewrites the tip of the branch into an "Update flake" commit and an
+# "Update agents" commit. See scripts/upgrade-all.sh for what it rewrites and
+# when it refuses to run.
+upgrade-all: ## Update all flake inputs and rebuild the "Update flake" and "Update agents" commits at the tip
+	@$(MAKEFILE_DIR)/scripts/upgrade-all.sh
 
 reload-shell: ## Reload the Noctalia shell config without restarting it
 	noctalia msg config-reload

@@ -35,6 +35,7 @@ The Makefile has a dedicated cleanup group. Override `STALE_DAYS=N` (default 30)
 ### Package Updates
 
 - `make upgrade-agents` - Update the `llm-agents` flake input (bumps claude, codex, amp, pi, opencode, hunk, ccusage together)
+- `make upgrade-all` (`scripts/upgrade-all.sh`) - Update every flake input and rewrite the tip of the branch into two commits: `Update flake` for all inputs except `llm-agents`, then `Update agents` for `llm-agents` on top. It drops whichever of those two commits is already at the tip and builds them again from the current inputs, so `flake.lock` is regenerated instead of merged. It refuses to run on a dirty tree, and stops if a tip commit changes any file other than `flake.lock`. The rebuilt commits replace the old ones, so a branch already on the remote needs `git push --force-with-lease`.
 - After updating, run `make switch` to apply
 
 ### VM Management (for remote bootstrap from host machine)
@@ -56,6 +57,7 @@ This is a flake-based NixOS configuration for a VMware Fusion VM running on Appl
 - `hosts/default/hardware-configuration.nix` - Generated hardware scan (don't hand-edit)
 - `modules/vmware-guest.nix` - Custom VMware guest module modified for aarch64 support
 - `config/` - Raw shell files sourced into zsh via `home.nix` (`zshrc`, `functions`, `githelpers`, `sshconfig`)
+- `scripts/` - Shell scripts that Makefile targets call when a recipe is too long to read inline (`upgrade-all.sh`)
 
 ### Configuration Workflow
 
