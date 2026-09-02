@@ -130,6 +130,10 @@
           path = ./devflakes/prolog;
           description = "Prolog dev shell (SWI-Prolog + GUI, prolog_ls, just)";
         };
+        lean = {
+          path = ./devflakes/lean;
+          description = "Lean 4 dev shell (lean + lake, pinned by this flake)";
+        };
         standardebooks = {
           path = ./devflakes/standardebooks;
           description = "Standard Ebooks (.envrc → use flake github:ahacop/standardebooks-nix)";

@@ -1051,6 +1051,27 @@ in
         tabstop = 2;
       };
 
+      # The Lean language server. nvim-lspconfig carries no entry for it under
+      # neovim's built-in LSP API, so the command and the file types are
+      # written out here. `lake serve` starts the server from the lean4
+      # toolchain on PATH, which the lean devflake provides.
+      lsp.servers.leanls = {
+        enable = true;
+        config = {
+          cmd = [
+            "lake"
+            "serve"
+            "--"
+          ];
+          filetypes = [ "lean" ];
+          root_markers = [
+            "lakefile.toml"
+            "lakefile.lean"
+            "lean-toolchain"
+          ];
+        };
+      };
+
       plugins = {
         render-markdown.enable = true;
         numbertoggle.enable = false;
