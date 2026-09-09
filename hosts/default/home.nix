@@ -964,28 +964,21 @@ in
         tabstop = 2;
       };
 
-      # The Lean language server. nvim-lspconfig carries no entry for it under
-      # neovim's built-in LSP API, so the command and the file types are
-      # written out here. `lake serve` starts the server from the lean4
-      # toolchain on PATH, which the lean devflake provides.
-      lsp.servers.leanls = {
-        enable = true;
-        config = {
-          cmd = [
-            "lake"
-            "serve"
-            "--"
-          ];
-          filetypes = [ "lean" ];
-          root_markers = [
-            "lakefile.toml"
-            "lakefile.lean"
-            "lean-toolchain"
-          ];
-        };
-      };
-
       plugins = {
+        # lean.nvim runs the Lean language server and adds the infoview: a
+        # split that shows the goal state at the cursor and updates as the
+        # cursor moves. It also installs the `\to` -> `→` style unicode
+        # abbreviations and the `<LocalLeader>` mappings (i infoview, p pin,
+        # t term goal, g restart file). The server is `lake serve` from the
+        # lean4 toolchain on PATH, which the lean devflake provides.
+        lean = {
+          enable = true;
+          settings = {
+            lsp.enable = true;
+            mappings = true;
+            infoview.autoopen = true;
+          };
+        };
         render-markdown.enable = true;
         nvim-surround.enable = true;
         mini = {

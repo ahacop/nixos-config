@@ -87,7 +87,7 @@ Uses Niri (scrollable-tiling Wayland compositor) with:
   - `rails` - Ruby + postgres, node, vips, flyctl, etc.
   - `rust` - Stable toolchain + clippy/rustfmt/rust-analyzer
   - `prolog` - SWI-Prolog + GUI, `prolog_ls` (wired into Nixvim via the swipl on PATH), `just`
-  - `lean` - Lean 4 (`lean` + `lake`) at the version this flake pins, `just`; the Lean LSP is wired into Nixvim as `leanls`, running `lake serve` from the shell
+  - `lean` - Lean 4 (`lean` + `lake`) at the version this flake pins, `just`; Nixvim runs the lean.nvim plugin (`plugins.lean` in `home.nix`), which starts `lake serve` from the shell and opens the goal-state infoview
   - `standardebooks` - direnv passthrough (`.envrc` only, no `flake.nix`); drops in `use flake github:ahacop/standardebooks-nix` to activate the Standard Ebooks `se`/`se-ext` devShell
 
 When formatting Nix in this repo, match the existing two-space style; Nixvim formats Nix on save via none-ls (`nixfmt`) with `statix` diagnostics, and `nix fmt` runs the same nixfmt.
