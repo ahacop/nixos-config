@@ -23,7 +23,14 @@ CODE_DIRS ?= $(HOME)/code
 # one is a deliberate review (don't add ~/.cache/mozilla without thinking).
 # disk-status reports these; clean-caches deletes them.
 SAFE_CACHE_DIRS := nix trivy ms-playwright puppeteer chrome-devtools-mcp \
-	pip deno bundix go-build bun pnpm chromium informers
+	pip deno bundix go-build .bun pnpm chromium informers
+
+# Re-downloadable package stores outside ~/.cache, relative to $HOME. Same
+# rule as SAFE_CACHE_DIRS: every entry is something a package manager fetches
+# again on the next install. disk-status reports these; clean-stores deletes
+# them.
+SAFE_STORE_DIRS := .local/share/pnpm/store .local/share/gem .npm/_cacache \
+	.npm/_npx .cargo/registry go/pkg/mod
 
 # Machine-local secrets file (untracked, outside the Nix store) and the
 # 1Password document it is backed up to/restored from. OP_VAULT is optional.
@@ -52,7 +59,7 @@ LLM_AGENTS_SYSTEM := aarch64-linux
 
 # Phony targets
 .PHONY: help clean optimize check-versions upgrade-agents upgrade-all reload-shell switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
-.PHONY: disk-status gc-roots stale-results stale-direnvs bloated-direnvs clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean-all
+.PHONY: disk-status gc-roots docker-volumes stale-results stale-direnvs bloated-direnvs clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean-docker-layers clean-all
 .PHONY: secrets/backup secrets/restore
 
 # Help target
@@ -63,7 +70,7 @@ help: ## Show this help message
 	@grep -E '^(switch|test|optimize|clean|reload-shell):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 	@echo ''
 	@echo 'Disk Cleanup (use STALE_DAYS=N to adjust threshold, default 30):'
-	@grep -E '^(disk-status|gc-roots|stale-[a-z]+|bloated-[a-z]+|clean-[a-z-]+):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+	@grep -E '^(disk-status|gc-roots|docker-volumes|stale-[a-z]+|bloated-[a-z]+|clean-[a-z-]+):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 	@echo ''
 	@echo 'Package Updates:'
 	@grep -E '^upgrade-.*:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
@@ -77,6 +84,8 @@ help: ## Show this help message
 	@echo 'VM Management:'
 	@grep -E '^vm/.*:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 
+# docker prune --volumes only removes anonymous volumes. Named volumes
+# (compose databases and the like) survive; see docker-volumes.
 clean: ## Clean old generations and garbage collect
 	sudo nix-env -p /nix/var/nix/profiles/system --delete-generations old
 	nix-collect-garbage -d
@@ -112,9 +121,18 @@ disk-status: ## Show disk usage overview (nix store, caches, docker)
 		printf "  ~/.cache/%-22s %s (not cleaned by clean-caches)\n" "mozilla" "$$size"; \
 	fi
 	@echo ""
+	@echo "Package stores:"
+	@for rel in $(SAFE_STORE_DIRS); do \
+		if [ -d "$(HOME)/$$rel" ]; then \
+			size=$$(du -sh "$(HOME)/$$rel" 2>/dev/null | cut -f1); \
+			printf "  ~/%-28s %s\n" "$$rel" "$$size"; \
+		fi; \
+	done
+	@echo ""
 	@echo "Docker:"
 	@if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then \
 		docker system df --format 'table  {{.Type}}\t{{.Size}}\t{{.Reclaimable}}' 2>/dev/null || echo "  (not running)"; \
+		echo "  Named volumes are not reclaimable by clean; see docker-volumes."; \
 	else \
 		echo "  (not running)"; \
 	fi
@@ -131,6 +149,28 @@ gc-roots: ## List all GC roots with status
 		fi; \
 		printf "%-7s %s\n" "$$status" "$$target"; \
 	done | sort -k2
+	@echo ""
+	@echo "=== Profile roots ==="
+	@echo ""
+	@echo "Home Manager runs as part of the system build, so a home-manager"
+	@echo "profile here is a leftover from the standalone setup and holds"
+	@echo "old packages alive. Remove its links and run make clean."
+	@echo ""
+	@for link in /nix/var/nix/profiles/*-link $(HOME)/.local/state/nix/profiles/*-link; do \
+		[ -L "$$link" ] || continue; \
+		printf "%-60s -> %s\n" "$$link" "$$(readlink "$$link")"; \
+	done
+
+docker-volumes: ## List named docker volumes with their on-disk size
+	@echo "=== Docker named volumes ==="
+	@echo ""
+	@echo "clean does not remove these. Drop one with: docker volume rm <name>"
+	@echo ""
+	@if ! docker info >/dev/null 2>&1; then echo "  (docker not running)"; exit 0; fi; \
+	for name in $$(docker volume ls -q); do \
+		size=$$(sudo du -sh "/var/lib/docker/volumes/$$name/_data" 2>/dev/null | cut -f1); \
+		printf "  %-8s %s\n" "$$size" "$$name"; \
+	done | sort -rh
 
 stale-results: ## Find result symlinks older than STALE_DAYS
 	@echo "=== Result symlinks older than $(STALE_DAYS) days ==="
@@ -228,33 +268,49 @@ clean-direnvs: ## Remove .direnv from projects with no git activity in STALE_DAY
 	done
 	@echo "Done."
 
+# Tools run under sudo (trivy, for one) leave root-owned cache dirs that a
+# plain rm cannot delete, so fall back to sudo when the dir is not writable.
 clean-caches: ## Clean nix and other re-downloadable tool caches
 	@echo "Cleaning caches..."
 	@for name in $(SAFE_CACHE_DIRS); do \
 		dir="$(HOME)/.cache/$$name"; \
 		if [ -d "$$dir" ]; then \
-			size=$$(du -sh "$$dir" 2>/dev/null | cut -f1); \
-			rm -rf "$$dir"; \
+			size=$$(sudo du -sh "$$dir" 2>/dev/null | cut -f1); \
+			if [ -w "$$dir" ]; then rm -rf "$$dir"; else sudo rm -rf "$$dir"; fi; \
 			printf "  Removed ~/.cache/%-22s (%s)\n" "$$name" "$$size"; \
 		fi; \
 	done
 	@echo "Done."
 
-clean-stores: ## Remove pnpm store and user-installed gems (re-downloadable)
+# The go module cache is read-only on disk, so make it writable before rm.
+clean-stores: ## Remove pnpm, gem, npm, cargo and go module stores (re-downloadable)
 	@echo "Removing package stores..."
-	@if [ -d "$(HOME)/.local/share/pnpm/store" ]; then \
-		size=$$(du -sh "$(HOME)/.local/share/pnpm/store" 2>/dev/null | cut -f1); \
-		rm -rf "$(HOME)/.local/share/pnpm/store"; \
-		printf "  Removed ~/.local/share/pnpm/store    (%s)\n" "$$size"; \
-	fi
-	@if [ -d "$(HOME)/.local/share/gem" ]; then \
-		size=$$(du -sh "$(HOME)/.local/share/gem" 2>/dev/null | cut -f1); \
-		rm -rf "$(HOME)/.local/share/gem"; \
-		printf "  Removed ~/.local/share/gem           (%s)\n" "$$size"; \
-	fi
+	@for rel in $(SAFE_STORE_DIRS); do \
+		dir="$(HOME)/$$rel"; \
+		if [ -d "$$dir" ]; then \
+			size=$$(du -sh "$$dir" 2>/dev/null | cut -f1); \
+			chmod -R u+w "$$dir" 2>/dev/null; \
+			rm -rf "$$dir"; \
+			printf "  Removed ~/%-28s (%s)\n" "$$rel" "$$size"; \
+		fi; \
+	done
 	@echo "Done."
 
-clean-all: clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean ## Full cleanup (stale items + old profiles + caches + stores + gc)
+# docker system prune leaves layer dirs behind in overlay2 that no image or
+# container references. They can only be removed with the daemon stopped, so
+# this refuses to run while any image or container exists.
+clean-docker-layers: ## Remove orphaned overlay2 layers (only when docker holds no images or containers)
+	@if ! docker info >/dev/null 2>&1; then echo "docker not running"; exit 0; fi; \
+	if [ -n "$$(docker ps -aq)" ] || [ -n "$$(docker images -q)" ]; then \
+		echo "docker still has images or containers; run make clean first"; exit 1; \
+	fi; \
+	before=$$(sudo du -sh /var/lib/docker/overlay2 2>/dev/null | cut -f1); \
+	sudo systemctl stop docker.socket docker.service; \
+	sudo find /var/lib/docker/overlay2 /var/lib/docker/buildkit -mindepth 1 -maxdepth 1 -exec rm -rf {} +; \
+	sudo systemctl start docker.socket docker.service; \
+	echo "Removed orphaned docker layers ($$before)"
+
+clean-all: clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean clean-docker-layers ## Full cleanup (stale items + old profiles + caches + stores + gc + docker layers)
 	@echo ""
 	@echo "=== Full cleanup complete ==="
 

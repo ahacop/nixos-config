@@ -659,6 +659,14 @@ in
     jack.enable = true;
   };
 
+  # Keep about three days of system logs. Journald writes roughly 13M a day
+  # here and rotates in files of one eighth of SystemMaxUse, so 100M leaves
+  # room for the retention window to be the limit that actually applies.
+  services.journald.settings.Journal = {
+    SystemMaxUse = "100M";
+    MaxRetentionSec = "3day";
+  };
+
   # Local dictionary server
   services.dictd = {
     enable = true;
