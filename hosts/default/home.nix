@@ -4,10 +4,11 @@
   inputs,
   llmAgentPackages,
   pkgs,
+  user,
   ...
 }:
 let
-  # Identity, shared by the git and jujutsu configs below.
+  # Identity for the git config below.
   fullName = "Ara Hacopian";
   primaryEmail = "ara@hacopian.de";
   workEmail = "ara@changebot.ai";
@@ -29,8 +30,8 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "ahacop";
       repo = "websters-dict-1913-stardict";
-      rev = "main";
-      sha256 = "sha256-XmmbS0mnGn4WEUnEm4XDxaIQ890/JXjFwPkK+2YsgGs=";
+      rev = "7f9c6d6725eb1b0d8545a6f74904610fa2a2c71e";
+      sha256 = "sha256-/g7Tm0tQzf7pkA6EzTMxOrh3FCr8CLxgRVsAp/ZxFpU=";
     };
 
     nativeBuildInputs = [
@@ -102,88 +103,6 @@ in
   stylix.targets.firefox.profileNames = [ "default" ];
 
   programs = {
-    jujutsu = {
-      enable = true;
-      settings = {
-        user = {
-          name = fullName;
-          email = primaryEmail;
-        };
-        aliases = {
-          # Common shortcuts
-          d = [ "diff" ];
-          di = [ "diff" ];
-          l = [ "log" ];
-          ll = [
-            "log"
-            "-r"
-            "::@"
-          ]; # Show all ancestors of current revision
-          lg = [
-            "log"
-            "--graph"
-          ];
-
-          # Branch operations
-          b = [ "branch" ];
-          bl = [
-            "branch"
-            "list"
-          ];
-          bc = [
-            "branch"
-            "create"
-          ];
-          bd = [
-            "branch"
-            "delete"
-          ];
-
-          # Navigation
-          co = [ "checkout" ];
-          n = [ "new" ]; # Create new commit
-
-          # Working with changes
-          a = [ "squash" ]; # Amend/squash into parent
-          sp = [ "split" ];
-          ab = [ "abandon" ];
-
-          # History exploration
-          p = [
-            "log"
-            "-r"
-            "@-"
-          ]; # Show previous commit
-          pp = [
-            "log"
-            "-r"
-            "@--"
-          ]; # Show grandparent commit
-          r = [
-            "log"
-            "-r"
-            "root()"
-          ];
-
-          # Useful queries
-          mine = [
-            "log"
-            "-r"
-            "mine()"
-          ]; # Your commits
-          conflicts = [
-            "log"
-            "-r"
-            "conflict()"
-          ];
-          heads = [
-            "log"
-            "-r"
-            "heads()"
-          ];
-        };
-      };
-    };
     yazi = {
       enable = true;
       enableZshIntegration = true;
@@ -267,12 +186,6 @@ in
       # nixpkgs (single nixpkgs across the whole config). Set the source
       # explicitly to silence nixvim's follows/skew warning.
       nixpkgs.source = pkgs.path;
-
-      diagnostic = {
-        settings = {
-          virtual_lines.only_current_line = true;
-        };
-      };
 
       globals = {
         mapleader = " ";
@@ -575,7 +488,7 @@ in
           action.__raw = ''
             function()
               -- if there is an active search highlight and we are not in the quickfix
-              local shouldClearHighlight = vim.api.nvim_buf_get_option(0, 'buftype') ~= 'quickfix' and vim.v.hlsearch ~= 0
+              local shouldClearHighlight = vim.bo[0].buftype ~= 'quickfix' and vim.v.hlsearch ~= 0
 
               if shouldClearHighlight then
                 -- Clear highlight
@@ -1074,7 +987,6 @@ in
 
       plugins = {
         render-markdown.enable = true;
-        numbertoggle.enable = false;
         nvim-surround.enable = true;
         mini = {
           enable = true;
@@ -1085,7 +997,6 @@ in
           };
         };
         direnv.enable = true;
-        gitgutter.enable = true;
         vim-dadbod.enable = true;
         vim-dadbod-completion.enable = true;
         vim-dadbod-ui.enable = true;
@@ -1148,16 +1059,6 @@ in
           settings = {
             callbacks = {
               "github.com".__raw = "require('gitlinker.hosts').get_github_type_url";
-            };
-          };
-        };
-        lspkind = {
-          enable = false;
-          settings = {
-            maxwidth = 50;
-            ellipsis_char = "...";
-            symbol_map = {
-              Copilot = "";
             };
           };
         };
@@ -1296,11 +1197,9 @@ in
         };
 
         fugitive.enable = true;
-        neogit.enable = false;
         diffview.enable = true;
         endwise.enable = true;
         nvim-lightbulb.enable = true;
-        auto-session.enable = false;
         comment.enable = true;
         lualine.enable = true;
 
@@ -1310,20 +1209,6 @@ in
             gopls.enable = true;
             # nixd.enable = true;
             bashls.enable = true;
-            cssls = {
-              enable = false;
-              extraOptions = {
-                on_attach = {
-                  # disable formatting
-                  __raw = ''
-                    function(client, bufnr)
-                      client.server_capabilities.documentFormattingProvider = false
-                    end
-                  '';
-                };
-              };
-            };
-            elixirls.enable = true;
             eslint = {
               enable = true;
             };
@@ -1391,9 +1276,6 @@ in
             "K" = "hover";
           };
         };
-        lsp-lines = {
-          enable = true;
-        };
         vim-test.enable = true;
         trouble.enable = true;
         overseer.enable = true;
@@ -1453,7 +1335,7 @@ in
               checkmake.enable = true;
             };
             formatting = {
-              alejandra.enable = true;
+              nixfmt.enable = true;
               prettier = {
                 enable = true;
                 disableTsServerFormatter = true;
@@ -1544,8 +1426,6 @@ in
           };
         }
       ];
-
-      extraPlugins = with pkgs.vimPlugins; [ direnv-vim ];
 
       extraFiles."lua/aoc.lua".text = ''
         local M = {}
@@ -1648,80 +1528,9 @@ in
       settings = {
         command_timeout = 500;
         add_newline = false;
-        line_break.disabled = true;
-
-        aws.disabled = true;
-        battery.disabled = true;
-        c.disabled = true;
-        cmake.disabled = true;
-        cobol.disabled = true;
-        conda.disabled = true;
-        crystal.disabled = true;
-        daml.disabled = true;
-        dart.disabled = true;
-        deno.disabled = true;
-        direnv.disabled = true;
-        docker_context.disabled = true;
-        dotnet.disabled = true;
-        elixir.disabled = true;
-        elm.disabled = true;
-        env_var.disabled = true;
-        erlang.disabled = true;
-        fennel.disabled = true;
-        fossil_branch.disabled = true;
-        fossil_metrics.disabled = true;
-        gcloud.disabled = true;
-        gleam.disabled = true;
-        golang.disabled = true;
-        gradle.disabled = true;
-        guix_shell.disabled = true;
-        haskell.disabled = true;
-        haxe.disabled = true;
-        helm.disabled = true;
-        hg_branch.disabled = true;
-        java.disabled = true;
-        jobs.disabled = true;
-        julia.disabled = true;
-        kotlin.disabled = true;
-        kubernetes.disabled = true;
-        localip.disabled = true;
-        lua.disabled = true;
-        memory_usage.disabled = true;
-        meson.disabled = true;
-        nats.disabled = true;
-        nim.disabled = true;
-        nix_shell.disabled = true;
-        nodejs.disabled = true;
-        ocaml.disabled = true;
-        openstack.disabled = true;
-        opa.disabled = true;
-        os.disabled = true;
-        perl.disabled = true;
-        php.disabled = true;
-        pijul_channel.disabled = true;
-        pulumi.disabled = true;
-        purescript.disabled = true;
-        python.disabled = true;
-        quarto.disabled = true;
-        raku.disabled = true;
-        red.disabled = true;
-        rlang.disabled = true;
-        ruby.disabled = true;
-        rust.disabled = true;
-        scala.disabled = true;
-        shlvl.disabled = true;
-        singularity.disabled = true;
-        solidity.disabled = true;
-        spack.disabled = true;
-        sudo.disabled = true;
-        swift.disabled = true;
-        terraform.disabled = true;
-        time.disabled = true;
-        typst.disabled = true;
-        vagrant.disabled = true;
-        vcsh.disabled = true;
-        vlang.disabled = true;
-        zig.disabled = true;
+        # Only the modules named here run, in this order. Every language,
+        # cloud and status module starship ships is left out.
+        format = "$username$hostname$directory$git_branch$git_commit$git_state$git_status$package$cmd_duration$character";
       };
     };
 
@@ -1757,10 +1566,9 @@ in
         gv = "open_modified_and_untracked_in_vim";
         gvh = "open_changed_from_head_in_vim";
         gvv = "edit_diff_files_in_vim";
-        ls = "ls -GF";
+        ls = "eza";
         show-git-remote-authors = "git for-each-ref --format=' %(authorname) %09 %(refname)' --sort=authorname | grep remote";
         showtodos = "git grep -l TODO | xargs -n1 git blame --show-email -f | grep TODO  | sed -E 's/[[:blank:]]+/ /g' | sort -k 4";
-        strip = "sed $'s,x1b\\[[0-9;]*[a-zA-Z],,g;s,\r$,,g'";
         res-low = "niri msg output Virtual-1 mode 1920x1080@60.000";
         res-default = "niri msg output Virtual-1 mode 7680x3200@60.000";
       };
@@ -1845,10 +1653,6 @@ in
       };
     };
 
-    difftastic = {
-      enable = false;
-    };
-
     git = {
       enable = true;
       signing.format = "openpgp";
@@ -1914,7 +1718,6 @@ in
           askPass = ""; # needs to be empty to use terminal for ask pass
           editor = "nvim";
         };
-        credential.helper = "store"; # want to make this more secure
         diff = {
           colorMoved = "default";
           algorithm = "histogram";
@@ -1981,11 +1784,6 @@ in
         set-option -g allow-rename on
         set-window-option -g automatic-rename off
       '';
-    };
-
-    wezterm = {
-      enable = true;
-      enableZshIntegration = true;
     };
 
     # Noctalia is the whole shell layer: bar, launcher, notification daemon,
@@ -2211,14 +2009,9 @@ in
         enable = true;
       };
 
+      # niri --session exports WAYLAND_DISPLAY and XDG_CURRENT_DESKTOP to
+      # systemd and D-Bus on its own, so nothing here has to.
       spawn-at-startup = [
-        {
-          command = [
-            "sh"
-            "-c"
-            "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
-          ];
-        }
         { command = [ "noctalia" ]; }
       ];
 
@@ -2427,8 +2220,8 @@ in
   };
 
   home = {
-    username = "ahacop";
-    homeDirectory = "/home/ahacop";
+    username = user;
+    homeDirectory = "/home/${user}";
 
     file = {
       ".githelpers".source = ./../../config/githelpers;

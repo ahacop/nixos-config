@@ -340,7 +340,7 @@ check-versions: ## Compare installed LLM agent CLI versions with the latest the 
 		printf '%-12s pin is current with upstream main\n' ''; \
 	fi
 
-upgrade-agents: ## Update the numtide llm-agents flake (claude, codex, amp, pi, opencode, hunk, ccusage)
+upgrade-agents: ## Update the llm-agents flake input (every CLI in llmAgentNames in flake.nix)
 	nix flake update llm-agents
 
 # Rewrites the tip of the branch into an "Update flake" commit and an
@@ -355,8 +355,10 @@ reload-shell: ## Reload the Noctalia shell config without restarting it
 switch: ## Apply configuration changes (rebuilds and switches)
 	sudo nixos-rebuild switch --flake ".#${NIXNAME}"
 
-test: ## Test configuration changes without switching
-	sudo nixos-rebuild test --flake ".#$(NIXNAME)"
+# Builds the system closure and leaves a ./result link (gitignored) without
+# activating anything. `nixos-rebuild test` would activate the running system.
+test: ## Build the configuration without activating it
+	nixos-rebuild build --flake ".#$(NIXNAME)"
 
 # =============================================================================
 # Secrets (machine-local env file, archived in 1Password — never committed)
@@ -399,8 +401,10 @@ vm/bootstrap0: ## Bootstrap brand new VM with NixOS installation
 		mount /dev/disk/by-label/boot /mnt/boot; \
 		nixos-generate-config --root /mnt; \
 		sed --in-place '/system\.stateVersion = .*/a \
-			nix.package = pkgs.nixUnstable;\n \
+			nix.package = pkgs.nixVersions.latest;\n \
 			nix.extraOptions = \"experimental-features = nix-command flakes\";\n \
+			nix.settings.substituters = [\"https://ahacop.cachix.org\"];\n \
+			nix.settings.trusted-public-keys = [\"ahacop.cachix.org-1:DNW02GubEpEM6HsOgAwIPDj81nPOuGxmCp4dvKzJOq0=\"];\n \
   			services.openssh.enable = true;\n \
 			services.openssh.settings.PasswordAuthentication = true;\n \
 			services.openssh.settings.PermitRootLogin = \"yes\";\n \

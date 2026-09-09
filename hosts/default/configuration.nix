@@ -1,11 +1,9 @@
-# Edit this configuration file to define what should be installed on
-# your system. Help is available in the configuration.nix(5) man page, on
-# https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 {
   config,
   lib,
   inputs,
   pkgs,
+  user,
   ...
 }:
 let
@@ -146,16 +144,15 @@ in
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../../modules/vmware-guest.nix
   ];
 
   environment.localBinInPath = true;
 
   documentation.dev.enable = true;
 
-  users.users.ahacop = {
+  users.users.${user} = {
     isNormalUser = true;
-    home = "/home/ahacop";
+    home = "/home/${user}";
     extraGroups = [
       "docker"
       "wheel"
@@ -183,15 +180,20 @@ in
   };
 
   nix = {
-    # use unstable nix so we can access flakes
     package = pkgs.nixVersions.latest;
-    extraOptions = ''
-      experimental-features = nix-command flakes
-      keep-outputs = true
-      keep-derivations = true
-    '';
 
     settings = {
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      # Do not keep the build-time inputs of live outputs. That would hold
+      # rustc, clang and rust-docs for every program built from source, and
+      # nothing here runs them. nix-direnv roots each dev shell on its own,
+      # with the shell's toolchain in that root, so shells still survive
+      # `make clean`.
+      keep-outputs = false;
+      keep-derivations = true;
       substituters = [
         "https://nix-community.cachix.org"
         "https://cache.numtide.com"
@@ -276,13 +278,12 @@ in
 
   security.sudo.wheelNeedsPassword = false;
 
-  # Enable hardware 3D acceleration for VMware
+  # Hardware 3D acceleration for VMware. This installs the mesa drivers,
+  # vmwgfx among them, under /run/opengl-driver, where the GL and Vulkan
+  # loaders look for them.
   hardware.graphics = {
     enable = true;
     enable32Bit = false; # only available on x86
-    extraPackages = with pkgs; [
-      mesa
-    ];
   };
 
   # Virtualization settings
@@ -309,19 +310,6 @@ in
     config.common.default = [ "gtk" ];
   };
 
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Select internationalisation properties.
-  # i18n.defaultLocale = "en_US.UTF-8";
-  # console = {
-  #   font = "Lat2-Terminus16";
-  #   keyMap = "us";
-  #   useXkbConfig = true; # use xkb.options in tty.
-  # };
-
-  # Enable Niri Wayland compositor
   i18n = {
     defaultLocale = "en_US.UTF-8";
   };
@@ -344,7 +332,6 @@ in
     };
   };
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
   users.mutableUsers = true;
 
   fonts = {
@@ -353,7 +340,6 @@ in
 
     packages = with pkgs; [
       dejavu_fonts
-      emacs-all-the-icons-fonts
       fira-code
       font-awesome
       ibm-plex
@@ -373,12 +359,11 @@ in
   nixpkgs.config.allowUnfree = true;
   environment = {
     sessionVariables = {
-      FLAKE = "/home/ahacop/nixos-config";
+      # Where `nh os switch` finds this flake when run without a path.
+      NH_FLAKE = "/home/${user}/nixos-config";
       # Force Mesa to use the VMware SVGA driver for hardware acceleration
       LIBGL_ALWAYS_SOFTWARE = "0";
       MESA_LOADER_DRIVER_OVERRIDE = "vmwgfx";
-      MOZ_ENABLE_WAYLAND = "1";
-      MOZ_WEBRENDER = "1";
     };
 
     # List packages installed in system profile. To search, run:
@@ -403,7 +388,6 @@ in
       git
       gnumake
       iproute2
-      mesa
       mesa-demos
       gnupg
       heroku
@@ -420,7 +404,6 @@ in
       ncdu
       netcat
       fastfetch
-      neovim
       nb
       nh
       nix-output-monitor
@@ -433,7 +416,6 @@ in
       procps
       ripgrep
       rsync
-      rxvt-unicode-unwrapped
       socat # used by nb
       sox
       sqlite
@@ -471,7 +453,6 @@ in
       yt-dlp
       zip
       chromium
-      fish
       gum
 
       # macOS notification bridge.
@@ -596,13 +577,6 @@ in
       tig
       tldr
       tree
-
-      gtkmm3
-      # ] ++ lib.optionals (currentSystemName == "vm-aarch64") [
-      #   # This is needed for the vmware user tools clipboard to work.
-      #   # You can test if you don't need this by deleting this and seeing
-      #   # if the clipboard sill works.
-      #   gtkmm3
     ];
   };
 
@@ -619,15 +593,25 @@ in
   # Setup qemu so we can run x86_64 binaries
   boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
 
-  # Disable the default module and import our override. We have
-  # customizations to make this work on aarch64.
-  disabledModules = [ "virtualisation/vmware-guest.nix" ];
-
   # Interface is this on M1
   networking.interfaces.enp2s0.useDHCP = true;
 
-  # This works through our custom module imported above
+  # open-vm-tools: vmtoolsd for host integration, plus the vmhgfs-fuse helper
+  # for the /host mount below. No X server is configured, so the module picks
+  # the headless package, which leaves out vmware-user and the vmblock mount.
+  # Both are X11-only and do nothing under niri. Clipboard sharing goes
+  # through the /host file instead (sf/st in the launcher).
   virtualisation.vmware.guest.enable = true;
+
+  # The /host HGFS mount uses `auto_unmount`, so the libfuse3 `vmhgfs-fuse`
+  # daemon needs `fusermount3` (fuse3) at mount time, and `mount` needs
+  # `mount.fuse` (fuse2) to handle the fuse.<helper> fstype. Nothing pulls
+  # them in transitively. Without them the mount fails at boot and the
+  # machine drops into emergency mode.
+  system.fsPackages = [
+    pkgs.fuse
+    pkgs.fuse3
+  ];
 
   # Share our host filesystem
   fileSystems."/host" = {
@@ -642,13 +626,6 @@ in
       "defaults"
     ];
   };
-
-  # Configure keymap in X11
-  # services.xserver.xkb.layout = "us";
-  # services.xserver.xkb.options = "eurosign:e,caps:escape";
-
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
 
   # Enable sound with PipeWire
   services.pipewire = {
@@ -666,6 +643,10 @@ in
     SystemMaxUse = "100M";
     MaxRetentionSec = "3day";
   };
+
+  # The desktop modules turn speech-dispatcher on by default. Nothing here
+  # uses it, and it pulls in espeak-ng and the mbrola voices, about 2.3G.
+  services.speechd.enable = false;
 
   # Local dictionary server
   services.dictd = {
@@ -693,79 +674,8 @@ in
     };
   };
 
-  # Export Wayland environment to D-Bus for xdg-desktop-portal
-  # This fixes slow startup of GTK apps (like ghostty) that query the portal
-  systemd.user.services.xdg-desktop-portal-env = {
-    description = "Export Wayland environment to D-Bus";
-    wantedBy = [ "graphical-session.target" ];
-    before = [ "xdg-desktop-portal.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.dbus}/bin/dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP";
-      RemainAfterExit = true;
-    };
-  };
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.libinput.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  # users.users.alice = {
-  #   isNormalUser = true;
-  #   extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-  #   packages = with pkgs; [
-  #     firefox
-  #     tree
-  #   ];
-  # };
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  # environment.systemPackages = with pkgs; [
-  #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #   wget
-  # ];
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # Copy the NixOS configuration file and link it from the resulting system
-  # (/run/current-system/configuration.nix). This is useful in case you
-  # accidentally delete configuration.nix.
-  # system.copySystemConfiguration = true;
-
-  # This option defines the first version of NixOS you have installed on this particular machine,
-  # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
-  #
-  # Most users should NEVER change this value after the initial install, for any reason,
-  # even if you've upgraded your system to a new NixOS release.
-  #
-  # This value does NOT affect the Nixpkgs version your packages and OS are pulled from,
-  # so changing it will NOT upgrade your system - see https://nixos.org/manual/nixos/stable/#sec-upgrading for how
-  # to actually do that.
-  #
-  # This value being lower than the current NixOS release does NOT mean your system is
-  # out of date, out of support, or vulnerable.
-  #
-  # Do NOT change this value unless you have manually inspected all the changes it would make to your configuration,
-  # and migrated your data accordingly.
-  #
-  # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
-  system.stateVersion = "24.05"; # Did you read the comment?
+  # The NixOS release this machine was first installed with. It sets the
+  # defaults for stateful data such as database formats. Do not change it on
+  # upgrades.
+  system.stateVersion = "24.05";
 }

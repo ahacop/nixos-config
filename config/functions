@@ -53,17 +53,6 @@ man() {
     man "$@"
 }
 
-# check if uri is up
-isup() {
-  local uri=$1
-
-  if curl -s --head --request GET "$uri" | grep "200 OK" >/dev/null; then
-    echo "$uri is down"
-  else
-    echo "$uri is up"
-  fi
-}
-
 # Determine size of a file or total size of a directory
 fs() {
   local arg
@@ -105,31 +94,12 @@ unidecode() {
   fi
 }
 
-# Simplified Git command or git status, falls back to jujutsu if not in git repo
+# `g` alone runs git status; `g <args>` runs git with those arguments.
 g() {
-  if git rev-parse --git-dir > /dev/null 2>&1; then
-    # In a git repository
-    if [[ $# -gt 0 ]]; then
-      git "$@"
-    else
-      git status
-    fi
-  else
-    # Not in a git repository, use jujutsu
-    if [[ $# -gt 0 ]]; then
-      jj "$@"
-    else
-      jj status
-    fi
-  fi
-}
-
-# Simplified Jujutsu command or jj status
-j() {
   if [[ $# -gt 0 ]]; then
-    jj "$@"
+    git "$@"
   else
-    jj status
+    git status
   fi
 }
 

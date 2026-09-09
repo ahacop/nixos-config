@@ -113,6 +113,10 @@
         }) llmAgentNames
       );
 
+      # `nix fmt` runs nixfmt, the same formatter nvim applies on save through
+      # none-ls in home.nix, so both produce the same layout.
+      formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt;
+
       templates = {
         ruby = {
           path = ./devflakes/ruby;
@@ -153,7 +157,7 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              extraSpecialArgs = { inherit inputs llmAgentPackages; };
+              extraSpecialArgs = { inherit inputs user llmAgentPackages; };
               users.${user}.imports = [
                 ./hosts/default/home.nix
                 inputs.nixvim.homeModules.nixvim

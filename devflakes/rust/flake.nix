@@ -38,7 +38,10 @@
       devShells = forAllSystems (
         pkgs:
         let
-          rust = pkgs.rust-bin.stable.latest.default.override {
+          # The minimal profile is rustc, cargo and the standard library. The
+          # default profile adds rust-docs on top, close to 1G of HTML nobody
+          # opens from a dev shell, so the extras are listed by hand instead.
+          rust = pkgs.rust-bin.stable.latest.minimal.override {
             extensions = [
               "rust-src"
               "rust-analyzer"

@@ -1,82 +1,54 @@
 ## Setup (VM)
 
-You can download the NixOS ISO from the
+This configuration targets one VMware Fusion VM on an Apple Silicon Mac
+(`aarch64-linux`). The flake has a single system, `nixosConfigurations.default`,
+and the Makefile builds `.#default` unless `NIXNAME` is set to something else.
+
+Download the `aarch64` NixOS ISO from the
 [official NixOS download page](https://nixos.org/download.html#nixos-iso).
-There are ISOs for both `x86_64` and `aarch64` at the time of writing this.
 
-Create a VMware Fusion VM with the following settings. My configurations
-are made for VMware Fusion exclusively currently and you will have issues
-on other virtualization solutions without minor changes.
+Create a VMware Fusion VM with these settings:
 
-- ISO: NixOS 23.05 or later.
-- Disk: SATA 150 GB+
-- CPU/Memory: I give at least half my cores and half my RAM, as much as you can.
+- ISO: NixOS 24.05 or later.
+- Disk: NVMe, 150 GB+. `make vm/bootstrap0` partitions `/dev/nvme0n1`; set
+  `HDDEV` if the disk shows up under another name.
+- CPU/Memory: at least half the cores and half the RAM.
 - Graphics: Full acceleration, full resolution, maximum graphics RAM.
-- Network: Shared with my Mac.
-- Remove sound card, remove video camera, remove printer.
-- Profile: Disable almost all keybindings
-- Boot Mode: UEFI
+- Network: Bridged, so the VM gets its own address on the local network.
+- Remove the sound card, video camera and printer.
+- Profile: Disable almost all keybindings.
+- Boot Mode: UEFI.
 
-Boot the VM, and using the graphical console, change the root password to "root":
+Boot the VM. In the graphical console, set the root password to "root":
 
 ```
 $ sudo su
 $ passwd
-# change to root
 ```
 
-At this point, verify `/dev/sda` exists. This is the expected block device
-where the Makefile will install the OS. If you setup your VM to use SATA,
-this should exist. If `/dev/nvme` or `/dev/vda` exists instead, you didn't
-configure the disk properly. Note, these other block device types work fine,
-but you'll have to modify the `bootstrap0` Makefile task to use the proper
-block device paths.
+Take a snapshot here if you want an easy retry.
 
-Also at this point, I recommend making a snapshot in case anything goes wrong.
-I usually call this snapshot "prebootstrap0". This is entirely optional,
-but it'll make it super easy to go back and retry if things go wrong.
-
-Run `ifconfig` and get the IP address of the first device. It is probably
-`192.168.58.XXX`, but it can be anything. In a terminal with this repository
-set this to the `NIXADDR` env var:
+Run `ip addr` and note the VM's address. In a terminal on the Mac, inside a
+clone of this repository:
 
 ```
 export NIXADDR=<VM ip address>
-```
-
-The Makefile assumes an Intel processor by default. If you are using an
-ARM-based processor (M1, etc.), you must change `NIXNAME` so that the ARM-based
-configuration is used:
-
-```
-export NIXNAME=vm-aarch64
-```
-
-**Other Hypervisors:** If you are using Parallels, use `vm-aarch64-prl`.
-If you are using UTM, use `vm-aarch64-utm`. Note that the environments aren't
-_exactly_ equivalent between hypervisors but they're very close and they
-all work.
-
-Perform the initial bootstrap. This will install NixOS on the VM disk image
-but will not setup any other configurations yet. This prepares the VM for
-any NixOS customization:
-
-```
 make vm/bootstrap0
 ```
 
-After the VM reboots, run the full bootstrap, this will finalize the
-NixOS customization using this configuration:
+That partitions the disk, installs a minimal NixOS with SSH enabled, and
+reboots. After the reboot, finish with this configuration:
 
 ```
 make vm/bootstrap
 ```
 
-You should have a graphical functioning dev VM.
+That copies the repository to `/nix-config` in the VM, runs
+`nixos-rebuild switch` there, copies the SSH and GPG keys over
+(`make vm/secrets`), and reboots.
 
-At this point, I never use Mac terminals ever again. I clone this repository
-in my VM and I use the other Make tasks such as `make test`, `make switch`, etc.
-to make changes my VM.
+From here on, work inside the VM. Clone this repository there and use
+`make test` and `make switch`.
 
 ## Dev Shells (devflakes)
 
@@ -91,6 +63,8 @@ Available templates:
 - `rust` — stable toolchain + clippy/rustfmt/rust-analyzer
 - `prolog` — SWI-Prolog + GUI, `prolog_ls` (wired into Nixvim via the `swipl` on
   PATH), `just`
+- `lean` — Lean 4 (`lean` + `lake`) at the version this flake pins, `just`; the
+  Lean LSP is wired into Nixvim as `leanls`
 - `standardebooks` — direnv passthrough (`.envrc` only, no `flake.nix`) that
   drops in `use flake github:ahacop/standardebooks-nix` to activate the Standard
   Ebooks `se`/`se-ext` devShell
@@ -107,7 +81,7 @@ mkdevenv ruby
 This runs `nix flake init -t ~/nixos-config#ruby` to copy the template's
 `flake.nix` into the current directory, and writes an `.envrc` containing
 `use flake` if one doesn't already exist. Swap `ruby` for `rails`, `rust`,
-`prolog`, or `standardebooks`. Run `mkdevenv` with no arguments (or `-h`) to list
+`prolog`, `lean`, or `standardebooks`. Run `mkdevenv` with no arguments (or `-h`) to list
 the available templates.
 
 ### Enter the shell
