@@ -10,6 +10,12 @@ MAKEFILE_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 # The name of the nixosConfiguration in the flake
 NIXNAME ?= default
 
+# Start the Nix evaluator with a large garbage-collector heap. Evaluating this
+# configuration allocates about 2 GB; with the default (small) initial heap the
+# collector runs many times on the way there and burns roughly a third of the
+# CPU time. 4 GB lets it run rarely. Peak memory rises to about 4 GB.
+NIX_EVAL_ENV := GC_INITIAL_HEAP_SIZE=4G
+
 # Recipes use bash features (process substitution), not plain POSIX sh.
 SHELL := bash
 
@@ -89,7 +95,7 @@ help: ## Show this help message
 clean: ## Clean old generations and garbage collect
 	sudo nix-env -p /nix/var/nix/profiles/system --delete-generations old
 	nix-collect-garbage -d
-	sudo nixos-rebuild boot --flake ".#${NIXNAME}"
+	sudo env $(NIX_EVAL_ENV) nixos-rebuild boot --flake ".#${NIXNAME}"
 	-docker system prune -a --volumes -f
 
 optimize: ## Optimize nix store
@@ -353,12 +359,18 @@ reload-shell: ## Reload the Noctalia shell config without restarting it
 	noctalia msg config-reload
 
 switch: ## Apply configuration changes (rebuilds and switches)
-	sudo nixos-rebuild switch --flake ".#${NIXNAME}"
+	sudo env $(NIX_EVAL_ENV) nixos-rebuild switch --flake ".#${NIXNAME}"
 
 # Builds the system closure and leaves a ./result link (gitignored) without
 # activating anything. `nixos-rebuild test` would activate the running system.
+#
+# Runs as root, like switch, for two reasons. Root reads and writes the store
+# directly instead of through nix-daemon, which halves evaluation time here.
+# And root keeps its own evaluation cache under /root/.cache, so a switch that
+# follows a test of the same tree skips evaluation entirely. The result link is
+# root-owned; deleting it only needs write access to this directory.
 test: ## Build the configuration without activating it
-	nixos-rebuild build --flake ".#$(NIXNAME)"
+	sudo env $(NIX_EVAL_ENV) nixos-rebuild build --flake ".#$(NIXNAME)"
 
 # =============================================================================
 # Secrets (machine-local env file, archived in 1Password — never committed)

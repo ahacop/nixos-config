@@ -181,6 +181,9 @@ in
       viAlias = true;
       vimAlias = true;
       withRuby = false;
+      # Skip the generated `man nixvim` option reference. Rendering it walks
+      # every nixvim option and costs about two seconds of every evaluation.
+      enableMan = false;
 
       # Nixvim pins its own tested nixpkgs, but we build it against the system
       # nixpkgs (single nixpkgs across the whole config). Set the source
