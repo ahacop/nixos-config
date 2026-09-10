@@ -1895,7 +1895,7 @@ in
           };
           clock = {
             type = "clock";
-            format = "{:%Y-%m-%d %H:%M:%S}";
+            format = "{:%Y-%m-%d %H:%M}";
             tooltip_format = "{:%A, %B %d, %Y}";
           };
         };
