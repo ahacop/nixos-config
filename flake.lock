@@ -132,11 +132,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789321044,
-        "narHash": "sha256-oxZ+AeGiSxVYmuOZZT55eyLstEunSHUinz1b/O/PxlQ=",
+        "lastModified": 1789323896,
+        "narHash": "sha256-jU9bU5mZ2wsa6u4IPFjStDk/miULNRAoezIwS+Jj8XQ=",
         "owner": "ahacop",
         "repo": "epub-sync",
-        "rev": "6e23e1f3c9951d21fe71ca125e92479bae80a750",
+        "rev": "a5509af61d3bdcda3856ffe97d866451318e46c2",
         "type": "github"
       },
       "original": {
