@@ -967,6 +967,14 @@ in
         tabstop = 2;
       };
 
+      # Keep lean4 out of the nvim wrapper. The lean plugin below would
+      # otherwise bake pkgs.lean4 into the wrapper ahead of the project's on
+      # PATH, which makes every nixpkgs bump a lean4 build and can run the
+      # wrong Lean version against a project's .olean files. The lean devflake
+      # provides the toolchain per project and lean.nvim finds it on PATH via
+      # direnv.
+      dependencies.lean.enable = false;
+
       plugins = {
         # lean.nvim runs the Lean language server and adds the infoview: a
         # split that shows the goal state at the cursor and updates as the
