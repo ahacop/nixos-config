@@ -56,6 +56,11 @@
       inputs.rust-overlay.follows = "rust-overlay";
     };
 
+    epub-sync = {
+      url = "github:ahacop/epub-sync";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     niri = {
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
