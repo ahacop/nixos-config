@@ -66,10 +66,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    llm-agents = {
-      url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # llm-agents keeps its own nixpkgs pin on purpose. Numtide builds and
+    # caches every agent CLI (codex is compiled from source) against that pin,
+    # so following our nixpkgs would change the store paths, miss
+    # cache.numtide.com, and compile codex locally whenever our nixpkgs moves
+    # past theirs.
+    llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
   outputs =
