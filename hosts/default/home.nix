@@ -103,13 +103,22 @@ in
   stylix.targets.firefox.profileNames = [ "default" ];
 
   # Mounts a plugged-in USB drive under /run/media/$USER, where epubsync
-  # looks for the Kobo. Eject with: udiskie-umount --detach /run/media/$USER/KOBOeReader
+  # looks for the Kobo. To eject, pick the device from the udiskie icon in
+  # the bar tray, choose it under the `/eject` launcher prefix, or run
+  # `udiskie-umount --detach /run/media/$USER/KOBOeReader`.
   services.udiskie = {
     enable = true;
     automount = true;
     notify = true;
-    tray = "never";
+    # The tray icon shows only while a removable device is present. Its
+    # menu has Unmount, Eject and Detach entries per device.
+    tray = "auto";
   };
+
+  # Makes the udiskie unit pass --appindicator, so its tray icon is a
+  # StatusNotifierItem that Noctalia's tray widget can show. The default
+  # is an X11 status icon, which is invisible under Wayland.
+  xsession.preferStatusNotifierItems = true;
 
   programs = {
     yazi = {
@@ -1938,6 +1947,19 @@ in
             command = "printf '%s\\n' 'Clipboard: Sync from Host (sf)' 'Clipboard: Sync to Host (st)' 'Display: 1920x1080' 'Display: 7680x3200' 'Dictate: toggle'";
             exec = ''case "{selection}" in "Clipboard: Sync from Host (sf)") wl-copy -n < /host/ahacop/clipboard.txt && notify-send "Clipboard synced from host" ;; "Clipboard: Sync to Host (st)") wl-paste -n > /host/ahacop/clipboard.txt && notify-send "Clipboard synced to host" ;; "Display: 1920x1080") niri msg output Virtual-1 mode 1920x1080@60.000 ;; "Display: 7680x3200") niri msg output Virtual-1 mode 7680x3200@60.000 ;; "Dictate: toggle") whisper-dictate ;; esac'';
           };
+
+          # Removable drives to eject, reached with `/eject` or from the
+          # global search. Each choice is a mount path such as
+          # /run/media/ahacop/KOBOeReader. Picking one unmounts the drive
+          # and powers it off, the same as `udiskie-umount --detach`.
+          dmenu.entry.eject = {
+            label = "Eject";
+            prefix = "/eject";
+            glyph = "usb";
+            global = true;
+            command = "${pkgs.udiskie}/bin/udiskie-info -a -f is_mounted -f is_external -o '{mount_path}'";
+            exec = ''${pkgs.udiskie}/bin/udiskie-umount --detach "{selection}" && notify-send "Ejected {selection}"'';
+          };
         };
       };
     };
@@ -2269,6 +2291,7 @@ in
         pomodoro
         presenterm
         sdcv
+        udiskie # puts udiskie-umount and udiskie-info on the PATH; the daemon is services.udiskie above
         vale
         websters-1913-stardict
         whisper-dictate
