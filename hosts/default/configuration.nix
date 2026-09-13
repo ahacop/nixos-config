@@ -648,6 +648,10 @@ in
   # uses it, and it pulls in espeak-ng and the mbrola voices, about 2.3G.
   services.speechd.enable = false;
 
+  # Mounts USB drives such as the Kobo. udiskie in home.nix mounts them
+  # under /run/media/$USER on plug-in, where epubsync looks for the device.
+  services.udisks2.enable = true;
+
   # Local dictionary server
   services.dictd = {
     enable = true;

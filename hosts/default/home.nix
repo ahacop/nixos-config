@@ -102,6 +102,15 @@ in
 {
   stylix.targets.firefox.profileNames = [ "default" ];
 
+  # Mounts a plugged-in USB drive under /run/media/$USER, where epubsync
+  # looks for the Kobo. Eject with: udiskie-umount --detach /run/media/$USER/KOBOeReader
+  services.udiskie = {
+    enable = true;
+    automount = true;
+    notify = true;
+    tray = "never";
+  };
+
   programs = {
     yazi = {
       enable = true;
