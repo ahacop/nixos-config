@@ -98,8 +98,10 @@
         "claude-code"
         "codex"
         "crit"
+        "herdr"
         "hunk"
         "pi"
+        "plannotator"
       ];
       # The llm-agents.nix package set for our system, resolved once and shared
       # by the llmAgents output (for the Makefile) and home.nix (the installed
