@@ -354,6 +354,71 @@ in
             end,
           }):find()
         end
+
+        -- Telescope picker for the Lean unicode abbreviations that lean.nvim
+        -- expands after a backslash. Each row is one symbol with every name
+        -- that types it, shortest name first. The search matches the symbol
+        -- and the names. Enter puts the symbol after the cursor.
+        --
+        -- The picker reads lean.nvim's abbreviations.json from the runtimepath.
+        -- require("lean.abbreviations").load() is not usable here: it finds the
+        -- file relative to the calling file, so a call from init.lua fails.
+        function _G.telescope_lean_symbols()
+          local pickers = require("telescope.pickers")
+          local finders = require("telescope.finders")
+          local conf = require("telescope.config").values
+          local actions = require("telescope.actions")
+          local action_state = require("telescope.actions.state")
+
+          local path = vim.api.nvim_get_runtime_file("vscode-lean/abbreviations.json", false)[1]
+          if not path then
+            vim.notify("lean.nvim abbreviations.json not found", vim.log.levels.ERROR)
+            return
+          end
+          local abbreviations = vim.json.decode(table.concat(vim.fn.readfile(path), "\n"))
+
+          local names_by_symbol = {}
+          for name, symbol in pairs(abbreviations) do
+            names_by_symbol[symbol] = names_by_symbol[symbol] or {}
+            table.insert(names_by_symbol[symbol], name)
+          end
+
+          local rows = {}
+          for symbol, names in pairs(names_by_symbol) do
+            table.sort(names, function(a, b)
+              if #a ~= #b then return #a < #b end
+              return a < b
+            end)
+            local typed = vim.tbl_map(function(name) return "\\" .. name end, names)
+            table.insert(rows, { symbol = symbol, text = table.concat(typed, "  ") })
+          end
+          table.sort(rows, function(a, b) return a.text < b.text end)
+
+          pickers.new({}, {
+            prompt_title = "Lean Symbols",
+            finder = finders.new_table({
+              results = rows,
+              entry_maker = function(row)
+                return {
+                  value = row.symbol,
+                  display = row.symbol .. "  " .. row.text,
+                  ordinal = row.symbol .. " " .. row.text,
+                }
+              end,
+            }),
+            sorter = conf.generic_sorter({}),
+            attach_mappings = function(prompt_bufnr)
+              actions.select_default:replace(function()
+                local selection = action_state.get_selected_entry()
+                actions.close(prompt_bufnr)
+                if selection then
+                  vim.api.nvim_put({ selection.value }, "c", true, true)
+                end
+              end)
+              return true
+            end,
+          }):find()
+        end
       '';
 
       userCommands = {
@@ -494,6 +559,15 @@ in
           options = {
             silent = true;
             desc = "WordNet thesaurus (Telescope)";
+          };
+        }
+        {
+          action.__raw = "function() _G.telescope_lean_symbols() end";
+          key = "<leader>lu";
+          mode = "n";
+          options = {
+            silent = true;
+            desc = "Lean unicode symbols (Telescope)";
           };
         }
         {
