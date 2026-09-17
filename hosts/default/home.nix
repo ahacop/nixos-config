@@ -2372,7 +2372,10 @@ in
         zathura
       ]);
     sessionVariables = {
-      PAGER = "less -FirSwX";
+      PAGER = "less";
+      # Read by every less invocation, not only the ones started through
+      # PAGER. -X keeps the output on screen after less exits.
+      LESS = "-FirSwX";
       # Ollama runs on the Mac host. Resolved via mDNS (avahi enabled in
       # configuration.nix) so it survives the host's IP changing.
       OLLAMA_HOST = "http://chunky-peanut-butter.local:11434";
