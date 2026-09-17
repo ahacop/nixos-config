@@ -101,6 +101,7 @@ let
 in
 {
   stylix.targets.firefox.profileNames = [ "default" ];
+  stylix.targets.rofi.enable = false;
 
   # Mounts a plugged-in USB drive under /run/media/$USER, where epubsync
   # looks for the Kobo. To eject, pick the device from the udiskie icon in
