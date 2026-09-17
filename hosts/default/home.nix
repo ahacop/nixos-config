@@ -1081,6 +1081,12 @@ in
             lsp.enable = true;
             mappings = true;
             infoview.autoopen = true;
+            # Turn off Kitty graphics inside tmux. At startup lean.nvim sends
+            # a Kitty graphics query (`\e_Gi=99999,...`), and tmux takes that
+            # text as the pane title, so it shows in the status bar.
+            # tui/html.lua still loads kitty.lua without this check, so the
+            # infoview can still send the query when it draws HTML.
+            graphics.enabled.__raw = "vim.env.TMUX == nil";
           };
         };
         render-markdown.enable = true;
