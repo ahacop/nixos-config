@@ -2441,6 +2441,38 @@ in
   };
 
   xdg.enable = true;
+
+  xdg.configFile."ghostty/tabbar.css".text = ''
+    tabbar tabbox {
+      min-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    tabbar tab {
+      min-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      font-size: 0.85em;
+    }
+
+    tabbar tab button.image-button {
+      min-height: 12px;
+      min-width: 12px;
+    }
+
+    tabbar .start-action,
+    tabbar .end-action {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    tabbar .box {
+      min-height: 0;
+      padding: 0;
+    }
+  '';
+
   xdg.desktopEntries.nvim-ghostty = {
     name = "Neovim";
     genericName = "Text Editor";
