@@ -45,6 +45,59 @@ let
     '';
   };
 
+  nirisnap = pkgs.stdenv.mkDerivation {
+    pname = "nirisnap";
+    version = "1.1.0-unstable-2026-09-17";
+
+    src = pkgs.fetchFromGitHub {
+      owner = "sergionoodles";
+      repo = "nirisnap";
+      rev = "d1b8f4677db7a67fb2c0348f2b02c0892f320764";
+      hash = "sha256-pkgYfxuJz9lYDVvL9PaYkgNOpR6Rn35txBLDwlboEo8=";
+    };
+
+    nativeBuildInputs = with pkgs; [
+      cmake
+      ninja
+      pkg-config
+      wayland-scanner
+      qt6Packages.wrapQtAppsHook
+    ];
+
+    buildInputs = with pkgs; [
+      qt6.qtbase
+      qt6.qtwayland
+      kdePackages.layer-shell-qt
+      wayland
+    ];
+
+    cmakeFlags = [ "-DBUILD_TESTING=OFF" ];
+
+    # nirisnap runs these as child processes and looks them up on PATH:
+    # wl-copy/wl-paste for the clipboard, tesseract for OCR, notify-send for
+    # the capture-finished notification. It also runs `niri msg`, which comes
+    # from the session's own niri on PATH.
+    qtWrapperArgs = [
+      "--prefix PATH : ${
+        lib.makeBinPath (
+          with pkgs;
+          [
+            wl-clipboard
+            libnotify
+            (tesseract5.override { enableLanguages = [ "eng" ]; })
+          ]
+        )
+      }"
+    ];
+
+    meta = {
+      description = "Native Wayland screenshot and annotation overlay for niri";
+      homepage = "https://github.com/sergionoodles/nirisnap";
+      license = lib.licenses.mit;
+      mainProgram = "nirisnap";
+    };
+  };
+
   whisper-dictate = pkgs.writeShellApplication {
     name = "whisper-dictate";
     runtimeInputs = with pkgs; [
@@ -2315,8 +2368,13 @@ in
 
         "Mod+Shift+X".action = quit;
 
-        "Mod+P".action.screenshot = [ ];
-        "Mod+Ctrl+P".action.screenshot-screen = [ ];
+        # nirisnap has no window mode, so window capture stays on niri's
+        # built-in screenshot action.
+        "Mod+P".action = spawn "nirisnap";
+        "Mod+Ctrl+P".action = spawn [
+          "nirisnap"
+          "--capture-fullscreen"
+        ];
         "Mod+Alt+P".action.screenshot-window = [ ];
 
         "Mod+Shift+P".action = power-off-monitors;
@@ -2369,6 +2427,7 @@ in
         inputs.epub-sync.packages.${pkgs.stdenv.hostPlatform.system}.default
         # inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
         mermaid-cli
+        nirisnap
         pomodoro
         presenterm
         sdcv
