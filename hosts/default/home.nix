@@ -2046,6 +2046,8 @@ in
           bluetooth = false;
         };
 
+        plugins.enabled = [ "ahmedhossamdev/timezone-hub" ];
+
         bar = {
           order = [ "default" ];
           default = {
@@ -2115,6 +2117,7 @@ in
             type = "clock";
             format = "{:%Y-%m-%d %H:%M}";
             tooltip_format = "{:%A, %B %d, %Y}";
+            actions.right = "panel-toggle ahmedhossamdev/timezone-hub:panel";
           };
         };
 
