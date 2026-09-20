@@ -2441,6 +2441,23 @@ in
   };
 
   xdg.enable = true;
+  xdg.desktopEntries.nvim-ghostty = {
+    name = "Neovim";
+    genericName = "Text Editor";
+    exec = "ghostty -e nvim %F";
+    icon = "nvim";
+    terminal = false;
+    categories = [
+      "Utility"
+      "TextEditor"
+    ];
+    mimeType = [
+      "text/plain"
+      "text/markdown"
+      "text/x-shellscript"
+    ];
+  };
+
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
@@ -2448,6 +2465,9 @@ in
       "application/xhtml+xml" = [ "firefox.desktop" ];
       "application/pdf" = [ "org.pwmt.zathura.desktop" ];
       "application/epub+zip" = [ "com.github.johnfactotum.Foliate.desktop" ];
+      "text/plain" = [ "nvim-ghostty.desktop" ];
+      "text/markdown" = [ "nvim-ghostty.desktop" ];
+      "text/x-shellscript" = [ "nvim-ghostty.desktop" ];
     };
   };
 
