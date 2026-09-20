@@ -2046,7 +2046,7 @@ in
           bluetooth = false;
         };
 
-        plugins.enabled = [ "ahmedhossamdev/timezone-hub" ];
+        plugins.enabled = [ "ahacop/timezone-grid" ];
 
         bar = {
           order = [ "default" ];
@@ -2117,7 +2117,7 @@ in
             type = "clock";
             format = "{:%Y-%m-%d %H:%M}";
             tooltip_format = "{:%A, %B %d, %Y}";
-            actions.right = "panel-toggle ahmedhossamdev/timezone-hub:panel";
+            actions.right = "panel-toggle ahacop/timezone-grid:panel";
           };
         };
 
@@ -2441,6 +2441,10 @@ in
   };
 
   xdg.enable = true;
+
+  # Noctalia scans this directory for plugins that come from neither the
+  # official nor the community repo.
+  xdg.dataFile."noctalia/plugins/timezone-grid".source = ./../../plugins/timezone-grid;
 
   xdg.configFile."ghostty/tabbar.css".text = ''
     tabbar tabbox {

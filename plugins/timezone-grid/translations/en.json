@@ -1,0 +1,48 @@
+{
+  "legend": {
+    "date-change": "date change",
+    "night": "night"
+  },
+  "panel": {
+    "add": "Add a city",
+    "detecting": "Detecting the device timezone…",
+    "empty": "No cities yet. Press + to add one.",
+    "open-settings": "Open plugin settings",
+    "title": "Timezone Grid"
+  },
+  "picker": {
+    "back": "Back",
+    "empty": "No matching timezones",
+    "loading": "Loading the timezone database…",
+    "search-placeholder": "Search a city or region…",
+    "title": "Add a city"
+  },
+  "row": {
+    "device": "device",
+    "drag-tooltip": "Drag to reorder",
+    "remove": "Remove this city",
+    "same-time": "same time"
+  },
+  "settings": {
+    "date-format": "Date format",
+    "date-format-iso": "2026-09-20",
+    "date-format-short": "Sep 20",
+    "date-format-weekday": "Sun, Sep 20",
+    "format-12h": "12-hour",
+    "format-24h": "24-hour",
+    "highlight-work-hours": "Shade work hours",
+    "time-format": "Time format",
+    "work-hour-end": "Work hours end",
+    "work-hour-start": "Work hours start",
+    "work-hour-end-desc": "The first hour that is no longer shaded.",
+    "work-hour-start-desc": "The first hour that is shaded.",
+    "work-hours-range": "Work hours"
+  },
+  "toast": {
+    "duplicate": "\"{zone}\" is already on the grid",
+    "empty-list": "No cities on the grid",
+    "full": "The grid holds {count} cities",
+    "invalid": "\"{zone}\" is not a valid IANA timezone",
+    "title": "Timezone Grid"
+  }
+}

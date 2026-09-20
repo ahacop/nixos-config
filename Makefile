@@ -64,7 +64,7 @@ LLM_AGENTS_SYSTEM := aarch64-linux
 .DEFAULT_GOAL := help
 
 # Phony targets
-.PHONY: help clean optimize check-versions upgrade-agents upgrade-all reload-shell switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
+.PHONY: help clean optimize check-versions upgrade-agents upgrade-all reload-shell restart-shell switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
 .PHONY: disk-status gc-roots docker-volumes stale-results stale-direnvs bloated-direnvs clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean-docker-layers clean-all
 .PHONY: secrets/backup secrets/restore
 
@@ -73,7 +73,7 @@ help: ## Show this help message
 	@echo 'Usage: make [target]'
 	@echo ''
 	@echo 'Configuration Management:'
-	@grep -E '^(switch|test|optimize|clean|reload-shell):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+	@grep -E '^(switch|test|optimize|clean|reload-shell|restart-shell):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 	@echo ''
 	@echo 'Disk Cleanup (use STALE_DAYS=N to adjust threshold, default 30):'
 	@grep -E '^(disk-status|gc-roots|docker-volumes|stale-[a-z]+|bloated-[a-z]+|clean-[a-z-]+):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
@@ -357,6 +357,17 @@ upgrade-all: ## Update all flake inputs and rebuild the "Update flake" and "Upda
 
 reload-shell: ## Reload the Noctalia shell config without restarting it
 	noctalia msg config-reload
+
+# A config reload registers plugin panels and starts plugin services only when
+# the [plugins] section changed, so a plugin whose directory appeared after the
+# reload stays loaded but dead. A restart picks it up. The pattern matches the
+# process name, which is the Nix wrapper `.noctalia-wrapp`, not `noctalia`.
+restart-shell: ## Restart the Noctalia shell (needed after adding a plugin)
+	-@pkill '^\.?noctalia'
+	@sleep 2; setsid noctalia -d >/dev/null 2>&1 </dev/null & sleep 3; \
+	  pgrep '^\.?noctalia' >/dev/null \
+	    && echo "noctalia restarted" \
+	    || { echo "noctalia did not come back up" >&2; exit 1; }
 
 switch: ## Apply configuration changes (rebuilds and switches)
 	sudo env $(NIX_EVAL_ENV) nixos-rebuild switch --flake ".#${NIXNAME}"

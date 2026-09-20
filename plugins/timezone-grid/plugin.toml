@@ -1,0 +1,74 @@
+# Timezone Grid — a worldtimebuddy-style hour grid for Noctalia. Every city
+# gets one 24-hour band for the same local day, so a column is the same
+# instant in every row.
+
+id           = "ahacop/timezone-grid"
+name         = "Timezone Grid"
+version      = "1.0.0"
+plugin_api   = 24
+author       = "ahacop"
+license      = "MIT"
+icon         = "world"
+description  = "Compare cities on a 24-hour grid. One band per city, columns aligned to the same instant, with work hours shaded and the current hour marked."
+tags         = ["clock", "time", "utility"]
+dependencies = ["timedatectl"]
+
+[[panel]]
+id              = "panel"
+entry           = "panel.luau"
+width           = 990
+height          = 560
+placement       = "attached"
+position        = "auto"
+open_near_click = true
+
+[[service]]
+id    = "service"
+entry = "service.luau"
+
+[[setting]]
+key       = "time_format"
+type      = "select"
+label_key = "settings.time-format"
+default   = "24h"
+options   = [
+  { value = "24h", label_key = "settings.format-24h" },
+  { value = "12h", label_key = "settings.format-12h" },
+]
+
+[[setting]]
+key       = "date_format"
+type      = "select"
+label_key = "settings.date-format"
+default   = "weekday"
+options   = [
+  { value = "weekday", label_key = "settings.date-format-weekday" },
+  { value = "short",   label_key = "settings.date-format-short" },
+  { value = "iso",     label_key = "settings.date-format-iso" },
+]
+
+[[setting]]
+key       = "highlight_work_hours"
+type      = "bool"
+label_key = "settings.highlight-work-hours"
+default   = true
+
+[[setting]]
+key             = "work_hour_start"
+type            = "int"
+label_key       = "settings.work-hours-range"
+description_key = "settings.work-hour-start-desc"
+default         = 9
+min             = 0
+max             = 23
+visible_when    = { key = "highlight_work_hours", values = ["true"] }
+
+[[setting]]
+key             = "work_hour_end"
+type            = "int"
+label_key       = "settings.work-hours-range"
+description_key = "settings.work-hour-end-desc"
+default         = 18
+min             = 1
+max             = 24
+visible_when    = { key = "highlight_work_hours", values = ["true"] }
