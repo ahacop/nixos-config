@@ -1979,6 +1979,11 @@ in
         bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
         bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
 
+        # prefix ] pastes the Wayland clipboard, which clipway keeps in sync
+        # with the Mac. It loads the clipboard into the tmux buffer first, so
+        # text copied on the host pastes the same as text yanked in tmux.
+        bind-key ] run-shell "wl-paste -n | tmux load-buffer - ; tmux paste-buffer -p"
+
         bind '"' split-window -v -c "#{pane_current_path}"
         bind % split-window -h -c "#{pane_current_path}"
         bind-key c new-window -c '#{pane_current_path}'
@@ -2133,11 +2138,8 @@ in
             prefix = "/cmd";
             glyph = "terminal";
             global = true;
-            # The two clipboard lines keep the "(sf)" and "(st)" suffixes the
-            # old .desktop files carried, so typing sf or st still selects
-            # them. `global` puts them in the unprefixed search as well.
-            command = "printf '%s\\n' 'Clipboard: Sync from Host (sf)' 'Clipboard: Sync to Host (st)' 'Display: 1920x1080' 'Display: 7680x3200' 'Dictate: toggle'";
-            exec = ''case "{selection}" in "Clipboard: Sync from Host (sf)") wl-copy -n < /host/ahacop/clipboard.txt && notify-send "Clipboard synced from host" ;; "Clipboard: Sync to Host (st)") wl-paste -n > /host/ahacop/clipboard.txt && notify-send "Clipboard synced to host" ;; "Display: 1920x1080") niri msg output Virtual-1 mode 1920x1080@60.000 ;; "Display: 7680x3200") niri msg output Virtual-1 mode 7680x3200@60.000 ;; "Dictate: toggle") whisper-dictate ;; esac'';
+            command = "printf '%s\\n' 'Display: 1920x1080' 'Display: 7680x3200' 'Dictate: toggle'";
+            exec = ''case "{selection}" in "Display: 1920x1080") niri msg output Virtual-1 mode 1920x1080@60.000 ;; "Display: 7680x3200") niri msg output Virtual-1 mode 7680x3200@60.000 ;; "Dictate: toggle") whisper-dictate ;; esac'';
           };
 
           # Removable drives to eject, reached with `/eject` or from the

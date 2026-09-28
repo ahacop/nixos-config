@@ -77,6 +77,14 @@
     # cache.numtide.com, and compile codex locally whenever our nixpkgs moves
     # past theirs.
     llm-agents.url = "github:numtide/llm-agents.nix";
+
+    # Patches open-vm-tools with a Wayland clipboard backend and runs the
+    # vmtoolsd user daemon, so copy and paste works between the Mac and niri.
+    # It patches our own open-vm-tools, so it follows our nixpkgs.
+    clipway = {
+      url = "github:krisztianfekete/clipway";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -158,6 +166,7 @@
         modules = [
           ./hosts/default/configuration.nix
           inputs.stylix.nixosModules.stylix
+          inputs.clipway.nixosModules.default
           home-manager.nixosModules.default
           {
             nixpkgs.overlays = [

@@ -125,6 +125,26 @@
         "type": "github"
       }
     },
+    "clipway": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790254865,
+        "narHash": "sha256-N21uHNF8slFxThvCcKKFGQCMfc4lJ514yZADrfpyy2g=",
+        "owner": "krisztianfekete",
+        "repo": "clipway",
+        "rev": "b449f3dfb82e7e84fac20083d75c29b24b591457",
+        "type": "github"
+      },
+      "original": {
+        "owner": "krisztianfekete",
+        "repo": "clipway",
+        "type": "github"
+      }
+    },
     "epub-sync": {
       "inputs": {
         "nixpkgs": [
@@ -623,6 +643,7 @@
     "root": {
       "inputs": {
         "aoc-cli": "aoc-cli",
+        "clipway": "clipway",
         "epub-sync": "epub-sync",
         "erwindb": "erwindb",
         "home-manager": "home-manager",

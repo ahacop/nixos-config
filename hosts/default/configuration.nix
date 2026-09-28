@@ -369,6 +369,10 @@ in
     # List packages installed in system profile. To search, run:
     # $ nix search wget
     systemPackages = with pkgs; [
+      # clipway's vmtoolsd -n vmusr starts GTK on X11 and exits with "cannot
+      # open display" when DISPLAY is not set. niri starts xwayland-satellite
+      # on demand when it is on PATH, and sets DISPLAY.
+      xwayland-satellite
       _1password-cli
       aspell
       aspellDicts.en
@@ -599,9 +603,18 @@ in
   # open-vm-tools: vmtoolsd for host integration, plus the vmhgfs-fuse helper
   # for the /host mount below. No X server is configured, so the module picks
   # the headless package, which leaves out vmware-user and the vmblock mount.
-  # Both are X11-only and do nothing under niri. Clipboard sharing goes
-  # through the /host file instead (sf/st in the launcher).
+  # Both are X11-only and do nothing under niri.
   virtualisation.vmware.guest.enable = true;
+
+  # clipway: host/guest clipboard sync under niri. It patches open-vm-tools
+  # with a Wayland backend and runs `vmtoolsd -n vmusr` as a user service.
+  # niri.service binds graphical-session.target, so the daemon starts with
+  # the session. It syncs plain text only. If the clipboard does not sync,
+  # set `virtualisation.vmware.guest.headless = false`.
+  services.clipway = {
+    enable = true;
+    target = "graphical-session.target";
+  };
 
   # The /host HGFS mount uses `auto_unmount`, so the libfuse3 `vmhgfs-fuse`
   # daemon needs `fusermount3` (fuse3) at mount time, and `mount` needs

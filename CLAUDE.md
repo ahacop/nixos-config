@@ -96,7 +96,7 @@ When formatting Nix in this repo, match the existing two-space style; Nixvim for
 
 - The upstream NixOS `virtualisation.vmware.guest` module in headless mode (no X server): vmtoolsd plus the HGFS mount helper, no vmware-user
 - Host filesystem mounted at `/host` for file sharing
-- Clipboard sync commands ("sf"/"st") move the clipboard to/from the host file (`/host/ahacop/clipboard.txt`) on demand; they live in the Noctalia launcher, reachable by typing sf/st or under the `/cmd` prefix
+- clipway (flake input) patches `open-vm-tools` with a Wayland clipboard backend and runs `vmtoolsd -n vmusr` as a user service, so the clipboard syncs with the Mac. It needs an X display at startup, which `xwayland-satellite` provides. Copy and paste must be on in the VM's Fusion Isolation settings. In tmux, prefix `]` pastes the Wayland clipboard
 
 ### Theme System (Stylix)
 
