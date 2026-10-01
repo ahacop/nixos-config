@@ -4,6 +4,12 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
+    # Supplies the kernel only, so the kernel stays on Linux 7.2.6 while the
+    # rest of the system follows nixos-unstable. The rev is in the URL, so
+    # `nix flake update` does not move it. configuration.nix reads
+    # linuxPackages_latest from this input.
+    nixpkgs-kernel.url = "github:nixos/nixpkgs/2e032a04454b525daa6c6651264aaa5d3e98cf54";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";

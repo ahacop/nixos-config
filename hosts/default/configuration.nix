@@ -165,8 +165,9 @@ in
   };
 
   boot = {
-    # Use the latest kernel from nixpkgs
-    kernelPackages = pkgs.linuxPackages_latest;
+    # Linux 7.2.6, from the nixpkgs-kernel input in flake.nix.
+    kernelPackages =
+      inputs.nixpkgs-kernel.legacyPackages.${pkgs.stdenv.hostPlatform.system}.linuxPackages_latest;
     loader = {
       # Use the systemd-boot EFI boot loader.
       systemd-boot.enable = true;
