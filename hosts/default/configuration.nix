@@ -331,6 +331,41 @@ in
       enable = true;
       nssmdns4 = true;
     };
+
+    # CUPS. The printers are declared in hardware.printers, so cups-browsed is
+    # off; it would otherwise add a second queue for every printer it finds.
+    printing = {
+      enable = true;
+      browsed.enable = false;
+      # The PPD for the Brother, made with `driverless cat <device URI>` from
+      # cups-filters. It tells CUPS to convert each job to Apple Raster (URF),
+      # because the printer reads URF and PWG raster but not PDF. A model of
+      # "everywhere" would ask the printer again each time CUPS starts, and
+      # CUPS would fail to start while the printer is off.
+      drivers = [
+        (pkgs.runCommand "brother-hl-l2350dw-ppd" { } ''
+          install -Dm644 ${./printers/brother-hl-l2350dw.ppd} $out/share/cups/model/brother-hl-l2350dw.ppd
+        '')
+      ];
+    };
+  };
+
+  # The Brother laser on the home wifi. It speaks IPP and needs no vendor
+  # driver. The .local name comes from Avahi and survives a new DHCP lease.
+  # compression=none stops the CUPS IPP backend from sending gzip. The
+  # printer advertises gzip, but it can reject a gzip job partway through
+  # with document-format-error and print nothing.
+  hardware.printers = {
+    ensurePrinters = [
+      {
+        name = "Brother_HL_L2350DW_series";
+        description = "Brother HL-L2350DW";
+        deviceUri = "ipp://BRW00410EE401FE.local/ipp/print?compression=none";
+        model = "brother-hl-l2350dw.ppd";
+        ppdOptions.Duplex = "DuplexNoTumble";
+      }
+    ];
+    ensureDefaultPrinter = "Brother_HL_L2350DW_series";
   };
 
   users.mutableUsers = true;
@@ -495,6 +530,37 @@ in
         # Convert first 8 hex chars to decimal and modulo by number of sounds
         INDEX=$(( 0x''${HASH:0:8} % ''${#SOUNDS[@]} ))
         echo "''${SOUNDS[$INDEX]}"
+      '')
+
+      # Print text files with the filename, date and page number at the top of
+      # each page. paps lays out the text with Pango, so UTF-8 box-drawing
+      # characters print; the plain CUPS text filter drops them. Extra lp
+      # options go before the files: print-text -n 2 notes.txt
+      (writeShellScriptBin "print-text" ''
+        set -euo pipefail
+
+        lp_args=()
+        while [ $# -gt 0 ] && [[ "$1" == -* ]]; do
+          lp_args+=("$1")
+          if [[ "$1" == -[ndoP] ]]; then
+            lp_args+=("$2")
+            shift
+          fi
+          shift
+        done
+
+        if [ $# -eq 0 ]; then
+          echo "Usage: print-text [lp options] FILE..." >&2
+          exit 1
+        fi
+
+        for file in "$@"; do
+          ${pkgs.paps}/bin/paps \
+            --format=pdf --paper=a4 --font="Monospace 10" \
+            --header --header-left="$(${pkgs.coreutils}/bin/date +%F)" \
+            --title="$(${pkgs.coreutils}/bin/basename "$file")" \
+            "$file" | ${pkgs.cups}/bin/lp -t "$(${pkgs.coreutils}/bin/basename "$file")" "''${lp_args[@]}"
+        done
       '')
 
       # Copy latest screenshot(s) from Desktop to current directory
