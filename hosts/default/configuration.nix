@@ -563,6 +563,48 @@ in
         done
       '')
 
+      # Print prose as a typeset document: reflowed paragraphs in Libertinus
+      # Serif, with headings and lists. A .md file goes to pandoc as it is.
+      # Any other file goes through transcript-to-markdown.awk first, which
+      # undoes the 80-column wrap of a Claude Code transcript. Typst sets the
+      # type and has the font built in. Extra lp options go before the files:
+      # print-doc -n 2 first-pass.txt
+      (writeShellScriptBin "print-doc" ''
+        set -euo pipefail
+
+        lp_args=()
+        while [ $# -gt 0 ] && [[ "$1" == -* ]]; do
+          lp_args+=("$1")
+          if [[ "$1" == -[ndoP] ]]; then
+            lp_args+=("$2")
+            shift
+          fi
+          shift
+        done
+
+        if [ $# -eq 0 ]; then
+          echo "Usage: print-doc [lp options] FILE..." >&2
+          exit 1
+        fi
+
+        tmp=$(${pkgs.coreutils}/bin/mktemp -d)
+        trap '${pkgs.coreutils}/bin/rm -rf "$tmp"' EXIT
+
+        for file in "$@"; do
+          name=$(${pkgs.coreutils}/bin/basename "$file")
+          if [[ "$file" == *.md ]]; then
+            ${pkgs.coreutils}/bin/cp "$file" "$tmp/doc.md"
+          else
+            ${pkgs.gawk}/bin/awk -f ${./print-doc/transcript-to-markdown.awk} "$file" > "$tmp/doc.md"
+          fi
+          ${pkgs.pandoc}/bin/pandoc "$tmp/doc.md" -o "$tmp/doc.pdf" \
+            --pdf-engine=${pkgs.typst}/bin/typst \
+            -V papersize=a4 -V margin.x=2.5cm -V margin.y=2.5cm \
+            -V mainfont="Libertinus Serif" -V fontsize=11pt
+          ${pkgs.cups}/bin/lp -t "$name" "''${lp_args[@]}" "$tmp/doc.pdf"
+        done
+      '')
+
       # Copy latest screenshot(s) from Desktop to current directory
       (writeShellScriptBin "copy-screenshot" ''
         set -euo pipefail
