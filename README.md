@@ -65,9 +65,12 @@ Available templates:
   PATH), `just`
 - `lean` — Lean 4 (`lean` + `lake`) at the version this flake pins, `just`; the
   Lean LSP is wired into Nixvim as `leanls`
-- `standardebooks` — direnv passthrough (`.envrc` only, no `flake.nix`) that
-  drops in `use flake github:ahacop/standardebooks-nix` to activate the Standard
-  Ebooks `se`/`se-ext` devShell
+
+For a Standard Ebooks book, run `se-new --author "…" --title "…"` instead. It
+runs `se-ext new` from the
+[standardebooks-nix](https://github.com/ahacop/standardebooks-nix) flake, which
+creates the book and adds an `.envrc` for that flake. `se-init` adds the same
+files to a book that already exists.
 
 ### Initialize a new project
 
@@ -81,7 +84,7 @@ mkdevenv ruby
 This runs `nix flake init -t ~/nixos-config#ruby` to copy the template's
 `flake.nix` into the current directory, and writes an `.envrc` containing
 `use flake` if one doesn't already exist. Swap `ruby` for `rails`, `rust`,
-`prolog`, `lean`, or `standardebooks`. Run `mkdevenv` with no arguments (or `-h`) to list
+`prolog`, or `lean`. Run `mkdevenv` with no arguments (or `-h`) to list
 the available templates.
 
 ### Enter the shell

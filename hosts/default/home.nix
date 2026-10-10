@@ -1782,6 +1782,8 @@ in
         showtodos = "git grep -l TODO | xargs -n1 git blame --show-email -f | grep TODO  | sed -E 's/[[:blank:]]+/ /g' | sort -k 4";
         res-low = "niri msg output Virtual-1 mode 1920x1080@60.000";
         res-default = "niri msg output Virtual-1 mode 7680x3200@60.000";
+        se-new = "nix run github:ahacop/standardebooks-nix -- new";
+        se-init = "nix run github:ahacop/standardebooks-nix -- init";
       };
       initContent = ''
         # Tell zsh-completion-sync to pass -i to compinit (ignore insecure directories)

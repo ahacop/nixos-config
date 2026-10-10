@@ -82,13 +82,13 @@ Uses Niri (scrollable-tiling Wayland compositor) with:
 
 - **Nixvim** - Neovim configured via Nix with LSP support (Ruby, Go, TypeScript, Bash, Nix, etc.)
 - **direnv + nix-direnv** - Automatic environment switching for project-specific shells
+- **Standard Ebooks** - The `se-new` and `se-init` shell aliases in `home.nix` run `se-ext new` and `se-ext init` from the [standardebooks-nix](https://github.com/ahacop/standardebooks-nix) flake. `se-new` takes `se create-draft` options and creates a book; `se-init` adds `.envrc`, `Justfile` and `CLAUDE.md` to an existing book
 - **devflakes/** - Language-specific dev shells, also exposed as flake `templates` (use `nix flake init -t ~/nixos-config#<name>` in a new project):
   - `ruby` - Pinned Ruby + bundler/gem build deps
   - `rails` - Ruby + postgres, node, vips, flyctl, etc.
   - `rust` - Stable toolchain + clippy/rustfmt/rust-analyzer
   - `prolog` - SWI-Prolog + GUI, `prolog_ls` (wired into Nixvim via the swipl on PATH), `just`
   - `lean` - Lean 4 (`lean` + `lake`) at the version this flake pins, `just`; Nixvim runs the lean.nvim plugin (`plugins.lean` in `home.nix`), which starts `lake serve` from the shell and opens the goal-state infoview
-  - `standardebooks` - direnv passthrough (`.envrc` only, no `flake.nix`); drops in `use flake github:ahacop/standardebooks-nix` to activate the Standard Ebooks `se`/`se-ext` devShell
 
 When formatting Nix in this repo, match the existing two-space style; Nixvim formats Nix on save via none-ls (`nixfmt`) with `statix` diagnostics, and `nix fmt` runs the same nixfmt.
 

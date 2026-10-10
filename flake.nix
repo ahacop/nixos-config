@@ -161,10 +161,6 @@
           path = ./devflakes/lean;
           description = "Lean 4 dev shell (lean + lake, pinned by this flake)";
         };
-        standardebooks = {
-          path = ./devflakes/standardebooks;
-          description = "Standard Ebooks (.envrc → use flake github:ahacop/standardebooks-nix)";
-        };
       };
 
       nixosConfigurations.default = nixpkgs.lib.nixosSystem {
