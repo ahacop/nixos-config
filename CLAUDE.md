@@ -40,6 +40,14 @@ The Makefile has a dedicated cleanup group. Override `STALE_DAYS=N` (default 30)
 - `make upgrade-all` (`scripts/upgrade-all.sh`) - Update every flake input and rewrite the tip of the branch into two commits: `Update flake` for all inputs except `llm-agents`, then `Update agents` for `llm-agents` on top. It drops whichever of those two commits is already at the tip and builds them again from the current inputs, so `flake.lock` is regenerated instead of merged. It refuses to run on a dirty tree, and stops if a tip commit changes any file other than `flake.lock`. The rebuilt commits replace the old ones, so a branch already on the remote needs `git push --force-with-lease`.
 - After updating, run `make switch` to apply
 
+### Kernel
+
+`configuration.nix` takes the kernel from the `nixpkgs-kernel` flake input. That input normally follows `nixpkgs`, so the kernel is the newest one in nixos-unstable.
+
+- `make pin-kernel` - Fix `nixpkgs-kernel` to the nixpkgs rev in `KERNEL_REV`. The default rev ships Linux 7.2.6. Newer kernels (7.2.8) made the VM slow and logged "vmwgfx: No GMR memory available"
+- `make unpin-kernel` - Make `nixpkgs-kernel` follow `nixpkgs` again
+- Both targets rewrite one line in `flake.nix`, relock, and print the kernel version the config now builds. Run `make switch` and reboot afterwards
+
 ### VM Management (for remote bootstrap from host machine)
 
 - `make vm/bootstrap0` - Bootstrap brand new VM with NixOS installation (requires `NIXADDR` env var)

@@ -67,6 +67,7 @@ LLM_AGENTS_SYSTEM := aarch64-linux
 .PHONY: help clean optimize check-versions upgrade-agents upgrade-all reload-shell restart-shell switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
 .PHONY: disk-status gc-roots docker-volumes stale-results stale-direnvs bloated-direnvs clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean-docker-layers clean-all
 .PHONY: secrets/backup secrets/restore
+.PHONY: pin-kernel unpin-kernel
 
 # Help target
 help: ## Show this help message
@@ -83,6 +84,9 @@ help: ## Show this help message
 	@echo ''
 	@echo 'System Info:'
 	@grep -E '^check-.*:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+	@echo ''
+	@echo 'Kernel:'
+	@grep -E '^(pin|unpin)-kernel:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 	@echo ''
 	@echo 'Secrets:'
 	@grep -E '^secrets/.*:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
@@ -354,6 +358,28 @@ upgrade-agents: ## Update the llm-agents flake input (every CLI in llmAgentNames
 # when it refuses to run.
 upgrade-all: ## Update all flake inputs and rebuild the "Update flake" and "Update agents" commits at the tip
 	@$(MAKEFILE_DIR)/scripts/upgrade-all.sh
+
+# =============================================================================
+# Kernel
+# =============================================================================
+
+# pin-kernel and unpin-kernel rewrite the nixpkgs-kernel line in flake.nix,
+# relock that input and print the kernel version the config now builds. Run
+# make switch and reboot afterwards. KERNEL_REV is the nixpkgs rev to pin to;
+# the default rev ships Linux 7.2.6, which runs well in this VM. Override it on
+# the command line to pin to another kernel.
+KERNEL_REV ?= 2e032a04454b525daa6c6651264aaa5d3e98cf54
+KERNEL_LINE := ^    nixpkgs-kernel\.\(follows\|url\) = .*
+
+pin-kernel: ## Pin the kernel to the nixpkgs rev in KERNEL_REV (default: Linux 7.2.6)
+	sed -i 's,$(KERNEL_LINE),    nixpkgs-kernel.url = "github:nixos/nixpkgs/$(KERNEL_REV)";,' flake.nix
+	nix flake lock
+	@echo "Kernel: $$(env $(NIX_EVAL_ENV) nix eval --raw .#nixosConfigurations.$(NIXNAME).config.boot.kernelPackages.kernel.version)"
+
+unpin-kernel: ## Use the newest kernel in nixos-unstable again
+	sed -i 's,$(KERNEL_LINE),    nixpkgs-kernel.follows = "nixpkgs";,' flake.nix
+	nix flake lock
+	@echo "Kernel: $$(env $(NIX_EVAL_ENV) nix eval --raw .#nixosConfigurations.$(NIXNAME).config.boot.kernelPackages.kernel.version)"
 
 reload-shell: ## Reload the Noctalia shell config without restarting it
 	noctalia msg config-reload

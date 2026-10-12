@@ -4,10 +4,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    # Supplies the kernel only, so the kernel stays on Linux 7.2.6 while the
-    # rest of the system follows nixos-unstable. The rev is in the URL, so
-    # `nix flake update` does not move it. configuration.nix reads
-    # linuxPackages_latest from this input.
+    # Supplies the kernel only. configuration.nix reads linuxPackages_latest
+    # from this input. It follows nixpkgs, so the kernel is the newest one in
+    # nixos-unstable. `make pin-kernel` replaces the next line with a fixed
+    # nixpkgs rev, and `make unpin-kernel` puts this line back.
     nixpkgs-kernel.url = "github:nixos/nixpkgs/2e032a04454b525daa6c6651264aaa5d3e98cf54";
 
     home-manager = {

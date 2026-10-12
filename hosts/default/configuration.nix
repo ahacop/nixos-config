@@ -165,7 +165,8 @@ in
   };
 
   boot = {
-    # Linux 7.2.6, from the nixpkgs-kernel input in flake.nix.
+    # From the nixpkgs-kernel input in flake.nix, which `make pin-kernel` can fix
+    # to one nixpkgs rev.
     kernelPackages =
       inputs.nixpkgs-kernel.legacyPackages.${pkgs.stdenv.hostPlatform.system}.linuxPackages_latest;
     loader = {
