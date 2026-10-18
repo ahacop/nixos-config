@@ -382,13 +382,18 @@ in
       ibm-plex
       inconsolata
       intel-one-mono
+      libertine
+      libertinus
       meslo-lgs-nf
       nerd-fonts.jetbrains-mono
       nerd-fonts.terminess-ttf
       noto-fonts
       noto-fonts-color-emoji
+      oldstandard
+      sorts-mill-goudy
       source-sans
       source-serif
+      tex-gyre.bonum
       ultimate-oldschool-pc-font-pack
     ];
   };
