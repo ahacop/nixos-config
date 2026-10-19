@@ -179,6 +179,8 @@ in
       # "error switching console mode" on boot.
       systemd-boot.consoleMode = "0";
     };
+
+    tmp.cleanOnBoot = true;
   };
 
   nix = {
