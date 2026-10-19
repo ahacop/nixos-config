@@ -65,7 +65,7 @@ LLM_AGENTS_SYSTEM := aarch64-linux
 
 # Phony targets
 .PHONY: help clean optimize check-versions upgrade-agents upgrade-all reload-shell restart-shell switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
-.PHONY: disk-status gc-roots docker-volumes stale-results stale-direnvs bloated-direnvs clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean-docker-layers clean-all
+.PHONY: disk-status gc-roots docker-volumes stale-results stale-direnvs stale-targets bloated-direnvs clean-results clean-direnvs clean-targets clean-direnv-profiles clean-caches clean-stores clean-docker-layers clean-all
 .PHONY: secrets/backup secrets/restore
 .PHONY: pin-kernel unpin-kernel
 
@@ -278,6 +278,51 @@ clean-direnvs: ## Remove .direnv from projects with no git activity in STALE_DAY
 	done
 	@echo "Done."
 
+# Cargo never deletes old build output from target/, so it grows with each
+# toolchain or dependency change. A target/ counts only when a Cargo.toml sits
+# next to it. Staleness uses the repo that holds the crate, so a crate in a
+# subdirectory of a repo works. The test is the same as stale-direnvs, except
+# that it reads HEAD and index from the absolute git dir, which also handles
+# worktrees. stale-targets previews exactly what clean-targets deletes; keep
+# their staleness tests identical.
+stale-targets: ## Find Rust target/ dirs in projects with no git activity in STALE_DAYS
+	@echo "=== Rust target/ in projects inactive for $(STALE_DAYS)+ days ==="
+	@echo ""
+	@out=$$(for dir in $(CODE_DIRS); do \
+		[ -d "$$dir" ] || continue; \
+		while IFS= read -r tgt; do \
+			proj=$$(dirname "$$tgt"); \
+			[ -f "$$proj/Cargo.toml" ] || continue; \
+			root=$$(git -C "$$proj" rev-parse --show-toplevel 2>/dev/null) || continue; \
+			gitdir=$$(git -C "$$root" rev-parse --absolute-git-dir 2>/dev/null) || continue; \
+			[ -z "$$(git -C "$$root" log -1 --since='$(STALE_DAYS) days ago' --format=%h 2>/dev/null)" ] || continue; \
+			[ -z "$$(find "$$gitdir/HEAD" "$$gitdir/index" -mtime -$(STALE_DAYS) 2>/dev/null)" ] || continue; \
+			git_date=$$(git -C "$$root" log -1 --format=%ci 2>/dev/null | cut -d' ' -f1); \
+			size=$$(du -sh "$$tgt" 2>/dev/null | cut -f1); \
+			printf "%-12s %-8s %s\n" "$${git_date:-(unknown)}" "$$size" "$$tgt"; \
+		done < <(find "$$dir" -name target -type d -prune 2>/dev/null); \
+	done | sort); \
+	if [ -n "$$out" ]; then printf '%s\n' "$$out"; else echo "(none found)"; fi
+
+# The staleness test matches stale-targets; keep them identical.
+clean-targets: ## Remove Rust target/ dirs from projects with no git activity in STALE_DAYS
+	@echo "Removing Rust target/ from projects inactive for $(STALE_DAYS)+ days..."
+	@for dir in $(CODE_DIRS); do \
+		[ -d "$$dir" ] || continue; \
+		while IFS= read -r tgt; do \
+			proj=$$(dirname "$$tgt"); \
+			[ -f "$$proj/Cargo.toml" ] || continue; \
+			root=$$(git -C "$$proj" rev-parse --show-toplevel 2>/dev/null) || continue; \
+			gitdir=$$(git -C "$$root" rev-parse --absolute-git-dir 2>/dev/null) || continue; \
+			[ -z "$$(git -C "$$root" log -1 --since='$(STALE_DAYS) days ago' --format=%h 2>/dev/null)" ] || continue; \
+			[ -z "$$(find "$$gitdir/HEAD" "$$gitdir/index" -mtime -$(STALE_DAYS) 2>/dev/null)" ] || continue; \
+			size=$$(du -sh "$$tgt" 2>/dev/null | cut -f1); \
+			echo "  Removing $$tgt ($$size)"; \
+			rm -rf "$$tgt"; \
+		done < <(find "$$dir" -name target -type d -prune 2>/dev/null); \
+	done
+	@echo "Done."
+
 # Tools run under sudo (trivy, for one) leave root-owned cache dirs that a
 # plain rm cannot delete, so fall back to sudo when the dir is not writable.
 clean-caches: ## Clean nix and other re-downloadable tool caches
@@ -320,7 +365,7 @@ clean-docker-layers: ## Remove orphaned overlay2 layers (only when docker holds 
 	sudo systemctl start docker.socket docker.service; \
 	echo "Removed orphaned docker layers ($$before)"
 
-clean-all: clean-results clean-direnvs clean-direnv-profiles clean-caches clean-stores clean clean-docker-layers ## Full cleanup (stale items + old profiles + caches + stores + gc + docker layers)
+clean-all: clean-results clean-direnvs clean-targets clean-direnv-profiles clean-caches clean-stores clean clean-docker-layers ## Full cleanup (stale items + Rust targets + old profiles + caches + stores + gc + docker layers)
 	@echo ""
 	@echo "=== Full cleanup complete ==="
 

@@ -24,11 +24,12 @@ The Makefile has a dedicated cleanup group. Override `STALE_DAYS=N` (default 30)
 - `make docker-volumes` - List named docker volumes with sizes; `clean` never removes these, drop one with `docker volume rm <name>`
 - `make stale-results` / `make clean-results` - Find/remove old `result` symlinks
 - `make stale-direnvs` / `make clean-direnvs` - Find/remove `.direnv` in inactive projects
+- `make stale-targets` / `make clean-targets` - Find/remove Rust `target/` (next to a `Cargo.toml`) in inactive projects
 - `make bloated-direnvs` / `make clean-direnv-profiles` - Find/trim extra flake profiles in `.direnv`
 - `make clean-caches` - Remove re-downloadable tool caches (allow-list in `SAFE_CACHE_DIRS`; uses sudo for root-owned dirs such as trivy)
 - `make clean-stores` - Remove re-downloadable package stores (allow-list in `SAFE_STORE_DIRS`: pnpm, gem, npm, cargo registry, go modules)
 - `make clean-docker-layers` - Remove orphaned overlay2 layers; stops docker briefly and refuses to run while any image or container exists
-- `make clean-all` - Full sweep (stale items + old flake profiles + caches + stores + `clean` + docker layers)
+- `make clean-all` - Full sweep (stale items + Rust targets + old flake profiles + caches + stores + `clean` + docker layers)
 
 ### System Information
 
