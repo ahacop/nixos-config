@@ -63,8 +63,9 @@ Available templates:
 - `rust` — stable toolchain + clippy/rustfmt/rust-analyzer
 - `prolog` — SWI-Prolog + GUI, `prolog_ls` (wired into Nixvim via the `swipl` on
   PATH), `just`
-- `lean` — Lean 4 (`lean` + `lake`) at the version this flake pins, `just`; the
-  Lean LSP is wired into Nixvim as `leanls`
+- `lean` — Lean 4 (`lean` + `lake`) at the version this flake pins, `just`;
+  Nixvim's lean.nvim plugin runs `lake serve` from this shell and opens the
+  goal-state infoview
 
 For a Standard Ebooks book, run `se-new --author "…" --title "…"` instead. It
 runs `se-ext new` from the
