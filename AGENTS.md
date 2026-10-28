@@ -37,7 +37,7 @@ The Mac home directory is mounted at `/host` over HGFS. Never run a search or gl
 ## Make targets with side effects
 
 - `make upgrade-all` (`scripts/upgrade-all.sh`) updates every input and rewrites the tip of the branch into an `Update flake` commit and an `Update agents` commit. It replaces those commits if they are already at the tip, so a pushed branch then needs `git push --force-with-lease`.
-- `make pin-kernel` and `make unpin-kernel` rewrite the `nixpkgs-kernel` line in `flake.nix` and relock. `nixpkgs-kernel` supplies only the kernel. Kernels newer than 7.2.6 made this VM slow and logged "vmwgfx: No GMR memory available".
+- `make pin-kernel` and `make unpin-kernel` rewrite the `nixpkgs-kernel` line in `flake.nix` and relock. `nixpkgs-kernel` supplies only the kernel. Linux 7.2.8 made this VM slow, so `make pin-kernel` defaults to 7.2.6.
 - `make clean-docker-layers` stops docker for a short time, and it refuses to run while any image or container exists.
 - `make clean-caches` and `make clean-stores` delete only the directories in `SAFE_CACHE_DIRS` and `SAFE_STORE_DIRS`. Add a new directory to those lists, not to the recipe.
 

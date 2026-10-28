@@ -8,7 +8,7 @@
     # from this input. It follows nixpkgs, so the kernel is the newest one in
     # nixos-unstable. `make pin-kernel` replaces the next line with a fixed
     # nixpkgs rev, and `make unpin-kernel` puts this line back.
-    nixpkgs-kernel.url = "github:nixos/nixpkgs/2e032a04454b525daa6c6651264aaa5d3e98cf54";
+    nixpkgs-kernel.follows = "nixpkgs";
 
     home-manager = {
       url = "github:nix-community/home-manager";
