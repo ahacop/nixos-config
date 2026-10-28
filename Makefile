@@ -67,7 +67,7 @@ LLM_AGENTS_SYSTEM := aarch64-linux
 .PHONY: help clean optimize check-versions upgrade-agents upgrade-all reload-shell restart-shell switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
 .PHONY: disk-status gc-roots docker-volumes stale-results stale-direnvs stale-targets bloated-direnvs clean-results clean-direnvs clean-targets clean-direnv-profiles clean-caches clean-stores clean-docker-layers clean-all
 .PHONY: secrets/backup secrets/restore
-.PHONY: pin-kernel unpin-kernel
+.PHONY: pin-kernel unpin-kernel kernel-check
 
 # Help target
 help: ## Show this help message
@@ -86,7 +86,7 @@ help: ## Show this help message
 	@grep -E '^check-.*:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 	@echo ''
 	@echo 'Kernel:'
-	@grep -E '^(pin|unpin)-kernel:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+	@grep -E '^((pin|unpin)-kernel|kernel-check):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 	@echo ''
 	@echo 'Secrets:'
 	@grep -E '^secrets/.*:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
@@ -425,6 +425,11 @@ unpin-kernel: ## Use the newest kernel in nixos-unstable again
 	sed -i 's,$(KERNEL_LINE),    nixpkgs-kernel.follows = "nixpkgs";,' flake.nix
 	nix flake lock
 	@echo "Kernel: $$(env $(NIX_EVAL_ENV) nix eval --raw .#nixosConfigurations.$(NIXNAME).config.boot.kernelPackages.kernel.version)"
+
+# Writes one snapshot file per run to ~/kernel-checks. See
+# scripts/kernel-check.sh for what it records.
+kernel-check: ## Save a load, interrupt and log-spam snapshot to ~/kernel-checks
+	@$(MAKEFILE_DIR)/scripts/kernel-check.sh
 
 reload-shell: ## Reload the Noctalia shell config without restarting it
 	noctalia msg config-reload
