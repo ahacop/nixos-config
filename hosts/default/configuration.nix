@@ -153,10 +153,7 @@ in
   users.users.${user} = {
     isNormalUser = true;
     home = "/home/${user}";
-    extraGroups = [
-      "docker"
-      "wheel"
-    ];
+    extraGroups = [ "wheel" ];
     shell = pkgs.zsh;
     initialPassword = "password";
     openssh.authorizedKeys.keys = [
@@ -291,7 +288,10 @@ in
   };
 
   # Virtualization settings
-  virtualisation.docker.enable = true;
+  virtualisation.docker.rootless = {
+    enable = true;
+    setSocketVariable = true;
+  };
 
   # Enable Niri window manager
   programs.niri.enable = true;

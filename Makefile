@@ -177,8 +177,8 @@ docker-volumes: ## List named docker volumes with their on-disk size
 	@echo "clean does not remove these. Drop one with: docker volume rm <name>"
 	@echo ""
 	@if ! docker info >/dev/null 2>&1; then echo "  (docker not running)"; exit 0; fi; \
-	for name in $$(docker volume ls -q); do \
-		size=$$(sudo du -sh "/var/lib/docker/volumes/$$name/_data" 2>/dev/null | cut -f1); \
+	docker system df -v --format '{{range .Volumes}}{{.Size}}{{"\t"}}{{.Name}}{{println}}{{end}}' | \
+	while IFS="$$(printf '\t')" read -r size name; do \
 		printf "  %-8s %s\n" "$$size" "$$name"; \
 	done | sort -rh
 
@@ -353,16 +353,21 @@ clean-stores: ## Remove pnpm, gem, npm, cargo and go module stores (re-downloada
 
 # docker system prune leaves layer dirs behind in overlay2 that no image or
 # container references. They can only be removed with the daemon stopped, so
-# this refuses to run while any image or container exists.
+# this refuses to run while any image or container exists. Docker is
+# rootless, so its data root is in the user's home. Files in the layers
+# belong to subordinate UIDs, so find and rm run in a user namespace that
+# maps those UIDs (unshare --map-auto) and not through sudo.
+DOCKER_DATA := $(or $(XDG_DATA_HOME),$(HOME)/.local/share)/docker
+
 clean-docker-layers: ## Remove orphaned overlay2 layers (only when docker holds no images or containers)
 	@if ! docker info >/dev/null 2>&1; then echo "docker not running"; exit 0; fi; \
 	if [ -n "$$(docker ps -aq)" ] || [ -n "$$(docker images -q)" ]; then \
 		echo "docker still has images or containers; run make clean first"; exit 1; \
 	fi; \
-	before=$$(sudo du -sh /var/lib/docker/overlay2 2>/dev/null | cut -f1); \
-	sudo systemctl stop docker.socket docker.service; \
-	sudo find /var/lib/docker/overlay2 /var/lib/docker/buildkit -mindepth 1 -maxdepth 1 -exec rm -rf {} +; \
-	sudo systemctl start docker.socket docker.service; \
+	before=$$(unshare --map-root-user --map-auto du -sh "$(DOCKER_DATA)/overlay2" 2>/dev/null | cut -f1); \
+	systemctl --user stop docker.service; \
+	unshare --map-root-user --map-auto find "$(DOCKER_DATA)/overlay2" "$(DOCKER_DATA)/buildkit" -mindepth 1 -maxdepth 1 -exec rm -rf {} +; \
+	systemctl --user start docker.service; \
 	echo "Removed orphaned docker layers ($$before)"
 
 clean-all: clean-results clean-direnvs clean-targets clean-direnv-profiles clean-caches clean-stores clean clean-docker-layers ## Full cleanup (stale items + Rust targets + old profiles + caches + stores + gc + docker layers)
