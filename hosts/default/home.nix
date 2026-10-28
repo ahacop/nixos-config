@@ -98,59 +98,156 @@ let
     };
   };
 
-  whisper-dictate = pkgs.writeShellApplication {
-    name = "whisper-dictate";
-    runtimeInputs = with pkgs; [
-      ffmpeg
-      whisper-cpp
-      wtype
-      libnotify
-      coreutils
-      gnused
-    ];
-    text = ''
-      MODEL_NAME="''${WHISPER_DICTATE_MODEL:-medium.en}"
-      MODEL_DIR="''${XDG_CACHE_HOME:-$HOME/.cache}/whisper-dictate"
-      MODEL_FILE="$MODEL_DIR/ggml-$MODEL_NAME.bin"
-      WAV="/tmp/whisper-dictate-$UID.wav"
-      TXT="$WAV.txt"
-      PIDFILE="/tmp/whisper-dictate-$UID.pid"
+  # Local speech-to-text with NVIDIA Parakeet V3 through onnx-asr. The
+  # derivation follows upstream's nix/package.nix, which supports only
+  # Whisper.cpp on x86_64-linux. This copy swaps pywhispercpp for onnx-asr
+  # in the Python environment, and the postPatch lets the Nix install mode
+  # accept the onnx-asr backend. The model downloads from Hugging Face into
+  # ~/.cache/huggingface on the first start of the service.
+  hyprwhspr =
+    let
+      python = pkgs.python313.withPackages (
+        ps: with ps; [
+          sounddevice
+          numpy
+          soxr
+          soundfile
+          evdev
+          pyperclip
+          pyudev
+          pulsectl
+          rich
+          jsonschema
+          dbus-python
+          pygobject3
+          pycairo
+          onnx-asr
+          huggingface-hub
+        ]
+      );
+      # Fallbacks only: they must match the host's running systemd and audio
+      # server, so the wrapper appends them after the session PATH.
+      hostTools = lib.makeBinPath (
+        with pkgs;
+        [
+          systemd
+          pulseaudio
+        ]
+      );
+    in
+    pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
+      pname = "hyprwhspr";
+      version = "1.49.2";
 
-      mkdir -p "$MODEL_DIR"
+      src = pkgs.fetchFromGitHub {
+        owner = "goodroot";
+        repo = "hyprwhspr";
+        tag = "v${finalAttrs.version}";
+        hash = "sha256-rSWO9gANWp0rflzJamdPVqB2zYouh2mp0qzezIAfEw4=";
+      };
 
-      if [[ ! -f "$MODEL_FILE" ]]; then
-        notify-send -t 5000 "Whisper" "Downloading $MODEL_NAME model (one-time)…"
-        whisper-cpp-download-ggml-model "$MODEL_NAME" "$MODEL_DIR"
-      fi
+      nativeBuildInputs = with pkgs; [
+        makeWrapper
+        wrapGAppsHook4
+        gobject-introspection
+      ];
 
-      if [[ -f "$PIDFILE" ]] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
-        PID="$(cat "$PIDFILE")"
-        rm -f "$PIDFILE"
-        kill -INT "$PID" 2>/dev/null || true
-        for _ in 1 2 3 4 5 6 7 8; do
-          kill -0 "$PID" 2>/dev/null || break
-          sleep 0.25
-        done
-        notify-send -t 1500 "Whisper" "Transcribing…"
-        whisper-cli -m "$MODEL_FILE" -f "$WAV" -nt -np -otxt >/dev/null 2>&1 || true
-        TEXT=""
-        if [[ -f "$TXT" ]]; then
-          TEXT="$(tr -d '\n' < "$TXT" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')"
-        fi
-        rm -f "$WAV" "$TXT"
-        if [[ -n "$TEXT" ]]; then
-          wtype -- "$TEXT"
-        else
-          notify-send -t 1500 "Whisper" "(no speech detected)"
-        fi
-      else
-        rm -f "$WAV" "$TXT" "$PIDFILE"
-        notify-send -t 1500 "Whisper" "Recording… (press again to stop)"
-        ffmpeg -loglevel error -nostdin -f pulse -i default -ar 16000 -ac 1 -y "$WAV" >/dev/null 2>&1 &
-        echo $! > "$PIDFILE"
-      fi
-    '';
-  };
+      # GTK 4 and the layer-shell library draw the recording overlay.
+      buildInputs = with pkgs; [
+        gtk4
+        gtk4-layer-shell
+        glib
+      ];
+
+      postPatch = ''
+        substituteInPlace lib/src/installation.py \
+          --replace-fail "normalize_backend(backend) in ('cpu', 'pywhispercpp')" \
+                         "normalize_backend(backend) == 'onnx-asr'"
+      '';
+
+      dontBuild = true;
+      dontWrapGApps = true;
+
+      installPhase = ''
+        runHook preInstall
+        mkdir -p "$out/lib/hyprwhspr" "$out/bin"
+        cp -r bin lib config share LICENSE requirements*.txt "$out/lib/hyprwhspr/"
+        echo '${builtins.toJSON { inherit (finalAttrs) version; }}' > "$out/lib/hyprwhspr/release.json"
+
+        # The noctwhspr bar widget runs <root>/config/hyprland/hyprwhspr-tray.sh
+        # and looks for <root> in /usr/lib/hyprwhspr by default. This copy of the
+        # plugin points <root> at a directory that holds the wrapped tray script,
+        # which carries the environment that the bare script does not have.
+        mkdir -p "$out/lib/hyprwhspr-widget/config/hyprland" "$out/share/noctalia/plugins"
+        ln -s "$out/bin/hyprwhspr-tray" "$out/lib/hyprwhspr-widget/config/hyprland/hyprwhspr-tray.sh"
+        cp -r config/noctalia/plugin "$out/share/noctalia/plugins/noctwhspr"
+        substituteInPlace \
+          "$out/share/noctalia/plugins/noctwhspr/plugin.toml" \
+          "$out/share/noctalia/plugins/noctwhspr/widget.luau" \
+          --replace-fail '"/usr/lib/hyprwhspr"' "\"$out/lib/hyprwhspr-widget\""
+        runHook postInstall
+      '';
+
+      preFixup = ''
+        makeWrapper "$out/lib/hyprwhspr/bin/hyprwhspr" "$out/bin/hyprwhspr" \
+          "''${gappsWrapperArgs[@]}" \
+          --set HYPRWHSPR_INSTALL_METHOD nix \
+          --set HYPRWHSPR_NIX_ROOT "$out/lib/hyprwhspr" \
+          --set HYPRWHSPR_BACKEND_ENV ${python} \
+          --unset HYPRWHSPR_GENERATION \
+          --unset PYTHONPATH \
+          --prefix PATH : ${
+            lib.makeBinPath (
+              with pkgs;
+              [
+                python
+                bash
+                coreutils
+                procps
+                wl-clipboard
+                wtype
+                libnotify
+                glib
+                alsa-utils
+                gawk
+                gnugrep
+                gnused
+              ]
+            )
+          } \
+          --suffix PATH : ${hostTools}
+        makeWrapper "$out/lib/hyprwhspr/config/hyprland/hyprwhspr-tray.sh" "$out/bin/hyprwhspr-tray" \
+          --set HYPRWHSPR_ROOT "$out/lib/hyprwhspr" \
+          --set HYPRWHSPR_INSTALL_METHOD nix \
+          --set HYPRWHSPR_BACKEND_ENV ${python} \
+          --prefix PATH : "$out/bin:${
+            lib.makeBinPath (
+              with pkgs;
+              [
+                python
+                bash
+                coreutils
+                procps
+                libnotify
+                glib
+                alsa-utils
+                gawk
+                gnugrep
+                gnused
+              ]
+            )
+          }" \
+          --suffix PATH : ${hostTools}
+      '';
+
+      meta = {
+        description = "Linux desktop speech-to-text, set up here for Parakeet V3 on the CPU";
+        homepage = "https://github.com/goodroot/hyprwhspr";
+        license = lib.licenses.mit;
+        mainProgram = "hyprwhspr";
+        platforms = lib.platforms.linux;
+      };
+    });
 in
 {
   stylix.targets.firefox.profileNames = [ "default" ];
@@ -2053,7 +2150,10 @@ in
           bluetooth = false;
         };
 
-        plugins.enabled = [ "ahacop/timezone-grid" ];
+        plugins.enabled = [
+          "ahacop/timezone-grid"
+          "goodroot/noctwhspr"
+        ];
 
         bar = {
           order = [ "default" ];
@@ -2081,6 +2181,10 @@ in
               "disk"
               "ram"
               "cpu"
+              # hyprwhspr state: a red dot while it records, a microphone
+              # when it is ready. Left click toggles a recording, right click
+              # restarts the service.
+              "goodroot/noctwhspr:status"
               "volume"
               "tray"
               "notifications"
@@ -2141,7 +2245,7 @@ in
             glyph = "terminal";
             global = true;
             command = "printf '%s\\n' 'Display: 1920x1080' 'Display: 7680x3200' 'Dictate: toggle'";
-            exec = ''case "{selection}" in "Display: 1920x1080") niri msg output Virtual-1 mode 1920x1080@60.000 ;; "Display: 7680x3200") niri msg output Virtual-1 mode 7680x3200@60.000 ;; "Dictate: toggle") whisper-dictate ;; esac'';
+            exec = ''case "{selection}" in "Display: 1920x1080") niri msg output Virtual-1 mode 1920x1080@60.000 ;; "Display: 7680x3200") niri msg output Virtual-1 mode 7680x3200@60.000 ;; "Dictate: toggle") hyprwhspr record toggle ;; esac'';
           };
 
           # Removable drives to eject, reached with `/eject` or from the
@@ -2281,8 +2385,11 @@ in
         "Mod+Tab".action = spawn-sh "noctalia msg window-switcher";
         "Mod+Shift+Escape".action = spawn-sh "noctalia msg session lock";
 
-        "Mod+Shift+Backslash" = {
-          action = spawn "whisper-dictate";
+        # Starts or stops a hyprwhspr recording. hyprwhspr's own shortcuts
+        # are off (external_bindings in its config.json), so niri owns the
+        # key and the CLI passes the toggle to the running service.
+        "Mod+Backslash" = {
+          action = spawn "hyprwhspr" "record" "toggle";
           repeat = false;
         };
 
@@ -2449,6 +2556,50 @@ in
   # Noctalia scans this directory for plugins that come from neither the
   # official nor the community repo.
   xdg.dataFile."noctalia/plugins/timezone-grid".source = ./../../plugins/timezone-grid;
+  xdg.dataFile."noctalia/plugins/noctwhspr".source = "${hyprwhspr}/share/noctalia/plugins/noctwhspr";
+
+  # hyprwhspr reads only the keys that differ from its defaults. It writes
+  # this file only when it migrates a legacy key, and none of these keys
+  # is legacy, so the read-only link that home-manager makes is safe.
+  xdg.configFile."hyprwhspr/config.json".text = builtins.toJSON {
+    transcription_backend = "onnx-asr";
+    onnx_asr_model = "nemo-parakeet-tdt-0.6b-v3";
+    # niri binds Mod+Backslash to `hyprwhspr record toggle`. With this key
+    # set, hyprwhspr does not read /dev/input, so the user needs no input
+    # group.
+    external_bindings = true;
+    recording_mode = "toggle";
+  };
+
+  # The dictation daemon. It keeps the model in memory, listens for
+  # `hyprwhspr record toggle`, and pastes the transcript into the focused
+  # window with wl-copy and wtype. It picks Ctrl+Shift+V for terminals from
+  # `niri msg focused-window`. While it records, it shows an overlay through
+  # gtk4-layer-shell and plays a start sound and a stop sound.
+  systemd.user.services.hyprwhspr = {
+    Unit = {
+      Description = "hyprwhspr speech-to-text";
+      Documentation = [ "https://github.com/goodroot/hyprwhspr" ];
+      PartOf = [ "graphical-session.target" ];
+      After = [
+        "graphical-session.target"
+        "pipewire.service"
+        "wireplumber.service"
+      ];
+      Wants = [
+        "pipewire.service"
+        "wireplumber.service"
+      ];
+    };
+    Service = {
+      Type = "simple";
+      ExecStart = lib.getExe hyprwhspr;
+      Environment = [ "PYTHONUNBUFFERED=1" ];
+      Restart = "on-failure";
+      RestartSec = 2;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
 
   xdg.configFile."ghostty/tabbar.css".text = ''
     tabbar tabbox {
@@ -2538,6 +2689,7 @@ in
         duckdb
         foliate
         glow
+        hyprwhspr # the CLI, for `hyprwhspr status` and `hyprwhspr record toggle`; the daemon is systemd.user.services.hyprwhspr
         inputs.aoc-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
         inputs.erwindb.packages.${pkgs.stdenv.hostPlatform.system}.default
         inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
@@ -2552,7 +2704,6 @@ in
         udiskie # puts udiskie-umount and udiskie-info on the PATH; the daemon is services.udiskie above
         vale
         websters-1913-stardict
-        whisper-dictate
         zathura
       ]);
     sessionVariables = {
