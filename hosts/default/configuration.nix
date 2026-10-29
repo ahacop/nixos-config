@@ -742,7 +742,9 @@ in
   #
   # `auto_unmount` makes libfuse3 call the setuid `fusermount3` wrapper, which
   # removes the mount if the daemon dies. Without it a crash leaves a dead
-  # mount at /host, and the restart cannot mount over it.
+  # mount at /host, and the restart cannot mount over it. `programs.fuse`
+  # installs that wrapper at /run/wrappers/bin/fusermount3.
+  programs.fuse.enable = true;
   systemd.services.host-share = {
     description = "VMware shared folders at /host";
     wantedBy = [ "multi-user.target" ];
