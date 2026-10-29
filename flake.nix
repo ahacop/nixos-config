@@ -42,20 +42,19 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # aoc-cli, erwindb and opdsview each declare their own rust-overlay. They all
-    # follow this one so the lock holds a single copy, and so a single update
-    # here moves all three off any rust-overlay that trips nixpkgs deprecation
-    # warnings during evaluation.
+    # erwindb and opdsview each declare their own rust-overlay. They both follow
+    # this one so the lock holds a single copy, and so a single update here
+    # moves both off any rust-overlay that trips nixpkgs deprecation warnings
+    # during evaluation.
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    aoc-cli = {
-      url = "github:ahacop/aoc-cli";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.rust-overlay.follows = "rust-overlay";
-    };
+    # aoc-cli keeps its own nixpkgs and rust-overlay. Its CI builds against
+    # aoc-cli's own lock and pushes the result to ahacop.cachix.org, so the
+    # store path here matches the cached one and nothing compiles locally.
+    aoc-cli.url = "github:ahacop/aoc-cli";
 
     # erwindb keeps its own nixpkgs so that its store path changes only when
     # erwindb's own lock changes. No binary cache has erwindb, so a store path
@@ -71,10 +70,9 @@
       inputs.rust-overlay.follows = "rust-overlay";
     };
 
-    epub-sync = {
-      url = "github:ahacop/epub-sync";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # epub-sync keeps its own nixpkgs for the same reason as aoc-cli: its CI
+    # pushes builds of its own lock to ahacop.cachix.org.
+    epub-sync.url = "github:ahacop/epub-sync";
 
     niri = {
       url = "github:sodiboo/niri-flake";
