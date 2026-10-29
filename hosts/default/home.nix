@@ -2470,13 +2470,17 @@ in
     # group.
     external_bindings = true;
     recording_mode = "toggle";
+    # No start and stop sounds. In this VMware VM, any sound that plays
+    # while the microphone is open stops the microphone for a few seconds,
+    # so the start sound would cut off the first words.
+    audio_feedback = false;
   };
 
   # The dictation daemon. It keeps the model in memory, listens for
   # `hyprwhspr record toggle`, and pastes the transcript into the focused
   # window with wl-copy and wtype. It picks Ctrl+Shift+V for terminals from
   # `niri msg focused-window`. While it records, it shows an overlay through
-  # gtk4-layer-shell and plays a start sound and a stop sound.
+  # gtk4-layer-shell.
   systemd.user.services.hyprwhspr = {
     Unit = {
       Description = "hyprwhspr speech-to-text";
