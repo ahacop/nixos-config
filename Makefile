@@ -194,27 +194,10 @@ stale-results: ## Find result symlinks older than STALE_DAYS
 	done | sort); \
 	if [ -n "$$out" ]; then printf '%s\n' "$$out"; else echo "(none found)"; fi
 
-# A project is stale when its repo shows no activity for STALE_DAYS: no commit
-# in the window, and .git/HEAD and .git/index untouched. Checkouts, staging,
-# and fresh clones update HEAD/index, so a newly cloned repo counts as active.
-# stale-direnvs previews exactly what clean-direnvs deletes; keep their
-# staleness tests identical.
+# stale-direnvs, clean-direnvs, stale-targets and clean-targets share one
+# staleness test in scripts/stale-dirs.sh, which says when a project is stale.
 stale-direnvs: ## Find .direnv in projects with no git activity in STALE_DAYS
-	@echo "=== .direnv in projects inactive for $(STALE_DAYS)+ days ==="
-	@echo ""
-	@out=$$(for dir in $(CODE_DIRS); do \
-		[ -d "$$dir" ] || continue; \
-		while IFS= read -r denv; do \
-			proj=$$(dirname "$$denv"); \
-			[ -d "$$proj/.git" ] || continue; \
-			[ -z "$$(git -C "$$proj" log -1 --since='$(STALE_DAYS) days ago' --format=%h 2>/dev/null)" ] || continue; \
-			[ -z "$$(find "$$proj/.git/HEAD" "$$proj/.git/index" -mtime -$(STALE_DAYS) 2>/dev/null)" ] || continue; \
-			git_date=$$(git -C "$$proj" log -1 --format=%ci 2>/dev/null | cut -d' ' -f1); \
-			size=$$(du -sh "$$denv" 2>/dev/null | cut -f1); \
-			printf "%-12s %-8s %s\n" "$${git_date:-(unknown)}" "$$size" "$$proj"; \
-		done < <(find "$$dir" -name ".direnv" -type d 2>/dev/null); \
-	done | sort); \
-	if [ -n "$$out" ]; then printf '%s\n' "$$out"; else echo "(none found)"; fi
+	@$(MAKEFILE_DIR)/scripts/stale-dirs.sh list direnv $(STALE_DAYS) $(CODE_DIRS)
 
 # nix-direnv names each profile flake-profile-<hash> with a matching .rc file
 # and creates a new pair whenever the flake inputs change; old pairs pile up
@@ -262,66 +245,14 @@ clean-results: ## Remove result symlinks older than STALE_DAYS
 	done
 	@echo "Done."
 
-# The staleness test matches stale-direnvs; keep them identical.
 clean-direnvs: ## Remove .direnv from projects with no git activity in STALE_DAYS
-	@echo "Removing .direnv from projects inactive for $(STALE_DAYS)+ days..."
-	@for dir in $(CODE_DIRS); do \
-		[ -d "$$dir" ] || continue; \
-		while IFS= read -r denv; do \
-			proj=$$(dirname "$$denv"); \
-			[ -d "$$proj/.git" ] || continue; \
-			[ -z "$$(git -C "$$proj" log -1 --since='$(STALE_DAYS) days ago' --format=%h 2>/dev/null)" ] || continue; \
-			[ -z "$$(find "$$proj/.git/HEAD" "$$proj/.git/index" -mtime -$(STALE_DAYS) 2>/dev/null)" ] || continue; \
-			echo "  Removing $$denv"; \
-			rm -rf "$$denv"; \
-		done < <(find "$$dir" -name ".direnv" -type d 2>/dev/null); \
-	done
-	@echo "Done."
+	@$(MAKEFILE_DIR)/scripts/stale-dirs.sh clean direnv $(STALE_DAYS) $(CODE_DIRS)
 
-# Cargo never deletes old build output from target/, so it grows with each
-# toolchain or dependency change. A target/ counts only when a Cargo.toml sits
-# next to it. Staleness uses the repo that holds the crate, so a crate in a
-# subdirectory of a repo works. The test is the same as stale-direnvs, except
-# that it reads HEAD and index from the absolute git dir, which also handles
-# worktrees. stale-targets previews exactly what clean-targets deletes; keep
-# their staleness tests identical.
 stale-targets: ## Find Rust target/ dirs in projects with no git activity in STALE_DAYS
-	@echo "=== Rust target/ in projects inactive for $(STALE_DAYS)+ days ==="
-	@echo ""
-	@out=$$(for dir in $(CODE_DIRS); do \
-		[ -d "$$dir" ] || continue; \
-		while IFS= read -r tgt; do \
-			proj=$$(dirname "$$tgt"); \
-			[ -f "$$proj/Cargo.toml" ] || continue; \
-			root=$$(git -C "$$proj" rev-parse --show-toplevel 2>/dev/null) || continue; \
-			gitdir=$$(git -C "$$root" rev-parse --absolute-git-dir 2>/dev/null) || continue; \
-			[ -z "$$(git -C "$$root" log -1 --since='$(STALE_DAYS) days ago' --format=%h 2>/dev/null)" ] || continue; \
-			[ -z "$$(find "$$gitdir/HEAD" "$$gitdir/index" -mtime -$(STALE_DAYS) 2>/dev/null)" ] || continue; \
-			git_date=$$(git -C "$$root" log -1 --format=%ci 2>/dev/null | cut -d' ' -f1); \
-			size=$$(du -sh "$$tgt" 2>/dev/null | cut -f1); \
-			printf "%-12s %-8s %s\n" "$${git_date:-(unknown)}" "$$size" "$$tgt"; \
-		done < <(find "$$dir" -name target -type d -prune 2>/dev/null); \
-	done | sort); \
-	if [ -n "$$out" ]; then printf '%s\n' "$$out"; else echo "(none found)"; fi
+	@$(MAKEFILE_DIR)/scripts/stale-dirs.sh list target $(STALE_DAYS) $(CODE_DIRS)
 
-# The staleness test matches stale-targets; keep them identical.
 clean-targets: ## Remove Rust target/ dirs from projects with no git activity in STALE_DAYS
-	@echo "Removing Rust target/ from projects inactive for $(STALE_DAYS)+ days..."
-	@for dir in $(CODE_DIRS); do \
-		[ -d "$$dir" ] || continue; \
-		while IFS= read -r tgt; do \
-			proj=$$(dirname "$$tgt"); \
-			[ -f "$$proj/Cargo.toml" ] || continue; \
-			root=$$(git -C "$$proj" rev-parse --show-toplevel 2>/dev/null) || continue; \
-			gitdir=$$(git -C "$$root" rev-parse --absolute-git-dir 2>/dev/null) || continue; \
-			[ -z "$$(git -C "$$root" log -1 --since='$(STALE_DAYS) days ago' --format=%h 2>/dev/null)" ] || continue; \
-			[ -z "$$(find "$$gitdir/HEAD" "$$gitdir/index" -mtime -$(STALE_DAYS) 2>/dev/null)" ] || continue; \
-			size=$$(du -sh "$$tgt" 2>/dev/null | cut -f1); \
-			echo "  Removing $$tgt ($$size)"; \
-			rm -rf "$$tgt"; \
-		done < <(find "$$dir" -name target -type d -prune 2>/dev/null); \
-	done
-	@echo "Done."
+	@$(MAKEFILE_DIR)/scripts/stale-dirs.sh clean target $(STALE_DAYS) $(CODE_DIRS)
 
 # Tools run under sudo (trivy, for one) leave root-owned cache dirs that a
 # plain rm cannot delete, so fall back to sudo when the dir is not writable.
