@@ -88,7 +88,6 @@
               ++ scripts;
 
             shellHook = ''
-              export PATH="${pkgs.lib.makeBinPath scripts}:$PATH"
               export LD_LIBRARY_PATH="${
                 pkgs.lib.makeLibraryPath [
                   pkgs.vips
