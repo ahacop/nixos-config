@@ -19,10 +19,8 @@ Commit a change before the user switches to try it, even an experiment. The user
 - `flake.nix` holds only the inputs. import-tree loads every `.nix` file under `modules/` as a flake-parts module, except paths that contain `/_`. `modules/hosts/default.nix` builds `nixosConfigurations.default`.
 - A feature file in `modules/` puts its NixOS part in `flake.modules.nixos.<name>` and its home-manager part in `flake.modules.homeManager.<name>`. The host file must list both parts.
 - A local evaluation reads only the files that git tracks. `make vm/copy` copies the tree without `.git`, so the VM build reads every file under `modules/`. Do not leave an untracked `.nix` file in `modules/`.
-- `modules/nixvim/default.nix` has the Nixvim config, about 1,400 lines.
-- `modules/niri/default.nix` has the niri config with every key bind.
-- `modules/noctalia/default.nix` has the Noctalia config: bar, launcher and the other shell settings.
-- `hosts/default/home.nix` has about 570 lines: zsh, git, tmux, Ghostty and Firefox. Search it by option path, for example `programs.tmux`.
+- Each feature has one file or directory in `modules/` with its name: dictation, dictionary, firefox, ghostty, git, niri, nixvim, noctalia, tmux and zsh.
+- `hosts/default/home.nix` has about 130 lines: the user packages, udiskie, small shell tools such as starship and direnv, and the session variables.
 - `hosts/default/configuration.nix` is the system config.
 - To add or remove an LLM CLI, edit `llmAgentNames` in `modules/llm-agents.nix`. `home.nix` and `make check-versions` both read that list.
 - The global gitignore ignores `.envrc`. An `.envrc` in a `devflakes/` template needs `git add -f`.
