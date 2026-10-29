@@ -32,6 +32,7 @@ in
             config.flake.modules.homeManager.firefox
             config.flake.modules.homeManager.ghostty
             config.flake.modules.homeManager.dictionary
+            config.flake.modules.homeManager.zsh
           ];
         };
       }
