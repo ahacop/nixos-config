@@ -1868,11 +1868,6 @@ in
 
         ${builtins.readFile ./../../config/functions}
 
-        # Generate pgbox completion if available
-        if command -v pgbox >/dev/null 2>&1; then
-          eval "$(pgbox completion zsh)"
-        fi
-
         # Tmux window renaming hooks
         if [[ -n "$TMUX" ]]; then
           # Function to rename tmux window
@@ -1881,9 +1876,6 @@ in
               tmux rename-window "$1" 2>/dev/null
             fi
           }
-
-          # Variable to store the last meaningful window name
-          typeset -g TMUX_LAST_WINDOW_NAME=""
 
           # Hook that runs before command execution
           preexec() {
@@ -1894,9 +1886,6 @@ in
             if [[ "$cmd_name" =~ ^(fg|bg|jobs)$ ]]; then
               return
             fi
-
-            # Store current window name before changing it
-            TMUX_LAST_WINDOW_NAME=$(tmux display-message -p '#W' 2>/dev/null)
 
             # Check if it's a make command and extract the target
             if [[ "$cmd" =~ ^make[[:space:]]+([^[:space:]]+) ]]; then
@@ -2626,7 +2615,6 @@ in
         inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
         inputs.opdsview.packages.${pkgs.stdenv.hostPlatform.system}.default
         inputs.epub-sync.packages.${pkgs.stdenv.hostPlatform.system}.default
-        # inputs.pgbox.packages.${pkgs.stdenv.hostPlatform.system}.default
         mermaid-cli
         nirisnap
         pomodoro
