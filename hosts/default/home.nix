@@ -2365,11 +2365,6 @@ in
           repeat = false;
         };
 
-        "Super+Alt+S" = {
-          action = spawn-sh "pkill orca || exec orca";
-          allow-when-locked = true;
-        };
-
         "XF86AudioRaiseVolume" = {
           action = spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0";
           allow-when-locked = true;
@@ -2384,42 +2379,6 @@ in
         };
         "XF86AudioMicMute" = {
           action = spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
-          allow-when-locked = true;
-        };
-
-        "XF86AudioPlay" = {
-          action = spawn-sh "playerctl play-pause";
-          allow-when-locked = true;
-        };
-        "XF86AudioStop" = {
-          action = spawn-sh "playerctl stop";
-          allow-when-locked = true;
-        };
-        "XF86AudioPrev" = {
-          action = spawn-sh "playerctl previous";
-          allow-when-locked = true;
-        };
-        "XF86AudioNext" = {
-          action = spawn-sh "playerctl next";
-          allow-when-locked = true;
-        };
-
-        "XF86MonBrightnessUp" = {
-          action = spawn [
-            "brightnessctl"
-            "--class=backlight"
-            "set"
-            "+10%"
-          ];
-          allow-when-locked = true;
-        };
-        "XF86MonBrightnessDown" = {
-          action = spawn [
-            "brightnessctl"
-            "--class=backlight"
-            "set"
-            "10%-"
-          ];
           allow-when-locked = true;
         };
 
