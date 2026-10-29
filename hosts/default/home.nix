@@ -2258,7 +2258,7 @@ in
             glyph = "usb";
             global = true;
             command = "${pkgs.udiskie}/bin/udiskie-info -a -f is_mounted -f is_external -o '{mount_path}'";
-            exec = ''${pkgs.udiskie}/bin/udiskie-umount --detach "{selection}" && notify-send "Ejected {selection}"'';
+            exec = ''${pkgs.udiskie}/bin/udiskie-umount --detach "{selection}" && ${pkgs.libnotify}/bin/notify-send "Ejected {selection}"'';
           };
         };
       };
