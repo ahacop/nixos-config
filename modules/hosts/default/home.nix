@@ -4,24 +4,6 @@
   flake.modules.homeManager.home =
     { pkgs, ... }:
     {
-      # Mounts a plugged-in USB drive under /run/media/$USER, where epubsync
-      # looks for the Kobo. To eject, pick the device from the udiskie icon in
-      # the bar tray, choose it under the `/eject` launcher prefix, or run
-      # `udiskie-umount --detach /run/media/$USER/KOBOeReader`.
-      services.udiskie = {
-        enable = true;
-        automount = true;
-        notify = true;
-        # The tray icon shows only while a removable device is present. Its
-        # menu has Unmount, Eject and Detach entries per device.
-        tray = "auto";
-      };
-
-      # Makes the udiskie unit pass --appindicator, so its tray icon is a
-      # StatusNotifierItem that Noctalia's tray widget can show. The default
-      # is an X11 status icon, which is invisible under Wayland.
-      xsession.preferStatusNotifierItems = true;
-
       programs = {
         yazi = {
           enable = true;
@@ -99,7 +81,6 @@
           mermaid-cli
           pomodoro
           presenterm
-          udiskie # puts udiskie-umount and udiskie-info on the PATH; the daemon is services.udiskie above
           vale
           zathura
         ];

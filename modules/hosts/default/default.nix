@@ -18,6 +18,7 @@ in
       config.flake.modules.nixos.printing
       config.flake.modules.nixos.vmware-guest
       config.flake.modules.nixos.theme
+      config.flake.modules.nixos.usb-drives
       {
         home-manager = {
           useGlobalPkgs = true;

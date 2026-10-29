@@ -397,10 +397,6 @@ in
       # uses it, and it pulls in espeak-ng and the mbrola voices, about 2.3G.
       services.speechd.enable = false;
 
-      # Mounts USB drives such as the Kobo. udiskie in home.nix mounts them
-      # under /run/media/$USER on plug-in, where epubsync looks for the device.
-      services.udisks2.enable = true;
-
       # The NixOS release this machine was first installed with. It sets the
       # defaults for stateful data such as database formats. Do not change it on
       # upgrades.
