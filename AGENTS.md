@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to coding agents such as Claude Code when they work in this repository. CLAUDE.md only imports this file.
 
 This is a flake-based NixOS configuration for one VMware Fusion VM on an Apple Silicon Mac (`aarch64-linux`). The flake has one system, `nixosConfigurations.default`. There is no test suite and no lint target.
 
