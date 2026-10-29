@@ -717,10 +717,11 @@ in
   # Interface is this on M1
   networking.interfaces.enp2s0.useDHCP = true;
 
-  # open-vm-tools: vmtoolsd for host integration, plus the vmhgfs-fuse helper
-  # for the /host mount below. No X server is configured, so the module picks
-  # the headless package, which leaves out vmware-user and the vmblock mount.
-  # Both are X11-only and do nothing under niri.
+  # open-vm-tools: vmtoolsd for host integration, plus the vmhgfs-fuse binary
+  # that the host-share service below uses to mount /host. No X server is
+  # configured, so the module picks the headless package, which leaves out
+  # vmware-user and the vmblock mount. Both are X11-only and do nothing under
+  # niri.
   virtualisation.vmware.guest.enable = true;
 
   # clipway: host/guest clipboard sync under niri. It patches open-vm-tools
@@ -733,28 +734,24 @@ in
     target = "graphical-session.target";
   };
 
-  # The /host HGFS mount uses `auto_unmount`, so the libfuse3 `vmhgfs-fuse`
-  # daemon needs `fusermount3` (fuse3) at mount time, and `mount` needs
-  # `mount.fuse` (fuse2) to handle the fuse.<helper> fstype. Nothing pulls
-  # them in transitively. Without them the mount fails at boot and the
-  # machine drops into emergency mode.
-  system.fsPackages = [
-    pkgs.fuse
-    pkgs.fuse3
-  ];
-
-  # Share our host filesystem
-  fileSystems."/host" = {
-    fsType = "fuse./run/current-system/sw/bin/vmhgfs-fuse";
-    device = ".host:/";
-    options = [
-      "umask=22"
-      "uid=1000"
-      "gid=1000"
-      "allow_other"
-      "auto_unmount"
-      "defaults"
-    ];
+  # Mounts the Mac's VMware shared folders at /host. A systemd service runs
+  # `vmhgfs-fuse` directly in the foreground, so the mount needs no mount
+  # helper. A fileSystems entry of type fuse.<helper> needs the fuse 2
+  # `mount.fuse` helper, and nixpkgs no longer has fuse 2. A failed mount
+  # here only fails this service, so boot continues.
+  #
+  # `auto_unmount` makes libfuse3 call the setuid `fusermount3` wrapper, which
+  # removes the mount if the daemon dies. Without it a crash leaves a dead
+  # mount at /host, and the restart cannot mount over it.
+  systemd.services.host-share = {
+    description = "VMware shared folders at /host";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p /host";
+      ExecStart = "${config.virtualisation.vmware.guest.package}/bin/vmhgfs-fuse .host:/ /host -f -o allow_other,auto_unmount,uid=1000,gid=100,umask=22";
+      ExecStop = "${pkgs.util-linux}/bin/umount /host";
+      Restart = "on-failure";
+    };
   };
 
   # Enable sound with PipeWire
