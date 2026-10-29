@@ -14,6 +14,7 @@ in
       inputs.home-manager.nixosModules.default
       config.flake.modules.nixos.dictation
       config.flake.modules.nixos.niri
+      config.flake.modules.nixos.dictionary
       {
         home-manager = {
           useGlobalPkgs = true;
@@ -30,6 +31,7 @@ in
             config.flake.modules.homeManager.noctalia
             config.flake.modules.homeManager.firefox
             config.flake.modules.homeManager.ghostty
+            config.flake.modules.homeManager.dictionary
           ];
         };
       }

@@ -794,17 +794,6 @@ in
   # under /run/media/$USER on plug-in, where epubsync looks for the device.
   services.udisks2.enable = true;
 
-  # Local dictionary server
-  services.dictd = {
-    enable = true;
-    DBs = with pkgs.dictdDBs; [
-      wordnet
-      wiktionary
-      eng2deu
-      deu2eng
-    ];
-  };
-
   # The NixOS release this machine was first installed with. It sets the
   # defaults for stateful data such as database formats. Do not change it on
   # upgrades.

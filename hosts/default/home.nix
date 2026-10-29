@@ -16,28 +16,6 @@ let
     mkdir -p $out
     JUST_COMPLETE=zsh ${pkgs.just}/bin/just > $out/_just
   '';
-
-  websters-1913-stardict = pkgs.stdenv.mkDerivation {
-    pname = "websters-1913-stardict";
-    version = "2.4.2";
-
-    src = pkgs.fetchFromGitHub {
-      owner = "ahacop";
-      repo = "websters-dict-1913-stardict";
-      rev = "7f9c6d6725eb1b0d8545a6f74904610fa2a2c71e";
-      sha256 = "sha256-/g7Tm0tQzf7pkA6EzTMxOrh3FCr8CLxgRVsAp/ZxFpU=";
-    };
-
-    nativeBuildInputs = [
-      pkgs.gnutar
-      pkgs.gzip
-    ];
-
-    installPhase = ''
-      mkdir -p $out/share/stardict/dic
-      tar -xzf stardict-dictd-web1913-2.4.2.tgz -C $out/share/stardict/dic
-    '';
-  };
 in
 {
   # rofi is not enabled. The stylix rofi target still sets
@@ -125,8 +103,6 @@ in
         ga = "git aa";
         gc = "git ci -p";
         gca = "git ci -p --amend";
-        define = "sdcv";
-        germ = "dict -d fd-deu-eng";
         gl = "git log";
         gp = "git push";
         gv = "open_modified_and_untracked_in_vim";
@@ -146,9 +122,6 @@ in
 
         # Static just completions (the default source <(...) wrapper breaks with direnv)
         source ${just-completions}/_just
-
-        # StarDict dictionary path (set unconditionally for subshells)
-        export STARDICT_DATA_DIR="${websters-1913-stardict}/share/stardict/dic"
 
         ${builtins.readFile ./../../config/zshrc}
 
@@ -389,10 +362,8 @@ in
         mermaid-cli
         pomodoro
         presenterm
-        sdcv
         udiskie # puts udiskie-umount and udiskie-info on the PATH; the daemon is services.udiskie above
         vale
-        websters-1913-stardict
         zathura
       ]);
     sessionVariables = {
