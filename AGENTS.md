@@ -20,7 +20,8 @@ Commit a change before the user switches to try it, even an experiment. The user
 - A feature file in `modules/` puts its NixOS part in `flake.modules.nixos.<name>` and its home-manager part in `flake.modules.homeManager.<name>`. The host file must list both parts.
 - A local evaluation reads only the files that git tracks. `make vm/copy` copies the tree without `.git`, so the VM build reads every file under `modules/`. Do not leave an untracked `.nix` file in `modules/`.
 - `modules/nixvim/default.nix` has the Nixvim config, about 1,400 lines.
-- `hosts/default/home.nix` has about 1,000 lines: zsh, git, tmux, niri and Noctalia. Search it by option path, for example `programs.noctalia`.
+- `modules/niri/default.nix` has the niri config with every key bind.
+- `hosts/default/home.nix` has about 740 lines: zsh, git, tmux, Ghostty, Firefox and Noctalia. Search it by option path, for example `programs.noctalia`.
 - `hosts/default/configuration.nix` is the system config.
 - To add or remove an LLM CLI, edit `llmAgentNames` in `modules/llm-agents.nix`. `home.nix` and `make check-versions` both read that list.
 - The global gitignore ignores `.envrc`. An `.envrc` in a `devflakes/` template needs `git add -f`.

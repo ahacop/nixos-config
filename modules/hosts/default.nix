@@ -13,10 +13,8 @@ in
       inputs.clipway.nixosModules.default
       inputs.home-manager.nixosModules.default
       config.flake.modules.nixos.dictation
+      config.flake.modules.nixos.niri
       {
-        nixpkgs.overlays = [
-          inputs.niri.overlays.niri
-        ];
         home-manager = {
           useGlobalPkgs = true;
           useUserPackages = true;
@@ -26,10 +24,9 @@ in
           };
           users.${user}.imports = [
             ../../hosts/default/home.nix
-            inputs.niri.homeModules.niri
-            inputs.niri.homeModules.stylix
             config.flake.modules.homeManager.dictation
             config.flake.modules.homeManager.nixvim
+            config.flake.modules.homeManager.niri
           ];
         };
       }

@@ -309,9 +309,6 @@ in
     setSocketVariable = true;
   };
 
-  # Enable Niri window manager
-  programs.niri.enable = true;
-
   # Enable greetd with tuigreet
   services.greetd = {
     enable = true;
