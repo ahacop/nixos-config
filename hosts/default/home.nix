@@ -1991,7 +1991,7 @@ in
           amend = "commit --amend";
           br = "branch";
           ci = "commit";
-          cleanup = "!git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 -r git branch -d";
+          cleanup = "!git branch --merged | grep -vE '^\\*|^\\s*(main|master|develop)$' | xargs -n 1 -r git branch -d";
           co = "checkout";
           dc = "diff --cached";
           df = "diff";
