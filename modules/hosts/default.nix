@@ -9,13 +9,13 @@ in
     specialArgs = { inherit inputs user; };
     modules = [
       ../../hosts/default/configuration.nix
-      inputs.stylix.nixosModules.stylix
       inputs.home-manager.nixosModules.default
       config.flake.modules.nixos.dictation
       config.flake.modules.nixos.niri
       config.flake.modules.nixos.dictionary
       config.flake.modules.nixos.printing
       config.flake.modules.nixos.vmware-guest
+      config.flake.modules.nixos.theme
       {
         home-manager = {
           useGlobalPkgs = true;
@@ -36,6 +36,7 @@ in
             config.flake.modules.homeManager.zsh
             config.flake.modules.homeManager.git
             config.flake.modules.homeManager.tmux
+            config.flake.modules.homeManager.theme
           ];
         };
       }

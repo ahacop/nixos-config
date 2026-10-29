@@ -5,11 +5,6 @@
   ...
 }:
 {
-  # rofi is not enabled. The stylix rofi target still sets
-  # `programs.rofi.font`, which home-manager renamed to
-  # `programs.rofi.settings.font`, and that causes an evaluation warning.
-  stylix.targets.rofi.enable = false;
-
   # Mounts a plugged-in USB drive under /run/media/$USER, where epubsync
   # looks for the Kobo. To eject, pick the device from the udiskie icon in
   # the bar tray, choose it under the `/eject` launcher prefix, or run
