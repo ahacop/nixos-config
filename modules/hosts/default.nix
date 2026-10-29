@@ -10,12 +10,12 @@ in
     modules = [
       ../../hosts/default/configuration.nix
       inputs.stylix.nixosModules.stylix
-      inputs.clipway.nixosModules.default
       inputs.home-manager.nixosModules.default
       config.flake.modules.nixos.dictation
       config.flake.modules.nixos.niri
       config.flake.modules.nixos.dictionary
       config.flake.modules.nixos.printing
+      config.flake.modules.nixos.vmware-guest
       {
         home-manager = {
           useGlobalPkgs = true;
