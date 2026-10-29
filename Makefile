@@ -53,6 +53,21 @@ OP_VAULT_FLAG := $(if $(OP_VAULT),--vault $(OP_VAULT),)
 # reused a lot so we just store them up here.
 SSH_OPTIONS := -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
 
+# vm/secrets sends private keys, so it asks before it trusts the VM's host
+# key. Compare the fingerprint SSH shows with the one the VM console prints
+# for `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`. Nothing remembers
+# the answer, so each of its two rsync calls asks again.
+SECRETS_SSH_OPTIONS := -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=ask
+
+# Binary caches that vm/install hands to nixos-install. The installer knows
+# only cache.nixos.org, and without these the LLM agent CLIs, aoc-cli and
+# epub-sync compile from source during the install. Keep them in step with
+# nix.settings in modules/hosts/default/configuration.nix.
+INSTALL_SUBSTITUTERS := https://nix-community.cachix.org https://cache.numtide.com https://ahacop.cachix.org
+INSTALL_TRUSTED_KEYS := nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= \
+	niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= \
+	ahacop.cachix.org-1:DNW02GubEpEM6HsOgAwIPDj81nPOuGxmCp4dvKzJOq0=
+
 # LLM agent CLIs come from the numtide llm-agents flake input. The list of
 # tools lives once in modules/llm-agents.nix (llmAgentNames), exposed as the
 # llmAgents output (package name -> binary name), so check-versions derives
@@ -64,7 +79,7 @@ LLM_AGENTS_SYSTEM := aarch64-linux
 .DEFAULT_GOAL := help
 
 # Phony targets
-.PHONY: help clean optimize check-versions upgrade-agents upgrade-all reload-shell restart-shell switch test vm/bootstrap0 vm/bootstrap vm/secrets vm/copy vm/switch
+.PHONY: help clean optimize check-versions upgrade-agents upgrade-all reload-shell restart-shell switch test vm/install vm/secrets vm/copy vm/switch
 .PHONY: disk-status gc-roots docker-volumes stale-results stale-direnvs stale-targets bloated-direnvs clean-results clean-direnvs clean-targets clean-direnv-profiles clean-caches clean-stores clean-docker-layers clean-all
 .PHONY: secrets/backup secrets/restore
 .PHONY: pin-kernel unpin-kernel kernel-check
@@ -419,8 +434,21 @@ secrets/restore: ## Restore local secrets.env from 1Password
 	@chmod 600 "$(SECRETS_FILE)"
 	@echo "Done. Run 'source $(SECRETS_FILE)' or open a new shell to load it."
 
-vm/bootstrap0: ## Bootstrap brand new VM with NixOS installation
+# Installs this flake on a new VM that runs the NixOS installer ISO, with
+# root's password set to "root" in the VM console. It partitions and formats
+# HDDEV, copies this repository to /mnt/nix-config (/nix-config once the VM
+# boots), runs nixos-install on the flake and reboots. It does not run
+# nixos-generate-config: modules/hosts/default/_hardware-configuration.nix
+# fits any VMware Fusion VM with an NVMe disk.
+#
+# The installer sets GC_INITIAL_HEAP_SIZE=1M, so nixos-install gets
+# NIX_EVAL_ENV like the other targets. nixos-install keeps its temporary
+# files under /mnt, not in the installer's RAM.
+#
+# It copies no private keys. Run vm/secrets after the reboot.
+vm/install: ## Install this configuration on a new VM booted from the NixOS ISO
 	ssh $(SSH_OPTIONS) -p$(NIXPORT) root@$(NIXADDR) " \
+		set -e; \
 		parted $(HDDEV) -- mklabel gpt; \
 		parted $(HDDEV) -- mkpart primary 512MB -8GB; \
 		parted $(HDDEV) -- mkpart primary linux-swap -8GB 100\%; \
@@ -434,37 +462,26 @@ vm/bootstrap0: ## Bootstrap brand new VM with NixOS installation
 		mount /dev/disk/by-label/nixos /mnt; \
 		mkdir -p /mnt/boot; \
 		mount /dev/disk/by-label/boot /mnt/boot; \
-		nixos-generate-config --root /mnt; \
-		sed --in-place '/system\.stateVersion = .*/a \
-			nix.package = pkgs.nixVersions.latest;\n \
-			nix.extraOptions = \"experimental-features = nix-command flakes\";\n \
-			nix.settings.substituters = [\"https://ahacop.cachix.org\"];\n \
-			nix.settings.trusted-public-keys = [\"ahacop.cachix.org-1:DNW02GubEpEM6HsOgAwIPDj81nPOuGxmCp4dvKzJOq0=\"];\n \
-  			services.openssh.enable = true;\n \
-			services.openssh.settings.PasswordAuthentication = true;\n \
-			services.openssh.settings.PermitRootLogin = \"yes\";\n \
-			users.users.root.initialPassword = \"root\";\n \
-		' /mnt/etc/nixos/configuration.nix; \
-		nixos-install --no-root-passwd && reboot; \
 	"
-
-vm/bootstrap: ## Finalize VM bootstrap after initial installation
-	NIXUSER=root $(MAKE) vm/copy
-	NIXUSER=root $(MAKE) vm/switch
-	$(MAKE) vm/secrets
-	ssh $(SSH_OPTIONS) -p$(NIXPORT) $(NIXUSER)@$(NIXADDR) " \
-		sudo reboot; \
+	rsync -av -e 'ssh $(SSH_OPTIONS) -p$(NIXPORT)' \
+		--exclude='.git/' \
+		$(MAKEFILE_DIR)/ root@$(NIXADDR):/mnt/nix-config
+	ssh $(SSH_OPTIONS) -p$(NIXPORT) root@$(NIXADDR) " \
+		$(NIX_EVAL_ENV) nixos-install --flake '/mnt/nix-config#$(NIXNAME)' --no-root-passwd \
+			--option extra-substituters '$(INSTALL_SUBSTITUTERS)' \
+			--option extra-trusted-public-keys '$(INSTALL_TRUSTED_KEYS)' \
+		&& reboot; \
 	"
 
 vm/secrets: ## Copy GPG and SSH secrets into the VM
 	# GPG keyring
-	rsync -av -e 'ssh $(SSH_OPTIONS) -p$(NIXPORT)' \
+	rsync -av -e 'ssh $(SECRETS_SSH_OPTIONS) -p$(NIXPORT)' \
 		--exclude='.#*' \
 		--exclude='S.*' \
 		--exclude='*.conf' \
 		$(HOME)/.gnupg/ $(NIXUSER)@$(NIXADDR):~/.gnupg
 	# SSH keys
-	rsync -av -e 'ssh $(SSH_OPTIONS) -p$(NIXPORT)' \
+	rsync -av -e 'ssh $(SECRETS_SSH_OPTIONS) -p$(NIXPORT)' \
 		--exclude='environment' \
 		$(HOME)/.ssh/ $(NIXUSER)@$(NIXADDR):~/.ssh
 
