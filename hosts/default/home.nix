@@ -1,6 +1,5 @@
 {
   inputs,
-  llmAgentPackages,
   pkgs,
   ...
 }:
@@ -85,30 +84,25 @@
 
     stateVersion = "24.05";
 
-    packages =
-      # LLM agent CLIs from the numtide llm-agents.nix flake, resolved in
-      # modules/llm-agents.nix from the llmAgentNames single source of truth
-      # and passed in via extraSpecialArgs.
-      llmAgentPackages
-      ++ (with pkgs; [
-        (calibre.override { speechSupport = false; })
-        circumflex
-        devenv
-        duckdb
-        foliate
-        glow
-        inputs.aoc-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
-        inputs.erwindb.packages.${pkgs.stdenv.hostPlatform.system}.default
-        inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
-        inputs.opdsview.packages.${pkgs.stdenv.hostPlatform.system}.default
-        inputs.epub-sync.packages.${pkgs.stdenv.hostPlatform.system}.default
-        mermaid-cli
-        pomodoro
-        presenterm
-        udiskie # puts udiskie-umount and udiskie-info on the PATH; the daemon is services.udiskie above
-        vale
-        zathura
-      ]);
+    packages = with pkgs; [
+      (calibre.override { speechSupport = false; })
+      circumflex
+      devenv
+      duckdb
+      foliate
+      glow
+      inputs.aoc-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
+      inputs.erwindb.packages.${pkgs.stdenv.hostPlatform.system}.default
+      inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
+      inputs.opdsview.packages.${pkgs.stdenv.hostPlatform.system}.default
+      inputs.epub-sync.packages.${pkgs.stdenv.hostPlatform.system}.default
+      mermaid-cli
+      pomodoro
+      presenterm
+      udiskie # puts udiskie-umount and udiskie-info on the PATH; the daemon is services.udiskie above
+      vale
+      zathura
+    ];
     sessionVariables = {
       PAGER = "less";
       # Read by every less invocation, not only the ones started through

@@ -22,7 +22,7 @@ Commit a change before the user switches to try it, even an experiment. The user
 - Each feature has one file or directory in `modules/` with its name: dictation, dictionary, firefox, ghostty, git, niri, nixvim, noctalia, tmux and zsh.
 - `hosts/default/home.nix` has about 130 lines: the user packages, udiskie, small shell tools such as starship and direnv, and the session variables.
 - `hosts/default/configuration.nix` is the system config.
-- To add or remove an LLM CLI, edit `llmAgentNames` in `modules/llm-agents.nix`. `home.nix` and `make check-versions` both read that list.
+- To add or remove an LLM CLI, edit `llmAgentNames` in `modules/llm-agents.nix`. The home-manager part in that file and `make check-versions` both read that list.
 - The global gitignore ignores `.envrc`. An `.envrc` in a `devflakes/` template needs `git add -f`.
 
 ## Desktop

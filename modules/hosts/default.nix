@@ -20,10 +20,7 @@ in
         home-manager = {
           useGlobalPkgs = true;
           useUserPackages = true;
-          extraSpecialArgs = {
-            inherit inputs user;
-            inherit (config) llmAgentPackages;
-          };
+          extraSpecialArgs = { inherit inputs user; };
           users.${user}.imports = [
             ../../hosts/default/home.nix
             config.flake.modules.homeManager.dictation
@@ -37,6 +34,7 @@ in
             config.flake.modules.homeManager.git
             config.flake.modules.homeManager.tmux
             config.flake.modules.homeManager.theme
+            config.flake.modules.homeManager.llm-agents
           ];
         };
       }
