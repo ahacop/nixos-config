@@ -4,7 +4,6 @@
   inputs,
   llmAgentPackages,
   pkgs,
-  user,
   ...
 }:
 let
@@ -251,6 +250,9 @@ let
 in
 {
   stylix.targets.firefox.profileNames = [ "default" ];
+  # rofi is not enabled. The stylix rofi target still sets
+  # `programs.rofi.font`, which home-manager renamed to
+  # `programs.rofi.settings.font`, and that causes an evaluation warning.
   stylix.targets.rofi.enable = false;
 
   # Mounts a plugged-in USB drive under /run/media/$USER, where epubsync
@@ -1911,7 +1913,6 @@ in
     gpg.enable = true;
     direnv = {
       enable = true;
-      enableBashIntegration = true; # see note on other shells below
       enableZshIntegration = true; # see note on other shells below
       nix-direnv.enable = true;
     };
@@ -2583,9 +2584,6 @@ in
   };
 
   home = {
-    username = user;
-    homeDirectory = "/home/${user}";
-
     file = {
       ".githelpers".source = ./../../config/githelpers;
       ".ssh/config".source = ./../../config/sshconfig;

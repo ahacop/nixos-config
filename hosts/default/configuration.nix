@@ -178,6 +178,9 @@ in
     };
 
     tmp.cleanOnBoot = true;
+
+    # Setup qemu so we can run x86_64 binaries
+    binfmt.emulatedSystems = [ "x86_64-linux" ];
   };
 
   nix = {
@@ -233,6 +236,9 @@ in
     # Setting this turns dhcpcd off on its own.
     useNetworkd = true;
 
+    # Interface is this on M1
+    interfaces.enp2s0.useDHCP = true;
+
     # The firewall is off so anything listening in the VM is reachable without
     # opening ports one at a time. The VM is bridged onto the local network, so
     # that means every host on that network, not just the Mac running it.
@@ -282,10 +288,7 @@ in
   # Hardware 3D acceleration for VMware. This installs the mesa drivers,
   # vmwgfx among them, under /run/opengl-driver, where the GL and Vulkan
   # loaders look for them.
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = false; # only available on x86
-  };
+  hardware.graphics.enable = true;
 
   # Virtualization settings
   virtualisation.docker.rootless = {
@@ -314,13 +317,7 @@ in
     config.common.default = [ "gtk" ];
   };
 
-  i18n = {
-    defaultLocale = "en_US.UTF-8";
-  };
   services = {
-    # Enable desktop portal for Wayland applications
-    dbus.enable = true;
-
     # Enable the OpenSSH daemon.
     openssh = {
       enable = true;
@@ -370,8 +367,6 @@ in
     ];
     ensureDefaultPrinter = "Brother_HL_L2350DW_series";
   };
-
-  users.mutableUsers = true;
 
   fonts = {
     fontDir.enable = true;
@@ -711,12 +706,6 @@ in
   # Disable GNOME's SSH agent to avoid conflict
   services.gnome.gnome-keyring.enable = lib.mkForce false;
 
-  # Setup qemu so we can run x86_64 binaries
-  boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
-
-  # Interface is this on M1
-  networking.interfaces.enp2s0.useDHCP = true;
-
   # open-vm-tools: vmtoolsd for host integration, plus the vmhgfs-fuse binary
   # that the host-share service below uses to mount /host. No X server is
   # configured, so the module picks the headless package, which leaves out
@@ -761,7 +750,6 @@ in
     enable = true;
     pulse.enable = true;
     alsa.enable = true;
-    alsa.support32Bit = true;
     jack.enable = true;
   };
 
