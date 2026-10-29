@@ -20,6 +20,7 @@ in
       config.flake.modules.nixos.theme
       config.flake.modules.nixos.usb-drives
       config.flake.modules.nixos.networking
+      config.flake.modules.nixos.mac-host
       {
         home-manager = {
           useGlobalPkgs = true;
