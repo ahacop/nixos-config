@@ -19,6 +19,7 @@ in
       config.flake.modules.nixos.vmware-guest
       config.flake.modules.nixos.theme
       config.flake.modules.nixos.usb-drives
+      config.flake.modules.nixos.networking
       {
         home-manager = {
           useGlobalPkgs = true;
