@@ -27,6 +27,7 @@ in
             config.flake.modules.homeManager.dictation
             config.flake.modules.homeManager.nixvim
             config.flake.modules.homeManager.niri
+            config.flake.modules.homeManager.noctalia
           ];
         };
       }
