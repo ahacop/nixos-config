@@ -676,53 +676,26 @@ in
         NavigateToTest = {
           command.__raw = ''
             function(opts)
-              local direction = opts.args or "next"
               local test_pattern = [[\v^\s*(test|def test_|it\s+['"])]]
-              local current_line = vim.fn.line('.')
+              -- With no argument, opts.args is "", so anything but "prev"
+              -- searches forward.
+              local step = opts.args == "prev" and -1 or 1
+              local last = step == 1 and vim.fn.line('$') or 1
 
-              if direction == "next" then
-                -- Search forward for next test
-                local last_line = vim.fn.line('$')
+              for line_num = vim.fn.line('.') + step, last, step do
+                if vim.fn.match(vim.fn.getline(line_num), test_pattern) >= 0 then
+                  vim.cmd('normal! ' .. line_num .. 'G')
 
-                for line_num = current_line + 1, last_line do
-                  local line = vim.fn.getline(line_num)
-                  if vim.fn.match(line, test_pattern) >= 0 then
-                    -- Move to the test line
-                    vim.cmd('normal! ' .. line_num .. 'G')
-
-                    -- Position test in top third of window
-                    local winheight = vim.fn.winheight(0)
-                    local top_third = math.floor(winheight / 3)
-                    vim.cmd('normal! zt')
-                    vim.cmd('normal! ' .. top_third .. 'k')
-                    vim.cmd('normal! ' .. top_third .. 'j')
-
-                    return
-                  end
+                  -- Put the test line one third of the way down the window.
+                  local top_third = math.floor(vim.fn.winheight(0) / 3)
+                  vim.cmd('normal! zt')
+                  vim.cmd('normal! ' .. top_third .. 'k')
+                  vim.cmd('normal! ' .. top_third .. 'j')
+                  return
                 end
-
-                print("No more tests found")
-              else
-                -- Search backward for previous test
-                for line_num = current_line - 1, 1, -1 do
-                  local line = vim.fn.getline(line_num)
-                  if vim.fn.match(line, test_pattern) >= 0 then
-                    -- Move to the test line
-                    vim.cmd('normal! ' .. line_num .. 'G')
-
-                    -- Position test in top third of window
-                    local winheight = vim.fn.winheight(0)
-                    local top_third = math.floor(winheight / 3)
-                    vim.cmd('normal! zt')
-                    vim.cmd('normal! ' .. top_third .. 'k')
-                    vim.cmd('normal! ' .. top_third .. 'j')
-
-                    return
-                  end
-                end
-
-                print("No previous tests found")
               end
+
+              print(step == 1 and "No more tests found" or "No previous tests found")
             end
           '';
           desc = "Navigate to next or previous test";
