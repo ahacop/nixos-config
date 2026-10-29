@@ -26,10 +26,10 @@ in
           };
           users.${user}.imports = [
             ../../hosts/default/home.nix
-            inputs.nixvim.homeModules.nixvim
             inputs.niri.homeModules.niri
             inputs.niri.homeModules.stylix
             config.flake.modules.homeManager.dictation
+            config.flake.modules.homeManager.nixvim
           ];
         };
       }
