@@ -6,25 +6,6 @@
   user,
   ...
 }:
-let
-  # Moby Thesaurus - 30,000+ root words, 2.5 million synonyms
-  moby-thesaurus = pkgs.stdenv.mkDerivation {
-    pname = "moby-thesaurus";
-    version = "1.0";
-
-    src = pkgs.fetchurl {
-      url = "https://www.gutenberg.org/files/3202/files/mthesaur.txt";
-      sha256 = "sha256-fJdCse2UQ1qJPAcZtCZyXtuKUkL4xSanVGG9bO4t/TI=";
-    };
-
-    dontUnpack = true;
-
-    installPhase = ''
-      mkdir -p $out/share/moby
-      cp $src $out/share/moby/mthesaur.txt
-    '';
-  };
-in
 {
   imports = [
     # Include the results of the hardware scan.
@@ -279,34 +260,6 @@ in
       which
       wl-clipboard
       wget
-      wordnet
-
-      # Thesaurus using Moby Thesaurus (30k+ words, 2.5M synonyms)
-      (writeShellApplication {
-        name = "thes";
-        runtimeInputs = [
-          coreutils
-          gnugrep
-          util-linux
-        ];
-        text = ''
-          if [ -z "''${1:-}" ]; then
-            echo "Usage: thes <word>" >&2
-            exit 1
-          fi
-          word="$1"
-          # grep exits with status 1 when no line matches.
-          result=$(grep -i -m 1 "^$word," ${moby-thesaurus}/share/moby/mthesaur.txt || true)
-          if [ -z "$result" ]; then
-            echo "No synonyms found for: $word" >&2
-            exit 1
-          fi
-          # Print header then synonyms in columns
-          echo "$result" | cut -d',' -f1
-          echo "---"
-          echo "$result" | cut -d',' -f2- | tr ',' '\n' | column
-        '';
-      })
       xxd
       yt-dlp
       zip
