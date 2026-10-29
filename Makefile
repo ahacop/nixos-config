@@ -54,9 +54,9 @@ OP_VAULT_FLAG := $(if $(OP_VAULT),--vault $(OP_VAULT),)
 SSH_OPTIONS := -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
 
 # LLM agent CLIs come from the numtide llm-agents flake input. The list of
-# tools lives once in flake.nix (llmAgentNames), exposed as the llmAgents
-# output (package name -> binary name), so check-versions derives it rather
-# than duplicating it.
+# tools lives once in modules/llm-agents.nix (llmAgentNames), exposed as the
+# llmAgents output (package name -> binary name), so check-versions derives
+# it rather than duplicating it.
 LLM_AGENTS_REPO := numtide/llm-agents.nix
 LLM_AGENTS_SYSTEM := aarch64-linux
 
@@ -331,7 +331,7 @@ check-versions: ## Compare installed LLM agent CLI versions with the latest the 
 		printf '%-12s pin is current with upstream main\n' ''; \
 	fi
 
-upgrade-agents: ## Update the llm-agents flake input (every CLI in llmAgentNames in flake.nix)
+upgrade-agents: ## Update the llm-agents flake input (every CLI in llmAgentNames in modules/llm-agents.nix)
 	nix flake update llm-agents
 
 # Rewrites the tip of the branch into an "Update flake" commit and an

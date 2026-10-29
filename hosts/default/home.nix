@@ -2581,8 +2581,8 @@ in
 
     packages =
       # LLM agent CLIs from the numtide llm-agents.nix flake, resolved in
-      # flake.nix from the llmAgentNames single source of truth and passed in
-      # via extraSpecialArgs.
+      # modules/llm-agents.nix from the llmAgentNames single source of truth
+      # and passed in via extraSpecialArgs.
       llmAgentPackages
       ++ (with pkgs; [
         (calibre.override { speechSupport = false; })

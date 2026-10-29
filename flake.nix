@@ -10,6 +10,13 @@
     # nixpkgs rev, and `make unpin-kernel` puts this line back.
     nixpkgs-kernel.follows = "nixpkgs";
 
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+
+    import-tree.url = "github:vic/import-tree";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -95,100 +102,8 @@
     };
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      home-manager,
-      ...
-    }@inputs:
-    let
-      user = "ahacop";
-      system = "aarch64-linux";
-      # Single source of truth for the LLM agent CLIs pulled from the numtide
-      # llm-agents flake. Consumed by home.nix (to install them) and, via the
-      # llmAgents output below, by the Makefile (to check versions) — so the
-      # list lives in exactly one place.
-      llmAgentNames = [
-        "ccusage"
-        "claude-code"
-        "codex"
-        "crit"
-        "herdr"
-        "hunk"
-        "pi"
-        "plannotator"
-      ];
-      # The llm-agents.nix package set for our system, resolved once and shared
-      # by the llmAgents output (for the Makefile) and home.nix (the installed
-      # CLIs, passed in via extraSpecialArgs) so the flake owns all the wiring.
-      llmAgentPkgs = inputs.llm-agents.packages.${system};
-      llmAgentPackages = map (n: llmAgentPkgs.${n}) llmAgentNames;
-    in
-    {
-      # Installed llm-agents CLIs as an attrset of package name -> main-program
-      # (binary) name, e.g. { claude-code = "claude"; ... }, derived from
-      # llmAgentNames via each package's meta.mainProgram. `make check-versions`
-      # reads this to map packages to binaries and to know which packages to
-      # look up upstream, so the tool list only lives in llmAgentNames above.
-      llmAgents = builtins.listToAttrs (
-        map (n: {
-          name = n;
-          value = llmAgentPkgs.${n}.meta.mainProgram or n;
-        }) llmAgentNames
-      );
-
-      # `nix fmt` runs nixfmt, the same formatter nvim applies on save through
-      # none-ls in home.nix, so both produce the same layout.
-      formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt;
-
-      templates = {
-        ruby = {
-          path = ./devflakes/ruby;
-          description = "Ruby dev shell (pinned ruby + gem build deps)";
-        };
-        rails = {
-          path = ./devflakes/rails;
-          description = "Rails dev shell (ruby + postgres, node, vips, flyctl, etc.)";
-        };
-        rust = {
-          path = ./devflakes/rust;
-          description = "Rust dev shell (stable toolchain + clippy/rustfmt/rust-analyzer)";
-        };
-        prolog = {
-          path = ./devflakes/prolog;
-          description = "Prolog dev shell (SWI-Prolog + GUI, prolog_ls, just)";
-        };
-        lean = {
-          path = ./devflakes/lean;
-          description = "Lean 4 dev shell (lean + lake, pinned by this flake)";
-        };
-      };
-
-      nixosConfigurations.default = nixpkgs.lib.nixosSystem {
-        specialArgs = { inherit inputs user; };
-        modules = [
-          ./hosts/default/configuration.nix
-          inputs.stylix.nixosModules.stylix
-          inputs.clipway.nixosModules.default
-          home-manager.nixosModules.default
-          {
-            nixpkgs.overlays = [
-              inputs.niri.overlays.niri
-            ];
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = { inherit inputs user llmAgentPackages; };
-              users.${user}.imports = [
-                ./hosts/default/home.nix
-                inputs.nixvim.homeModules.nixvim
-                inputs.niri.homeModules.niri
-                inputs.niri.homeModules.stylix
-              ];
-            };
-          }
-        ];
-      };
-    };
+  # Every .nix file under modules/ is a flake-parts module, and import-tree
+  # loads all of them. A file whose path has a part that starts with "_" is
+  # not loaded, so a module can keep plain Nix helper files beside it.
+  outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
 }
