@@ -33,6 +33,7 @@ in
             config.flake.modules.homeManager.ghostty
             config.flake.modules.homeManager.dictionary
             config.flake.modules.homeManager.zsh
+            config.flake.modules.homeManager.git
           ];
         };
       }
