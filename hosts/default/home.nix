@@ -96,157 +96,6 @@ let
       mainProgram = "nirisnap";
     };
   };
-
-  # Local speech-to-text with NVIDIA Parakeet V3 through onnx-asr. The
-  # derivation follows upstream's nix/package.nix, which supports only
-  # Whisper.cpp on x86_64-linux. This copy swaps pywhispercpp for onnx-asr
-  # in the Python environment, and the postPatch lets the Nix install mode
-  # accept the onnx-asr backend. The model downloads from Hugging Face into
-  # ~/.cache/huggingface on the first start of the service.
-  hyprwhspr =
-    let
-      python = pkgs.python313.withPackages (
-        ps: with ps; [
-          sounddevice
-          numpy
-          soxr
-          soundfile
-          evdev
-          pyperclip
-          pyudev
-          pulsectl
-          rich
-          jsonschema
-          dbus-python
-          pygobject3
-          pycairo
-          onnx-asr
-          huggingface-hub
-        ]
-      );
-      # Fallbacks only: they must match the host's running systemd and audio
-      # server, so the wrapper appends them after the session PATH.
-      hostTools = lib.makeBinPath (
-        with pkgs;
-        [
-          systemd
-          pulseaudio
-        ]
-      );
-    in
-    pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
-      pname = "hyprwhspr";
-      version = "1.49.2";
-
-      src = pkgs.fetchFromGitHub {
-        owner = "goodroot";
-        repo = "hyprwhspr";
-        tag = "v${finalAttrs.version}";
-        hash = "sha256-rSWO9gANWp0rflzJamdPVqB2zYouh2mp0qzezIAfEw4=";
-      };
-
-      nativeBuildInputs = with pkgs; [
-        makeWrapper
-        wrapGAppsHook4
-        gobject-introspection
-      ];
-
-      # GTK 4 and the layer-shell library draw the recording overlay.
-      buildInputs = with pkgs; [
-        gtk4
-        gtk4-layer-shell
-        glib
-      ];
-
-      postPatch = ''
-        substituteInPlace lib/src/installation.py \
-          --replace-fail "normalize_backend(backend) in ('cpu', 'pywhispercpp')" \
-                         "normalize_backend(backend) == 'onnx-asr'"
-      '';
-
-      dontBuild = true;
-      dontWrapGApps = true;
-
-      installPhase = ''
-        runHook preInstall
-        mkdir -p "$out/lib/hyprwhspr" "$out/bin"
-        cp -r bin lib config share LICENSE requirements*.txt "$out/lib/hyprwhspr/"
-        echo '${builtins.toJSON { inherit (finalAttrs) version; }}' > "$out/lib/hyprwhspr/release.json"
-
-        # The noctwhspr bar widget runs <root>/config/hyprland/hyprwhspr-tray.sh
-        # and looks for <root> in /usr/lib/hyprwhspr by default. This copy of the
-        # plugin points <root> at a directory that holds the wrapped tray script,
-        # which carries the environment that the bare script does not have.
-        mkdir -p "$out/lib/hyprwhspr-widget/config/hyprland" "$out/share/noctalia/plugins"
-        ln -s "$out/bin/hyprwhspr-tray" "$out/lib/hyprwhspr-widget/config/hyprland/hyprwhspr-tray.sh"
-        cp -r config/noctalia/plugin "$out/share/noctalia/plugins/noctwhspr"
-        substituteInPlace \
-          "$out/share/noctalia/plugins/noctwhspr/plugin.toml" \
-          "$out/share/noctalia/plugins/noctwhspr/widget.luau" \
-          --replace-fail '"/usr/lib/hyprwhspr"' "\"$out/lib/hyprwhspr-widget\""
-        runHook postInstall
-      '';
-
-      preFixup = ''
-        makeWrapper "$out/lib/hyprwhspr/bin/hyprwhspr" "$out/bin/hyprwhspr" \
-          "''${gappsWrapperArgs[@]}" \
-          --set HYPRWHSPR_INSTALL_METHOD nix \
-          --set HYPRWHSPR_NIX_ROOT "$out/lib/hyprwhspr" \
-          --set HYPRWHSPR_BACKEND_ENV ${python} \
-          --unset HYPRWHSPR_GENERATION \
-          --unset PYTHONPATH \
-          --prefix PATH : ${
-            lib.makeBinPath (
-              with pkgs;
-              [
-                python
-                bash
-                coreutils
-                procps
-                wl-clipboard
-                wtype
-                libnotify
-                glib
-                alsa-utils
-                gawk
-                gnugrep
-                gnused
-              ]
-            )
-          } \
-          --suffix PATH : ${hostTools}
-        makeWrapper "$out/lib/hyprwhspr/config/hyprland/hyprwhspr-tray.sh" "$out/bin/hyprwhspr-tray" \
-          --set HYPRWHSPR_ROOT "$out/lib/hyprwhspr" \
-          --set HYPRWHSPR_INSTALL_METHOD nix \
-          --set HYPRWHSPR_BACKEND_ENV ${python} \
-          --prefix PATH : "$out/bin:${
-            lib.makeBinPath (
-              with pkgs;
-              [
-                python
-                bash
-                coreutils
-                procps
-                libnotify
-                glib
-                alsa-utils
-                gawk
-                gnugrep
-                gnused
-              ]
-            )
-          }" \
-          --suffix PATH : ${hostTools}
-      '';
-
-      meta = {
-        description = "Linux desktop speech-to-text, set up here for Parakeet V3 on the CPU";
-        homepage = "https://github.com/goodroot/hyprwhspr";
-        license = lib.licenses.mit;
-        mainProgram = "hyprwhspr";
-        platforms = lib.platforms.linux;
-      };
-    });
 in
 {
   stylix.targets.firefox.profileNames = [ "default" ];
@@ -2327,14 +2176,6 @@ in
         "Mod+Tab".action = spawn-sh "noctalia msg window-switcher";
         "Mod+Shift+Escape".action = spawn-sh "noctalia msg session lock";
 
-        # Starts or stops a hyprwhspr recording. hyprwhspr's own shortcuts
-        # are off (external_bindings in its config.json), so niri owns the
-        # key and the CLI passes the toggle to the running service.
-        "Mod+Backslash" = {
-          action = spawn "hyprwhspr" "record" "toggle";
-          repeat = false;
-        };
-
         "XF86AudioRaiseVolume" = {
           action = spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0";
           allow-when-locked = true;
@@ -2457,54 +2298,6 @@ in
   # Noctalia scans this directory for plugins that come from neither the
   # official nor the community repo.
   xdg.dataFile."noctalia/plugins/timezone-grid".source = ./../../plugins/timezone-grid;
-  xdg.dataFile."noctalia/plugins/noctwhspr".source = "${hyprwhspr}/share/noctalia/plugins/noctwhspr";
-
-  # hyprwhspr reads only the keys that differ from its defaults. It writes
-  # this file only when it migrates a legacy key, and none of these keys
-  # is legacy, so the read-only link that home-manager makes is safe.
-  xdg.configFile."hyprwhspr/config.json".text = builtins.toJSON {
-    transcription_backend = "onnx-asr";
-    onnx_asr_model = "nemo-parakeet-tdt-0.6b-v3";
-    # niri binds Mod+Backslash to `hyprwhspr record toggle`. With this key
-    # set, hyprwhspr does not read /dev/input, so the user needs no input
-    # group.
-    external_bindings = true;
-    recording_mode = "toggle";
-    # No start and stop sounds. In this VMware VM, any sound that plays
-    # while the microphone is open stops the microphone for a few seconds,
-    # so the start sound would cut off the first words.
-    audio_feedback = false;
-  };
-
-  # The dictation daemon. It keeps the model in memory, listens for
-  # `hyprwhspr record toggle`, and pastes the transcript into the focused
-  # window with wl-copy and wtype. It picks Ctrl+Shift+V for terminals from
-  # `niri msg focused-window`. While it records, it shows an overlay through
-  # gtk4-layer-shell.
-  systemd.user.services.hyprwhspr = {
-    Unit = {
-      Description = "hyprwhspr speech-to-text";
-      Documentation = [ "https://github.com/goodroot/hyprwhspr" ];
-      PartOf = [ "graphical-session.target" ];
-      After = [
-        "graphical-session.target"
-        "pipewire.service"
-        "wireplumber.service"
-      ];
-      Wants = [
-        "pipewire.service"
-        "wireplumber.service"
-      ];
-    };
-    Service = {
-      Type = "simple";
-      ExecStart = lib.getExe hyprwhspr;
-      Environment = [ "PYTHONUNBUFFERED=1" ];
-      Restart = "on-failure";
-      RestartSec = 2;
-    };
-    Install.WantedBy = [ "graphical-session.target" ];
-  };
 
   xdg.configFile."ghostty/tabbar.css".text = ''
     tabbar tabbox {
@@ -2591,7 +2384,6 @@ in
         duckdb
         foliate
         glow
-        hyprwhspr # the CLI, for `hyprwhspr status` and `hyprwhspr record toggle`; the daemon is systemd.user.services.hyprwhspr
         inputs.aoc-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
         inputs.erwindb.packages.${pkgs.stdenv.hostPlatform.system}.default
         inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default

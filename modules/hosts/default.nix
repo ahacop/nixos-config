@@ -12,6 +12,7 @@ in
       inputs.stylix.nixosModules.stylix
       inputs.clipway.nixosModules.default
       inputs.home-manager.nixosModules.default
+      config.flake.modules.nixos.dictation
       {
         nixpkgs.overlays = [
           inputs.niri.overlays.niri
@@ -28,6 +29,7 @@ in
             inputs.nixvim.homeModules.nixvim
             inputs.niri.homeModules.niri
             inputs.niri.homeModules.stylix
+            config.flake.modules.homeManager.dictation
           ];
         };
       }
