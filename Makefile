@@ -458,26 +458,23 @@ vm/bootstrap: ## Finalize VM bootstrap after initial installation
 
 vm/secrets: ## Copy GPG and SSH secrets into the VM
 	# GPG keyring
-	rsync -av -e 'ssh $(SSH_OPTIONS)' \
+	rsync -av -e 'ssh $(SSH_OPTIONS) -p$(NIXPORT)' \
 		--exclude='.#*' \
 		--exclude='S.*' \
 		--exclude='*.conf' \
 		$(HOME)/.gnupg/ $(NIXUSER)@$(NIXADDR):~/.gnupg
 	# SSH keys
-	rsync -av -e 'ssh $(SSH_OPTIONS)' \
+	rsync -av -e 'ssh $(SSH_OPTIONS) -p$(NIXPORT)' \
 		--exclude='environment' \
 		$(HOME)/.ssh/ $(NIXUSER)@$(NIXADDR):~/.ssh
 
 vm/copy: ## Copy Nix configurations into the VM
 	rsync -av -e 'ssh $(SSH_OPTIONS) -p$(NIXPORT)' \
-		--exclude='vendor/' \
 		--exclude='.git/' \
-		--exclude='.git-crypt/' \
-		--exclude='iso/' \
 		--rsync-path="sudo rsync" \
 		$(MAKEFILE_DIR)/ $(NIXUSER)@$(NIXADDR):/nix-config
 
 vm/switch: ## Run nixos-rebuild switch in the VM (requires vm/copy first)
 	ssh $(SSH_OPTIONS) -p$(NIXPORT) $(NIXUSER)@$(NIXADDR) " \
-		sudo NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild switch --flake \"/nix-config#${NIXNAME}\" \
+		sudo nixos-rebuild switch --flake \"/nix-config#${NIXNAME}\" \
 	"
