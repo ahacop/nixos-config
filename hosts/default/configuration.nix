@@ -215,9 +215,7 @@ in
     # Define your hostname.
     hostName = "default";
 
-    # The global useDHCP flag is deprecated, therefore explicitly set to false here.
-    # Per-interface useDHCP will be mandatory in the future, so this generated config
-    # replicates the default behaviour.
+    # networkd runs DHCP only on enp2s0, set below.
     useDHCP = false;
 
     # DHCP is done by systemd-networkd, not by dhcpcd, so that resolved below
@@ -652,7 +650,6 @@ in
         echo "Copied ''${#screenshots[@]} screenshot(s) to current directory"
       '')
 
-      # System utilities moved from home.nix
       asciinema
       dysk
       fzf

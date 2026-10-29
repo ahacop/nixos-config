@@ -107,7 +107,7 @@
       system = "aarch64-linux";
       # Single source of truth for the LLM agent CLIs pulled from the numtide
       # llm-agents flake. Consumed by home.nix (to install them) and, via the
-      # llmAgentBins output below, by the Makefile (to check versions) — so the
+      # llmAgents output below, by the Makefile (to check versions) — so the
       # list lives in exactly one place.
       llmAgentNames = [
         "ccusage"

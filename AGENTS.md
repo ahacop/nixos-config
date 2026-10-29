@@ -20,7 +20,7 @@ Evaluation does not run `noctalia config validate` or `niri validate`. Those che
 
 - `flake.nix` holds the inputs, the dev-shell `templates`, and `llmAgentNames`. `llmAgentNames` is the one list of LLM CLIs from the `llm-agents` input. `home.nix` installs them and `make check-versions` reads them through the `llmAgents` output.
 - `hosts/default/configuration.nix` is the system config: boot, services, printing, VMware guest, Stylix theme, and small inline packages such as `print-doc` and `notify-macos`.
-- `hosts/default/home.nix` is the Home Manager config, about 2500 lines. It contains the whole Nixvim setup (LSP servers, keymaps, embedded Lua), zsh, git, tmux, niri and Noctalia. Search it by option path, for example `programs.noctalia`.
+- `hosts/default/home.nix` is the Home Manager config. It contains the whole Nixvim setup (LSP servers, keymaps, embedded Lua), zsh, git, tmux, niri and Noctalia. Search it by option path, for example `programs.noctalia`.
 - `hosts/default/hardware-configuration.nix` is generated. Do not edit it by hand.
 - `config/` holds raw zsh files that `home.nix` sources. `mkdevenv` lives in `config/functions`.
 - `devflakes/` holds the dev shells that the flake exposes as `templates` (`nix flake init -t ~/nixos-config#<name>`). The global gitignore ignores `.envrc`, so a template that ships one needs `git add -f`.
