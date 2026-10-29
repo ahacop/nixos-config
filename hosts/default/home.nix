@@ -457,6 +457,34 @@ in
           end, { desc = desc })
         end
 
+        -- Standard Ebooks preview for the <leader>sb keymaps. It builds the
+        -- book in the current directory into /tmp and opens the newest EPUB
+        -- there in ebook-viewer. open_at is a value for the --open-at option
+        -- of ebook-viewer, or nil to open at the start. where is the text
+        -- that the status message shows after the EPUB path. Running viewers
+        -- are killed first, so only one preview is open.
+        function _G.se_build_preview(open_at, where)
+          vim.fn.system([[pkill -9 -f ebook-viewer-wrapped]])
+
+          print("Building EPUB...")
+          vim.fn.system([[se build --output-dir=/tmp .]])
+          local latest_epub = vim.fn.system([[ls -t /tmp/*.epub | head -n1]]):gsub([[%s+''$]], [[]])
+          if latest_epub == [[]] then
+            print("No EPUB found in /tmp")
+            return
+          end
+
+          local cmd = { [[ebook-viewer]] }
+          if open_at then
+            table.insert(cmd, [[--open-at=]] .. open_at)
+            print("Opening " .. latest_epub .. " " .. where)
+          else
+            print("Opening " .. latest_epub)
+          end
+          table.insert(cmd, latest_epub)
+          vim.fn.jobstart(cmd, { detach = true })
+        end
+
         -- WordNet thesaurus functions
         local function wordnet_lookup(word)
           local output = vim.fn.systemlist("wn " .. vim.fn.shellescape(word) .. " -synsn -synsv -synsa -antsn -antsv -antsa 2>/dev/null")
@@ -1092,29 +1120,14 @@ in
           key = "<leader>sb";
           action.__raw = ''
             function()
-              -- Kill existing ebook-viewer instances
-              vim.fn.system([[pkill -9 -f ebook-viewer-wrapped]])
-
-              print("Building EPUB...")
-              vim.fn.system([[se build --output-dir=/tmp .]])
-              local latest_epub = vim.fn.system([[ls -t /tmp/*.epub | head -n1]]):gsub([[%s+''$]], [[]])
-              if latest_epub ~= [[]] then
-                local cmd = {[[ebook-viewer]]}
-
-                -- Check if current buffer is a text/*.xhtml file
-                local current_file = vim.fn.expand([[%:.]])
-                local chapter_file = current_file:match([[([^/]+%.xhtml)''$]])
-                if chapter_file and current_file:match([[text/]]) then
-                  table.insert(cmd, [[--open-at=toc-href-contains:]] .. chapter_file:gsub([[%.xhtml''$]], [[]]))
-                  print("Opening " .. latest_epub .. " at " .. chapter_file)
-                else
-                  print("Opening " .. latest_epub)
-                end
-
-                table.insert(cmd, latest_epub)
-                vim.fn.jobstart(cmd, {detach = true})
+              -- In a text/*.xhtml chapter, open the EPUB at that chapter.
+              local current_file = vim.fn.expand([[%:.]])
+              local chapter_file = current_file:match([[([^/]+%.xhtml)''$]])
+              if chapter_file and current_file:match([[text/]]) then
+                local chapter = chapter_file:gsub([[%.xhtml''$]], [[]])
+                _G.se_build_preview([[toc-href-contains:]] .. chapter, "at " .. chapter_file)
               else
-                print("No EPUB found in /tmp")
+                _G.se_build_preview(nil)
               end
             end
           '';
@@ -1128,32 +1141,16 @@ in
           key = "<leader>sb";
           action.__raw = ''
             function()
-              -- Kill existing ebook-viewer instances
-              vim.fn.system([[pkill -9 -f ebook-viewer-wrapped]])
-
               -- Yank selection to register z
               vim.cmd([[normal! "zy]])
               local selection = vim.fn.getreg([[z]])
 
-              print("Building EPUB...")
-              vim.fn.system([[se build --output-dir=/tmp .]])
-              local latest_epub = vim.fn.system([[ls -t /tmp/*.epub | head -n1]]):gsub([[%s+''$]], [[]])
-              if latest_epub ~= [[]] then
-                local cmd = {[[ebook-viewer]]}
-
-                -- Strip HTML tags and whitespace
-                local search_text = selection:gsub([[<[^>]+>]], [[]]):gsub([[^%s+]], [[]]):gsub([[%s+''$]], [[]])
-                if search_text ~= [[]] then
-                  table.insert(cmd, [[--open-at=search:]] .. search_text)
-                  print("Opening " .. latest_epub .. " searching for: " .. search_text)
-                else
-                  print("Opening " .. latest_epub)
-                end
-
-                table.insert(cmd, latest_epub)
-                vim.fn.jobstart(cmd, {detach = true})
+              -- Strip HTML tags and whitespace
+              local search_text = selection:gsub([[<[^>]+>]], [[]]):gsub([[^%s+]], [[]]):gsub([[%s+''$]], [[]])
+              if search_text ~= [[]] then
+                _G.se_build_preview([[search:]] .. search_text, "searching for: " .. search_text)
               else
-                print("No EPUB found in /tmp")
+                _G.se_build_preview(nil)
               end
             end
           '';
