@@ -1297,13 +1297,11 @@ in
           };
           settings = {
             autoEnableSources = true;
-            # experimental = {ghost_text = true;};
             performance = {
               debounce = 60;
               fetchingTimeout = 200;
               maxViewEntries = 30;
             };
-            # formatting = {fields = ["kind" "abbr" "menu"];};
             window = {
               completion = {
                 border = "solid";
@@ -1489,7 +1487,6 @@ in
           enable = true;
           servers = {
             gopls.enable = true;
-            # nixd.enable = true;
             bashls.enable = true;
             eslint = {
               enable = true;
@@ -2017,7 +2014,6 @@ in
 
     tmux = {
       enable = true;
-      # prefix = "C-x";
       mouse = true;
       plugins = with pkgs.tmuxPlugins; [
         prefix-highlight
@@ -2287,19 +2283,6 @@ in
         # is painted this color. Noctalia's wallpaper is off, so nothing draws
         # on top of it.
         background-color = config.lib.stylix.colors.withHashtag.base00;
-
-        # center-focused-column = "on-overflow";
-
-        # Make windows share space (two windows visible side by side)
-        # default-column-width = {
-        #   proportion = 0.5;
-        # };
-        #
-        # preset-column-widths = [
-        #   { proportion = 1.0 / 3.0; }
-        #   { proportion = 1.0 / 2.0; }
-        #   { proportion = 2.0 / 3.0; }
-        # ];
       };
 
       animations = {
