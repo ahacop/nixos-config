@@ -1,5 +1,9 @@
 # Dictionaries: sdcv with Webster's 1913 for `define`, the local dictd
 # server for `germ`, WordNet, and `thes` with the Moby thesaurus.
+{ config, ... }:
+let
+  inherit (config.flake.modules) homeManager;
+in
 {
   flake.modules.nixos.dictionary =
     { pkgs, ... }:
@@ -23,6 +27,8 @@
       };
     in
     {
+      home-manager.sharedModules = [ homeManager.dictionary ];
+
       # Local dictionary server
       services.dictd = {
         enable = true;

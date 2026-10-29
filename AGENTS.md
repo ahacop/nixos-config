@@ -17,7 +17,7 @@ Commit a change before the user switches to try it, even an experiment. The user
 ## Where things are
 
 - `flake.nix` holds only the inputs. import-tree loads every `.nix` file under `modules/` as a flake-parts module, except paths that contain `/_`. `modules/hosts/default/default.nix` builds `nixosConfigurations.default`.
-- A feature file in `modules/` puts its NixOS part in `flake.modules.nixos.<name>` and its home-manager part in `flake.modules.homeManager.<name>`. The host file must list both parts.
+- A feature file in `modules/` puts its NixOS part in `flake.modules.nixos.<name>` and its home-manager part in `flake.modules.homeManager.<name>`. A feature with both parts adds its home-manager part to `home-manager.sharedModules` from its NixOS part. The host file lists each feature once: the NixOS part if there is one, or else the home-manager part.
 - A local evaluation reads only the files that git tracks. `make vm/copy` copies the tree without `.git`, so the VM build reads every file under `modules/`. Do not leave an untracked `.nix` file in `modules/`.
 - Each feature has one file or directory in `modules/` with its name: dictation, dictionary, firefox, ghostty, git, llm-agents, niri, nixvim, noctalia, printing, theme, tmux, vmware-guest and zsh.
 - `modules/hosts/default/configuration.nix` and `modules/hosts/default/home.nix` hold the system and user settings that belong to no feature. `home.nix` has the user packages, udiskie, small shell tools such as starship and direnv, and the session variables.

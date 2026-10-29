@@ -1,6 +1,9 @@
 # Colors and fonts: stylix with the gruvbox scheme, the system fonts, and
 # other base16 schemes and a font to switch to.
-{ inputs, ... }:
+{ inputs, config, ... }:
+let
+  inherit (config.flake.modules) homeManager;
+in
 {
   flake.modules.nixos.theme =
     { config, pkgs, ... }:
@@ -84,6 +87,7 @@
     in
     {
       imports = [ inputs.stylix.nixosModules.stylix ];
+      home-manager.sharedModules = [ homeManager.theme ];
 
       stylix = {
         enable = true;

@@ -1,8 +1,13 @@
 # Niri, the compositor: the system session, the user config with every key
 # bind, and nirisnap for screenshots.
-{ inputs, ... }:
+{ inputs, config, ... }:
+let
+  inherit (config.flake.modules) homeManager;
+in
 {
   flake.modules.nixos.niri = {
+    home-manager.sharedModules = [ homeManager.niri ];
+
     nixpkgs.overlays = [ inputs.niri.overlays.niri ];
 
     # Enable Niri window manager

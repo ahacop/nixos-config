@@ -2,8 +2,14 @@
 # Mod+Backslash or the top mouse thumb button starts and stops a recording.
 # The Noctalia bar shows the state through the noctwhspr widget, which the
 # bar settings in modules/noctalia place.
+{ config, ... }:
+let
+  inherit (config.flake.modules) homeManager;
+in
 {
   flake.modules.nixos.dictation = {
+    home-manager.sharedModules = [ homeManager.dictation ];
+
     # Mouse thumb buttons for dictation. The top thumb button (BTN_EXTRA)
     # presses Mod+Backslash, which niri binds to `hyprwhspr record toggle`.
     # The bottom thumb button (BTN_SIDE) presses Enter. Both buttons lose
