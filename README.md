@@ -10,7 +10,7 @@ Download the `aarch64` NixOS ISO from the
 Create a VMware Fusion VM with these settings:
 
 - ISO: NixOS 24.05 or later.
-- Disk: NVMe, 150 GB+. `make vm/bootstrap0` partitions `/dev/nvme0n1`; set
+- Disk: NVMe, 150 GB+. `make vm/install` partitions `/dev/nvme0n1`; set
   `HDDEV` if the disk shows up under another name.
 - CPU/Memory: at least half the cores and half the RAM.
 - Graphics: Full acceleration, full resolution, maximum graphics RAM.
@@ -33,19 +33,28 @@ clone of this repository:
 
 ```
 export NIXADDR=<VM ip address>
-make vm/bootstrap0
+make vm/install
 ```
 
-That partitions the disk, installs a minimal NixOS with SSH enabled, and
-reboots. After the reboot, finish with this configuration:
+That partitions the disk, copies the repository to `/nix-config` in the VM,
+installs this configuration with `nixos-install`, and reboots.
+
+After the reboot, run `ip addr` in the VM console again, since the address can
+change. Then copy the SSH and GPG keys over from the Mac:
 
 ```
-make vm/bootstrap
+make vm/secrets NIXADDR=<VM ip address>
 ```
 
-That copies the repository to `/nix-config` in the VM, runs
-`nixos-rebuild switch` there, copies the SSH and GPG keys over
-(`make vm/secrets`), and reboots.
+Do this on a network you trust. SSH shows the VM's host key fingerprint and
+asks before it connects, once for each of the two copies. Compare the
+fingerprint with the one the VM console prints:
+
+```
+ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
+```
+
+The password for `ahacop` is `password` until you change it.
 
 From here on, work inside the VM. Clone this repository there and use
 `make test` and `make switch`.
