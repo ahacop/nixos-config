@@ -792,21 +792,6 @@ in
     ];
   };
 
-  # Set volume to 60% on boot
-  systemd.user.services.set-volume = {
-    description = "Set audio volume to 60%";
-    wantedBy = [ "default.target" ];
-    after = [
-      "pipewire.service"
-      "pipewire-pulse.service"
-    ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.pulseaudio}/bin/pactl set-sink-volume @DEFAULT_SINK@ 60%";
-      RemainAfterExit = true;
-    };
-  };
-
   # The NixOS release this machine was first installed with. It sets the
   # defaults for stateful data such as database formats. Do not change it on
   # upgrades.
