@@ -16,12 +16,13 @@ Commit a change before the user switches to try it, even an experiment. The user
 
 ## Where things are
 
-- `flake.nix` holds only the inputs. import-tree loads every `.nix` file under `modules/` as a flake-parts module, except paths that contain `/_`. `modules/hosts/default.nix` builds `nixosConfigurations.default`.
+- `flake.nix` holds only the inputs. import-tree loads every `.nix` file under `modules/` as a flake-parts module, except paths that contain `/_`. `modules/hosts/default/default.nix` builds `nixosConfigurations.default`.
 - A feature file in `modules/` puts its NixOS part in `flake.modules.nixos.<name>` and its home-manager part in `flake.modules.homeManager.<name>`. The host file must list both parts.
 - A local evaluation reads only the files that git tracks. `make vm/copy` copies the tree without `.git`, so the VM build reads every file under `modules/`. Do not leave an untracked `.nix` file in `modules/`.
-- Each feature has one file or directory in `modules/` with its name: dictation, dictionary, firefox, ghostty, git, niri, nixvim, noctalia, tmux and zsh.
-- `hosts/default/home.nix` has about 130 lines: the user packages, udiskie, small shell tools such as starship and direnv, and the session variables.
-- `hosts/default/configuration.nix` is the system config.
+- Each feature has one file or directory in `modules/` with its name: dictation, dictionary, firefox, ghostty, git, llm-agents, niri, nixvim, noctalia, printing, theme, tmux, vmware-guest and zsh.
+- `modules/hosts/default/configuration.nix` and `modules/hosts/default/home.nix` hold the system and user settings that belong to no feature. `home.nix` has the user packages, udiskie, small shell tools such as starship and direnv, and the session variables.
+- `modules/hosts/default/_hardware-configuration.nix` is the file that `nixos-generate-config` wrote. `nix fmt` does not format it.
+- No module gets `specialArgs`. A flake-parts module reads the flake inputs as `inputs` and the user name as `config.user`, from `modules/user.nix`. A NixOS or home-manager part uses them from the enclosing flake-parts module.
 - To add or remove an LLM CLI, edit `llmAgentNames` in `modules/llm-agents.nix`. The home-manager part in that file and `make check-versions` both read that list.
 - The global gitignore ignores `.envrc`. An `.envrc` in a `devflakes/` template needs `git add -f`.
 

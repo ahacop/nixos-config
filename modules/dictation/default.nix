@@ -1,7 +1,7 @@
 # Dictation: speak, and the transcript is typed into the focused window.
 # Mod+Backslash or the top mouse thumb button starts and stops a recording.
 # The Noctalia bar shows the state through the noctwhspr widget, which the
-# bar settings in home.nix place.
+# bar settings in modules/noctalia place.
 {
   flake.modules.nixos.dictation = {
     # Mouse thumb buttons for dictation. The top thumb button (BTN_EXTRA)

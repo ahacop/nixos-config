@@ -7,7 +7,7 @@
       # It replaces waybar, mako, walker and cliphist, so none of those are
       # installed. Colors, fonts and opacity arrive from stylix via
       # `stylix.targets.noctalia`, which writes a custom palette and points the
-      # theme at it — the scheme itself stays set in configuration.nix.
+      # theme at it — the scheme itself is set in modules/theme.nix.
       #
       # `settings` is an attrset rendered to TOML. `checkConfig` (on by default)
       # runs `noctalia config validate` over the result during the build, so a

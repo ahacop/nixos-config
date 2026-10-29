@@ -9,7 +9,7 @@
     { pkgs, ... }:
     {
       formatter = pkgs.nixfmt-tree.override {
-        settings.global.excludes = [ "hosts/default/hardware-configuration.nix" ];
+        settings.global.excludes = [ "modules/hosts/default/_hardware-configuration.nix" ];
       };
     };
 }
