@@ -1,9 +1,15 @@
 {
-  # `nix fmt` runs nixfmt, the same formatter nvim applies on save through
-  # none-ls in home.nix, so both produce the same layout.
+  # `nix fmt` with no arguments formats every Nix file in the repo. It runs
+  # nixfmt through treefmt. nvim applies the same nixfmt on save through
+  # none-ls in modules/nixvim, so both produce the same layout.
+  #
+  # hardware-configuration.nix is left as nixos-generate-config wrote it, so
+  # it can be compared with the file that a new install generates.
   perSystem =
     { pkgs, ... }:
     {
-      formatter = pkgs.nixfmt;
+      formatter = pkgs.nixfmt-tree.override {
+        settings.global.excludes = [ "hosts/default/hardware-configuration.nix" ];
+      };
     };
 }
