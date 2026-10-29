@@ -2013,8 +2013,8 @@ in
           ra = "!git r --all"; # ra = recent commits, all reachable refs
           root = "rev-parse --show-toplevel";
           st = "status";
-          today = "log --since=midnight --author='ahacop' --oneline";
-          yesterday = "log --since=midnight.yesterday --until=midnight --author='ahacop' --oneline";
+          today = "log --since=midnight --author='${fullName}' --oneline";
+          yesterday = "log --since=midnight.yesterday --until=midnight --author='${fullName}' --oneline";
           churn = "!f() { git log --all -M -C --name-only --format='format:' \"$@\" | sort | grep -v '^$' | uniq -c | sort -n; }; f";
         };
         branch = {
