@@ -101,6 +101,21 @@ let
       cp $src $out/share/moby/mthesaur.txt
     '';
   };
+
+  # Shell code for print-text and print-doc. It moves the lp options at the
+  # start of the arguments into the lp_args array, and leaves the files in
+  # "$@". -n, -d, -o and -P take a value, so the next argument goes with them.
+  collectLpArgs = ''
+    lp_args=()
+    while [ $# -gt 0 ] && [[ "$1" == -* ]]; do
+      lp_args+=("$1")
+      if [[ "$1" == -[ndoP] ]]; then
+        lp_args+=("$2")
+        shift
+      fi
+      shift
+    done
+  '';
 in
 {
   stylix = {
@@ -474,22 +489,31 @@ in
       wordnet
 
       # Thesaurus using Moby Thesaurus (30k+ words, 2.5M synonyms)
-      (writeShellScriptBin "thes" ''
-        if [ -z "$1" ]; then
-          echo "Usage: thes <word>" >&2
-          exit 1
-        fi
-        word="$1"
-        result=$(${pkgs.gnugrep}/bin/grep -i "^$word," ${moby-thesaurus}/share/moby/mthesaur.txt | head -1)
-        if [ -z "$result" ]; then
-          echo "No synonyms found for: $word" >&2
-          exit 1
-        fi
-        # Print header then synonyms in columns
-        echo "$result" | cut -d',' -f1
-        echo "---"
-        echo "$result" | cut -d',' -f2- | tr ',' '\n' | ${pkgs.util-linux}/bin/column
-      '')
+      (writeShellApplication {
+        name = "thes";
+        runtimeInputs = [
+          coreutils
+          gnugrep
+          util-linux
+        ];
+        text = ''
+          if [ -z "''${1:-}" ]; then
+            echo "Usage: thes <word>" >&2
+            exit 1
+          fi
+          word="$1"
+          # grep exits with status 1 when no line matches.
+          result=$(grep -i -m 1 "^$word," ${moby-thesaurus}/share/moby/mthesaur.txt || true)
+          if [ -z "$result" ]; then
+            echo "No synonyms found for: $word" >&2
+            exit 1
+          fi
+          # Print header then synonyms in columns
+          echo "$result" | cut -d',' -f1
+          echo "---"
+          echo "$result" | cut -d',' -f2- | tr ',' '\n' | column
+        '';
+      })
       xxd
       yt-dlp
       zip
@@ -504,65 +528,67 @@ in
         }/bin/notify-macos "$@"
       '')
       # Get macOS system sound based on current directory
-      (writeShellScriptBin "get-dir-sound" ''
-        # Get the current directory name
-        DIR_NAME=$(basename "$PWD")
+      (writeShellApplication {
+        name = "get-dir-sound";
+        runtimeInputs = [ coreutils ];
+        text = ''
+          # Get the current directory name
+          DIR_NAME=$(basename "$PWD")
 
-        # List of available macOS system sounds
-        SOUNDS=(
-          "Basso"
-          "Blow"
-          "Bottle"
-          "Frog"
-          "Funk"
-          "Glass"
-          "Hero"
-          "Morse"
-          "Ping"
-          "Pop"
-          "Purr"
-          "Sosumi"
-          "Submarine"
-          "Tink"
-        )
+          # List of available macOS system sounds
+          SOUNDS=(
+            "Basso"
+            "Blow"
+            "Bottle"
+            "Frog"
+            "Funk"
+            "Glass"
+            "Hero"
+            "Morse"
+            "Ping"
+            "Pop"
+            "Purr"
+            "Sosumi"
+            "Submarine"
+            "Tink"
+          )
 
-        # Hash the directory name and map to a sound
-        HASH=$(echo -n "$DIR_NAME" | ${pkgs.coreutils}/bin/sha256sum | cut -d' ' -f1)
-        # Convert first 8 hex chars to decimal and modulo by number of sounds
-        INDEX=$(( 0x''${HASH:0:8} % ''${#SOUNDS[@]} ))
-        echo "''${SOUNDS[$INDEX]}"
-      '')
+          # Hash the directory name and map to a sound
+          HASH=$(echo -n "$DIR_NAME" | sha256sum | cut -d' ' -f1)
+          # Convert first 8 hex chars to decimal and modulo by number of sounds
+          INDEX=$(( 0x''${HASH:0:8} % ''${#SOUNDS[@]} ))
+          echo "''${SOUNDS[$INDEX]}"
+        '';
+      })
 
       # Print text files with the filename, date and page number at the top of
       # each page. paps lays out the text with Pango, so UTF-8 box-drawing
       # characters print; the plain CUPS text filter drops them. Extra lp
       # options go before the files: print-text -n 2 notes.txt
-      (writeShellScriptBin "print-text" ''
-        set -euo pipefail
+      (writeShellApplication {
+        name = "print-text";
+        runtimeInputs = [
+          coreutils
+          cups
+          paps
+        ];
+        text = ''
+          ${collectLpArgs}
 
-        lp_args=()
-        while [ $# -gt 0 ] && [[ "$1" == -* ]]; do
-          lp_args+=("$1")
-          if [[ "$1" == -[ndoP] ]]; then
-            lp_args+=("$2")
-            shift
+          if [ $# -eq 0 ]; then
+            echo "Usage: print-text [lp options] FILE..." >&2
+            exit 1
           fi
-          shift
-        done
 
-        if [ $# -eq 0 ]; then
-          echo "Usage: print-text [lp options] FILE..." >&2
-          exit 1
-        fi
-
-        for file in "$@"; do
-          ${pkgs.paps}/bin/paps \
-            --format=pdf --paper=a4 --font="Monospace 10" \
-            --header --header-left="$(${pkgs.coreutils}/bin/date +%F)" \
-            --title="$(${pkgs.coreutils}/bin/basename "$file")" \
-            "$file" | ${pkgs.cups}/bin/lp -t "$(${pkgs.coreutils}/bin/basename "$file")" "''${lp_args[@]}"
-        done
-      '')
+          for file in "$@"; do
+            paps \
+              --format=pdf --paper=a4 --font="Monospace 10" \
+              --header --header-left="$(date +%F)" \
+              --title="$(basename "$file")" \
+              "$file" | lp -t "$(basename "$file")" "''${lp_args[@]}"
+          done
+        '';
+      })
 
       # Print prose as a typeset document: reflowed paragraphs in Libertinus
       # Serif, with headings and lists. A .md file goes to pandoc as it is.
@@ -570,85 +596,90 @@ in
       # undoes the 80-column wrap of a Claude Code transcript. Typst sets the
       # type and has the font built in. Extra lp options go before the files:
       # print-doc -n 2 first-pass.txt
-      (writeShellScriptBin "print-doc" ''
-        set -euo pipefail
+      (writeShellApplication {
+        name = "print-doc";
+        runtimeInputs = [
+          coreutils
+          cups
+          gawk
+          pandoc
+          typst
+        ];
+        text = ''
+          ${collectLpArgs}
 
-        lp_args=()
-        while [ $# -gt 0 ] && [[ "$1" == -* ]]; do
-          lp_args+=("$1")
-          if [[ "$1" == -[ndoP] ]]; then
-            lp_args+=("$2")
-            shift
+          if [ $# -eq 0 ]; then
+            echo "Usage: print-doc [lp options] FILE..." >&2
+            exit 1
           fi
-          shift
-        done
 
-        if [ $# -eq 0 ]; then
-          echo "Usage: print-doc [lp options] FILE..." >&2
-          exit 1
-        fi
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
 
-        tmp=$(${pkgs.coreutils}/bin/mktemp -d)
-        trap '${pkgs.coreutils}/bin/rm -rf "$tmp"' EXIT
-
-        for file in "$@"; do
-          name=$(${pkgs.coreutils}/bin/basename "$file")
-          if [[ "$file" == *.md ]]; then
-            ${pkgs.coreutils}/bin/cp "$file" "$tmp/doc.md"
-          else
-            ${pkgs.gawk}/bin/awk -f ${./print-doc/transcript-to-markdown.awk} "$file" > "$tmp/doc.md"
-          fi
-          ${pkgs.pandoc}/bin/pandoc "$tmp/doc.md" -o "$tmp/doc.pdf" \
-            --pdf-engine=${pkgs.typst}/bin/typst \
-            -V papersize=a4 -V margin.x=2.5cm -V margin.y=2.5cm \
-            -V mainfont="Libertinus Serif" -V fontsize=11pt
-          ${pkgs.cups}/bin/lp -t "$name" "''${lp_args[@]}" "$tmp/doc.pdf"
-        done
-      '')
+          for file in "$@"; do
+            name=$(basename "$file")
+            if [[ "$file" == *.md ]]; then
+              cp "$file" "$tmp/doc.md"
+            else
+              awk -f ${./print-doc/transcript-to-markdown.awk} "$file" > "$tmp/doc.md"
+            fi
+            pandoc "$tmp/doc.md" -o "$tmp/doc.pdf" \
+              --pdf-engine=typst \
+              -V papersize=a4 -V margin.x=2.5cm -V margin.y=2.5cm \
+              -V mainfont="Libertinus Serif" -V fontsize=11pt
+            lp -t "$name" "''${lp_args[@]}" "$tmp/doc.pdf"
+          done
+        '';
+      })
 
       # Copy latest screenshot(s) from Desktop to current directory
-      (writeShellScriptBin "copy-screenshot" ''
-        set -euo pipefail
+      (writeShellApplication {
+        name = "copy-screenshot";
+        runtimeInputs = [
+          coreutils
+          findutils
+        ];
+        text = ''
+          DESKTOP_PATH="/host/ahacop/Desktop"
+          NUM_SCREENSHOTS="''${1:-1}"
 
-        DESKTOP_PATH="/host/ahacop/Desktop"
-        NUM_SCREENSHOTS="''${1:-1}"
+          # Validate the argument is a positive integer
+          if ! [[ "$NUM_SCREENSHOTS" =~ ^[0-9]+$ ]] || [ "$NUM_SCREENSHOTS" -lt 1 ]; then
+            echo "Error: Argument must be a positive integer" >&2
+            echo "Usage: copy-screenshot [N]" >&2
+            exit 1
+          fi
 
-        # Validate the argument is a positive integer
-        if ! [[ "$NUM_SCREENSHOTS" =~ ^[0-9]+$ ]] || [ "$NUM_SCREENSHOTS" -lt 1 ]; then
-          echo "Error: Argument must be a positive integer" >&2
-          echo "Usage: copy-screenshot [N]" >&2
-          exit 1
-        fi
+          # Check if Desktop directory exists
+          if [ ! -d "$DESKTOP_PATH" ]; then
+            echo "Error: Desktop directory not found at $DESKTOP_PATH" >&2
+            exit 1
+          fi
 
-        # Check if Desktop directory exists
-        if [ ! -d "$DESKTOP_PATH" ]; then
-          echo "Error: Desktop directory not found at $DESKTOP_PATH" >&2
-          exit 1
-        fi
+          # Find screenshots and sort by modification time (newest first)
+          # Screenshot filenames look like: "Screenshot 2025-11-30 at 5.31.47 PM.png"
+          mapfile -t screenshots < <(find "$DESKTOP_PATH" -maxdepth 1 -type f -name "Screenshot *.png" -printf '%T@ %p\n' | sort -rn | head -n "$NUM_SCREENSHOTS" | cut -d' ' -f2-)
 
-        # Find screenshots and sort by modification time (newest first)
-        # Screenshot filenames look like: "Screenshot 2025-11-30 at 5.31.47 PM.png"
-        mapfile -t screenshots < <(${pkgs.findutils}/bin/find "$DESKTOP_PATH" -maxdepth 1 -type f -name "Screenshot *.png" -printf '%T@ %p\n' | ${pkgs.coreutils}/bin/sort -rn | ${pkgs.coreutils}/bin/head -n "$NUM_SCREENSHOTS" | ${pkgs.coreutils}/bin/cut -d' ' -f2-)
+          # Check if any screenshots were found
+          if [ ''${#screenshots[@]} -eq 0 ]; then
+            echo "No screenshots found in $DESKTOP_PATH" >&2
+            exit 1
+          fi
 
-        # Check if any screenshots were found
-        if [ ''${#screenshots[@]} -eq 0 ]; then
-          echo "No screenshots found in $DESKTOP_PATH" >&2
-          exit 1
-        fi
+          # Check if we found fewer screenshots than requested
+          if [ ''${#screenshots[@]} -lt "$NUM_SCREENSHOTS" ]; then
+            echo "Warning: Only found ''${#screenshots[@]} screenshot(s), requested $NUM_SCREENSHOTS" >&2
+          fi
 
-        # Check if we found fewer screenshots than requested
-        if [ ''${#screenshots[@]} -lt "$NUM_SCREENSHOTS" ]; then
-          echo "Warning: Only found ''${#screenshots[@]} screenshot(s), requested $NUM_SCREENSHOTS" >&2
-        fi
+          # Copy each screenshot to current directory
+          for screenshot in "''${screenshots[@]}"; do
+            filename=$(basename "$screenshot")
+            cp -v "$screenshot" "./$filename"
+          done
 
-        # Copy each screenshot to current directory
-        for screenshot in "''${screenshots[@]}"; do
-          filename=$(${pkgs.coreutils}/bin/basename "$screenshot")
-          ${pkgs.coreutils}/bin/cp -v "$screenshot" "./$filename"
-        done
-
-        echo "Copied ''${#screenshots[@]} screenshot(s) to current directory"
-      '')
+          echo "Copied ''${#screenshots[@]} screenshot(s) to current directory"
+        '';
+      })
 
       asciinema
       dysk
