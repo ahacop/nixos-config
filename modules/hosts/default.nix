@@ -15,6 +15,7 @@ in
       config.flake.modules.nixos.dictation
       config.flake.modules.nixos.niri
       config.flake.modules.nixos.dictionary
+      config.flake.modules.nixos.printing
       {
         home-manager = {
           useGlobalPkgs = true;
