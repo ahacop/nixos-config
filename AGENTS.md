@@ -16,6 +16,8 @@ Evaluation does not run `noctalia config validate` or `niri validate`. Those che
 
 `make help` lists every Make target. `make test` builds without activating and leaves a root-owned `./result` link. `make switch` builds and activates.
 
+Commit a change before the user switches to try it, even when it is an experiment. The user does not switch from a dirty tree. If the change does not work, drop or revert the commit afterwards.
+
 ## Layout
 
 - `flake.nix` holds the inputs, the dev-shell `templates`, and `llmAgentNames`. `llmAgentNames` is the one list of LLM CLIs from the `llm-agents` input. `home.nix` installs them and `make check-versions` reads them through the `llmAgents` output.
