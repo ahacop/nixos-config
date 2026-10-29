@@ -43,4 +43,4 @@ The Mac home directory is mounted at `/host` over HGFS. Never run a search or gl
 
 ## Input pins
 
-Most inputs follow our `nixpkgs`. `llm-agents` keeps its own nixpkgs on purpose, so its CLIs match the `cache.numtide.com` binaries. `aoc-cli`, `erwindb` and `opdsview` all follow one `rust-overlay` input.
+Most inputs follow our `nixpkgs`. `llm-agents` keeps its own nixpkgs on purpose, so its CLIs match the `cache.numtide.com` binaries. `erwindb` keeps its own nixpkgs too, so a `nixpkgs` update does not make it compile again from source. `aoc-cli`, `erwindb` and `opdsview` all follow one `rust-overlay` input.

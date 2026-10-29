@@ -50,9 +50,11 @@
       inputs.rust-overlay.follows = "rust-overlay";
     };
 
+    # erwindb keeps its own nixpkgs so that its store path changes only when
+    # erwindb's own lock changes. No binary cache has erwindb, so a store path
+    # change means a local compile from source.
     erwindb = {
       url = "github:ahacop/erwindb";
-      inputs.nixpkgs.follows = "nixpkgs";
       inputs.rust-overlay.follows = "rust-overlay";
     };
 
