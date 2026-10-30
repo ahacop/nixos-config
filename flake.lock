@@ -167,11 +167,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790775206,
-        "narHash": "sha256-S2Tt5MUlZ6fC1+i9rLB703od/RmniiHFplxeUX+JajQ=",
+        "lastModified": 1793349104,
+        "narHash": "sha256-5Xfvkk/tV2UAyjRPrDgr4V3e+H1VHIw7nTtoB+mNE7Q=",
         "owner": "ahacop",
         "repo": "erwindb",
-        "rev": "b9aee6bef2b736e1702608f1de260640c0e85079",
+        "rev": "e661639c7daf2ffbb9d108b9d63a836d1e81450c",
         "type": "github"
       },
       "original": {
@@ -452,16 +452,14 @@
     "mw-cli": {
       "inputs": {
         "flake-utils": "flake-utils_2",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
+        "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1763078867,
-        "narHash": "sha256-hy1Usij0WnIhmcPoICI7yV8RAG6N+pMvxc+ETfFeILo=",
+        "lastModified": 1793349104,
+        "narHash": "sha256-4eRyUY7eQeHy2xRZNxt0chnkTJ0yRCLGFmbN4mnYMNc=",
         "owner": "ahacop",
         "repo": "mw-cli",
-        "rev": "90f88d3efb5a05085a12e01ea14f92daa21544a3",
+        "rev": "f47ba90070b639a4c4209701d2bd923029a8dbdc",
         "type": "github"
       },
       "original": {
@@ -610,6 +608,22 @@
     },
     "nixpkgs_5": {
       "locked": {
+        "lastModified": 1762844143,
+        "narHash": "sha256-SlybxLZ1/e4T2lb1czEtWVzDCVSTvk9WLwGhmxFmBxI=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "9da7f1cf7f8a6e2a7cb3001b048546c92a8258b4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_6": {
+      "locked": {
         "lastModified": 1793110635,
         "narHash": "sha256-dhoW6VgFWlaodSY5jrBn+CF2FLmaUvDVgM7+C7T2+NM=",
         "owner": "nixos",
@@ -619,6 +633,22 @@
       },
       "original": {
         "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_7": {
+      "locked": {
+        "lastModified": 1790578696,
+        "narHash": "sha256-ZoxIApko70jCdbH3l20HWXOBaT2HZd87orzd2yJ9dVE=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "7a0f122f5090cf4c2ade2a13a0e229d4e19ba71f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
@@ -694,19 +724,17 @@
     },
     "opdsview": {
       "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
+        "nixpkgs": "nixpkgs_7",
         "rust-overlay": [
           "rust-overlay"
         ]
       },
       "locked": {
-        "lastModified": 1790710720,
-        "narHash": "sha256-tCIm5RgGUtsfVqkdEqH/Jx9vSSSzQ84jyKikUVmU61o=",
+        "lastModified": 1793349104,
+        "narHash": "sha256-GhAbJ/i6zg2jCcFXi2WlnS+Mmz6kuv4AuZTpTz+xbYI=",
         "owner": "ahacop",
         "repo": "opdsview",
-        "rev": "acdafd1338e2f391182eb06cda9259208178f57f",
+        "rev": "4c1a3acc5398bf36da2cf1cd09da4c7f11e264a7",
         "type": "github"
       },
       "original": {
@@ -728,7 +756,7 @@
         "macos-notifier-bridge": "macos-notifier-bridge",
         "mw-cli": "mw-cli",
         "niri": "niri",
-        "nixpkgs": "nixpkgs_5",
+        "nixpkgs": "nixpkgs_6",
         "nixpkgs-kernel": [
           "nixpkgs"
         ],

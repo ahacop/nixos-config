@@ -37,11 +37,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    mw-cli = {
-      url = "github:ahacop/mw-cli";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # erwindb and opdsview each declare their own rust-overlay. They both follow
     # this one so the lock holds a single copy, and so a single update here
     # moves both off any rust-overlay that trips nixpkgs deprecation warnings
@@ -56,9 +51,13 @@
     # store path here matches the cached one and nothing compiles locally.
     aoc-cli.url = "github:ahacop/aoc-cli";
 
-    # erwindb keeps its own nixpkgs so that its store path changes only when
-    # erwindb's own lock changes. No binary cache has erwindb, so a store path
-    # change means a local compile from source.
+    # mw-cli, erwindb and opdsview keep their own nixpkgs for the same reason
+    # as aoc-cli: their CI pushes builds of their own locks to
+    # ahacop.cachix.org. erwindb and opdsview use rust-overlay only in their
+    # dev shells, so the rust-overlay follows leave their package store paths
+    # unchanged.
+    mw-cli.url = "github:ahacop/mw-cli";
+
     erwindb = {
       url = "github:ahacop/erwindb";
       inputs.rust-overlay.follows = "rust-overlay";
@@ -66,7 +65,6 @@
 
     opdsview = {
       url = "github:ahacop/opdsview";
-      inputs.nixpkgs.follows = "nixpkgs";
       inputs.rust-overlay.follows = "rust-overlay";
     };
 
