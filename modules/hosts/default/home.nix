@@ -80,7 +80,6 @@
           inputs.epub-sync.packages.${pkgs.stdenv.hostPlatform.system}.default
           mermaid-cli
           pomodoro
-          presenterm
           vale
           zathura
         ];
