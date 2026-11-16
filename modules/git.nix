@@ -6,6 +6,7 @@
       fullName = "Ara Hacopian";
       primaryEmail = "ara@hacopian.de";
       workEmail = "ara@changebot.ai";
+      tryhackmeEmail = "ara@tryhackme.com";
     in
     {
       programs.gh = {
@@ -31,6 +32,14 @@
             contents = {
               user = {
                 email = workEmail;
+              };
+            };
+          }
+          {
+            condition = "gitdir:~/code/tryhackme/";
+            contents = {
+              user = {
+                email = tryhackmeEmail;
               };
             };
           }
