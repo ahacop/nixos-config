@@ -1,4 +1,5 @@
-# System settings for this VM that no feature file in modules/ holds.
+# System settings that every host gets and that no feature file in modules/
+# holds. Settings for one host only go in that host's module in modules/hosts/.
 { inputs, config, ... }:
 let
   inherit (config) user;
@@ -76,9 +77,6 @@ in
           ];
         };
       };
-
-      # Define your hostname.
-      networking.hostName = "default";
 
       # Set your time zone.
       time.timeZone = "Europe/Berlin";
@@ -235,10 +233,5 @@ in
       # The desktop modules turn speech-dispatcher on by default. Nothing here
       # uses it, and it pulls in espeak-ng and the mbrola voices, about 2.3G.
       services.speechd.enable = false;
-
-      # The NixOS release this machine was first installed with. It sets the
-      # defaults for stateful data such as database formats. Do not change it on
-      # upgrades.
-      system.stateVersion = "24.05";
     };
 }

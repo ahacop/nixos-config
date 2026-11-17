@@ -1,45 +1,68 @@
-# The one VM. `make switch` and `make vm/switch` build it as
-# nixosConfigurations.default.
+# The personal VM. A host is a named module like a feature: nixos.default
+# imports the shared base and the features this VM gets and sets what only this
+# VM has, and homeManager.default does the same for the user.
+# nixosConfigurations.default is built from nixos.default alone.
 { inputs, config, ... }:
 let
   inherit (config) user;
+  inherit (config.flake.modules) nixos homeManager;
 in
 {
-  flake.nixosConfigurations.default = inputs.nixpkgs.lib.nixosSystem {
-    modules = [
-      config.flake.modules.nixos.configuration
+  flake.modules.nixos.default = {
+    imports = [
+      nixos.configuration
       inputs.home-manager.nixosModules.default
 
       # Features with a NixOS part. A feature that also has a home-manager
       # part adds it to home-manager.sharedModules itself.
-      config.flake.modules.nixos.dictation
-      config.flake.modules.nixos.niri
-      config.flake.modules.nixos.dictionary
-      config.flake.modules.nixos.printing
-      config.flake.modules.nixos.vmware-guest
-      config.flake.modules.nixos.theme
-      config.flake.modules.nixos.usb-drives
-      config.flake.modules.nixos.networking
-      config.flake.modules.nixos.mac-host
-      {
-        home-manager = {
-          useGlobalPkgs = true;
-          useUserPackages = true;
-          users.${user}.imports = [
-            config.flake.modules.homeManager.home
-
-            # Features with only a home-manager part.
-            config.flake.modules.homeManager.nixvim
-            config.flake.modules.homeManager.noctalia
-            config.flake.modules.homeManager.firefox
-            config.flake.modules.homeManager.ghostty
-            config.flake.modules.homeManager.zsh
-            config.flake.modules.homeManager.git
-            config.flake.modules.homeManager.tmux
-            config.flake.modules.homeManager.llm-agents
-          ];
-        };
-      }
+      nixos.dictation
+      nixos.niri
+      nixos.dictionary
+      nixos.printing
+      nixos.vmware-guest
+      nixos.theme
+      nixos.usb-drives
+      nixos.networking
+      nixos.mac-host
     ];
+
+    # The Makefile builds the configuration with this host's name, so the
+    # hostname and the name of the nixosConfiguration must match.
+    networking.hostName = "default";
+
+    # The NixOS release this machine was first installed with. It sets the
+    # defaults for stateful data such as database formats. Do not change it on
+    # upgrades.
+    system.stateVersion = "24.05";
+
+    home-manager = {
+      useGlobalPkgs = true;
+      useUserPackages = true;
+      users.${user}.imports = [ homeManager.default ];
+    };
+  };
+
+  flake.modules.homeManager.default = {
+    imports = [
+      homeManager.home
+
+      # Features with only a home-manager part.
+      homeManager.nixvim
+      homeManager.noctalia
+      homeManager.firefox
+      homeManager.ghostty
+      homeManager.zsh
+      homeManager.git
+      homeManager.tmux
+      homeManager.llm-agents
+    ];
+
+    # The release home-manager was first used with on this machine. Do not
+    # change it on upgrades.
+    home.stateVersion = "24.05";
+  };
+
+  flake.nixosConfigurations.default = inputs.nixpkgs.lib.nixosSystem {
+    modules = [ nixos.default ];
   };
 }

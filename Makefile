@@ -7,8 +7,10 @@ HDDEV ?= /dev/nvme0n1
 # Get the path to this Makefile and directory
 MAKEFILE_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
-# The name of the nixosConfiguration in the flake
-NIXNAME ?= default
+# The name of the nixosConfiguration in the flake. Each host's configuration
+# is named after its hostname, so on a NixOS VM it defaults to the hostname.
+# Elsewhere (the Mac) it defaults to default; vm/install requires it to be set.
+NIXNAME ?= $(if $(wildcard /etc/NIXOS),$(shell hostname),default)
 
 # Start the Nix evaluator with a large garbage-collector heap. Evaluating this
 # configuration allocates about 2 GB; with the default (small) initial heap the
@@ -62,7 +64,7 @@ SECRETS_SSH_OPTIONS := -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/nul
 # Binary caches that vm/install hands to nixos-install. The installer knows
 # only cache.nixos.org, and without these the LLM agent CLIs, aoc-cli and
 # epub-sync compile from source during the install. Keep them in step with
-# nix.settings in modules/hosts/default/configuration.nix.
+# nix.settings in modules/base/configuration.nix.
 INSTALL_SUBSTITUTERS := https://nix-community.cachix.org https://cache.numtide.com https://ahacop.cachix.org
 INSTALL_TRUSTED_KEYS := nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= \
 	niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= \
@@ -438,7 +440,7 @@ secrets/restore: ## Restore local secrets.env from 1Password
 # root's password set to "root" in the VM console. It partitions and formats
 # HDDEV, copies this repository to /mnt/nix-config (/nix-config once the VM
 # boots), runs nixos-install on the flake and reboots. It does not run
-# nixos-generate-config: modules/hosts/default/_hardware-configuration.nix
+# nixos-generate-config: modules/base/_hardware-configuration.nix
 # fits any VMware Fusion VM with an NVMe disk.
 #
 # The installer sets GC_INITIAL_HEAP_SIZE=1M, so nixos-install gets
@@ -446,7 +448,11 @@ secrets/restore: ## Restore local secrets.env from 1Password
 # files under /mnt, not in the installer's RAM.
 #
 # It copies no private keys. Run vm/secrets after the reboot.
-vm/install: ## Install this configuration on a new VM booted from the NixOS ISO
+vm/install: ## Install a host (NIXNAME=<host>) on a new VM booted from the NixOS ISO
+	@if [ "$(origin NIXNAME)" = file ]; then \
+		echo "Set NIXNAME to the host to install, e.g. NIXNAME=default or NIXNAME=client-vm."; \
+		exit 1; \
+	fi
 	ssh $(SSH_OPTIONS) -p$(NIXPORT) root@$(NIXADDR) " \
 		set -e; \
 		parted $(HDDEV) -- mklabel gpt; \

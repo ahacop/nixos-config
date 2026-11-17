@@ -1,4 +1,5 @@
-# User settings for this VM that no feature file in modules/ holds.
+# User settings that every host gets and that no feature file in modules/
+# holds. Settings for one host only go in that host's module in modules/hosts/.
 { inputs, ... }:
 {
   flake.modules.homeManager.home =
@@ -61,10 +62,8 @@
 
       home = {
         file = {
-          ".ssh/config".source = ../../../config/sshconfig;
+          ".ssh/config".source = ../../config/sshconfig;
         };
-
-        stateVersion = "24.05";
 
         packages = with pkgs; [
           (calibre.override { speechSupport = false; })

@@ -1,8 +1,13 @@
 ## Setup (VM)
 
-This configuration targets one VMware Fusion VM on an Apple Silicon Mac
-(`aarch64-linux`). The flake has a single system, `nixosConfigurations.default`,
-and the Makefile builds `.#default` unless `NIXNAME` is set to something else.
+This configuration targets VMware Fusion VMs on an Apple Silicon Mac
+(`aarch64-linux`). Each VM is a host with its own system in the flake:
+
+- `default` — the personal VM.
+- `client-vm` — the VM for client work.
+
+A host's system is named after its hostname. Inside a VM the Makefile builds
+the system named after the VM's hostname; set `NIXNAME` to build another one.
 
 Download the `aarch64` NixOS ISO from the
 [official NixOS download page](https://nixos.org/download.html#nixos-iso).
@@ -33,14 +38,17 @@ clone of this repository:
 
 ```
 export NIXADDR=<VM ip address>
-make vm/install
+make vm/install NIXNAME=<host>
 ```
 
-That partitions the disk, copies the repository to `/nix-config` in the VM,
-installs this configuration with `nixos-install`, and reboots.
+`NIXNAME` is required here and names the host to install, for example
+`default` or `client-vm`. That partitions the disk, copies the repository to
+`/nix-config` in the VM, installs that host with `nixos-install`, and reboots.
 
 After the reboot, run `ip addr` in the VM console again, since the address can
-change. Then copy the SSH and GPG keys over from the Mac:
+change. For the personal VM, copy the SSH and GPG keys over from the Mac. Skip
+this for a client VM and make a new SSH key in the VM instead
+(`ssh-keygen`, then `gh auth login`):
 
 ```
 make vm/secrets NIXADDR=<VM ip address>
