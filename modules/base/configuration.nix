@@ -1,21 +1,26 @@
-# System settings that every host gets and that no feature file in modules/
-# holds. Settings for one host only go in that host's module in modules/hosts/.
+# The system itself, which every host gets: boot, nix, the user, time and
+# logging. It also imports the features every host gets. Settings for one
+# host only go in that host's module in modules/hosts/.
 { inputs, config, ... }:
 let
   inherit (config) user;
+  inherit (config.flake.modules) nixos;
 in
 {
   flake.modules.nixos.configuration =
-    { lib, pkgs, ... }:
+    { pkgs, ... }:
     {
       imports = [
         # Include the results of the hardware scan.
         ./_hardware-configuration.nix
+
+        nixos.audio
+        nixos.cli-tools
+        nixos.containers
+        nixos.ssh
       ];
 
       environment.localBinInPath = true;
-
-      documentation.dev.enable = true;
 
       users.users.${user} = {
         isNormalUser = true;
@@ -23,9 +28,6 @@ in
         extraGroups = [ "wheel" ];
         shell = pkgs.zsh;
         initialPassword = "password";
-        openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBV/HHQ0w3gMEOnwVvGUCnFJa8qlUCCAuLn26sNzRzk8 ahacop"
-        ];
       };
 
       boot = {
@@ -83,139 +85,11 @@ in
 
       security.sudo.wheelNeedsPassword = false;
 
-      # Virtualization settings
-      virtualisation.docker.rootless = {
-        enable = true;
-        setSocketVariable = true;
-      };
-
-      # Enable greetd with tuigreet
-      services.greetd = {
-        enable = true;
-        settings = {
-          default_session.command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --user-menu --cmd niri-session";
-        };
-      };
-
-      # XDG desktop portal for Wayland
-      xdg.portal = {
-        enable = true;
-        extraPortals = [
-          pkgs.xdg-desktop-portal-gtk
-        ];
-        # Use GTK portal for everything (no GNOME dependencies)
-        config.common.default = [ "gtk" ];
-      };
-
-      services = {
-        # Enable the OpenSSH daemon.
-        openssh = {
-          enable = true;
-          settings.PasswordAuthentication = true;
-          settings.PermitRootLogin = "no";
-        };
-      };
-
       nixpkgs.config.allowUnfree = true;
-      environment = {
-        sessionVariables = {
-          # Where `nh os switch` finds this flake when run without a path.
-          NH_FLAKE = "/home/${user}/nixos-config";
-        };
 
-        # List packages installed in system profile. To search, run:
-        # $ nix search wget
-        systemPackages = with pkgs; [
-          _1password-cli
-          aspell
-          aspellDicts.en
-          bat
-          bc
-          bind.dnsutils # dig, nslookup, etc.
-          btop
-          cachix
-          coreutils
-          curl
-          duf
-          dust
-          entr
-          fd
-          ffmpeg
-          file
-          git
-          gnumake
-          iproute2
-          mesa-demos
-          gnupg
-          htop
-          hunspell
-          jpegoptim
-          jq
-          just
-          killall
-          lsof
-          man-pages
-          man-pages-posix
-          ncdu
-          netcat
-          fastfetch
-          nb
-          nh
-          nix-output-monitor
-          nmap
-          nvd
-          p7zip
-          pandoc
-          pciutils
-          pinentry-curses
-          procps
-          ripgrep
-          rsync
-          socat # used by nb
-          sox
-          sqlite
-          strace
-          tcpdump
-          tmux
-          unzip
-          usbutils
-          w3m
-          watch
-          wdiff
-          which
-          wl-clipboard
-          wget
-          xxd
-          zip
-          chromium
-          gum
+      environment.systemPackages = [ pkgs.chromium ];
 
-          dysk
-          fzf
-          nodejs
-          tig
-          tldr
-          tree
-        ];
-      };
-
-      programs = {
-        zsh.enable = true;
-        ssh = {
-          startAgent = true;
-        };
-      };
-
-      # Disable GNOME's SSH agent to avoid conflict
-      services.gnome.gnome-keyring.enable = lib.mkForce false;
-
-      # Enable sound with PipeWire
-      services.pipewire = {
-        enable = true;
-        pulse.enable = true;
-        alsa.enable = true;
-        jack.enable = true;
-      };
+      programs.zsh.enable = true;
 
       # Keep about three days of system logs. Journald writes roughly 13M a day
       # here and rotates in files of one eighth of SystemMaxUse, so 100M leaves

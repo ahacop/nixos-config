@@ -24,6 +24,8 @@ in
       nixos.usb-drives
       nixos.networking
       nixos.mac-host
+      nixos.writing
+      nixos.notes
     ];
 
     # The Makefile builds the configuration with this host's name, so the

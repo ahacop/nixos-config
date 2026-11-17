@@ -60,18 +60,8 @@
       };
 
       home = {
-        file = {
-          ".ssh/config".source = ../../config/sshconfig;
-        };
-
         packages = with pkgs; [
-          devenv
-          duckdb
-          glow
           inputs.erwindb.packages.${pkgs.stdenv.hostPlatform.system}.default
-          inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
-          mermaid-cli
-          vale
           zathura
         ];
         sessionVariables = {
@@ -79,8 +69,8 @@
           # Read by every less invocation, not only the ones started through
           # PAGER. -X keeps the output on screen after less exits.
           LESS = "-FirSwX";
-          # Ollama runs on the Mac host. Resolved via mDNS (avahi enabled in
-          # configuration.nix) so it survives the host's IP changing.
+          # Ollama runs on the Mac host. Resolved via mDNS (Avahi, in
+          # modules/networking.nix) so it survives the host's IP changing.
           OLLAMA_HOST = "http://chunky-peanut-butter.local:11434";
         };
       };

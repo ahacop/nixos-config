@@ -1,6 +1,7 @@
 # Dictionaries: sdcv with Webster's 1913 for `define`, the local dictd
-# server for `germ`, WordNet, and `thes` with the Moby thesaurus.
-{ config, ... }:
+# server for `germ`, WordNet, `thes` with the Moby thesaurus, and mw-cli for
+# Merriam-Webster.
+{ inputs, config, ... }:
 let
   inherit (config.flake.modules) homeManager;
 in
@@ -109,6 +110,7 @@ in
       home.packages = [
         pkgs.sdcv
         websters-1913-stardict
+        inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
       ];
 
       programs.zsh.shellAliases = {

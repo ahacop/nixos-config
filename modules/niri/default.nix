@@ -1,18 +1,39 @@
-# Niri, the compositor: the system session, the user config with every key
-# bind, and nirisnap for screenshots.
+# Niri, the compositor: the system session, the greetd login that starts it,
+# the desktop portal, the user config with every key bind, and nirisnap for
+# screenshots.
 { inputs, config, ... }:
 let
   inherit (config.flake.modules) homeManager;
 in
 {
-  flake.modules.nixos.niri = {
-    home-manager.sharedModules = [ homeManager.niri ];
+  flake.modules.nixos.niri =
+    { pkgs, ... }:
+    {
+      home-manager.sharedModules = [ homeManager.niri ];
 
-    nixpkgs.overlays = [ inputs.niri.overlays.niri ];
+      nixpkgs.overlays = [ inputs.niri.overlays.niri ];
 
-    # Enable Niri window manager
-    programs.niri.enable = true;
-  };
+      # Enable Niri window manager
+      programs.niri.enable = true;
+
+      # Enable greetd with tuigreet
+      services.greetd = {
+        enable = true;
+        settings = {
+          default_session.command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --user-menu --cmd niri-session";
+        };
+      };
+
+      # XDG desktop portal for Wayland
+      xdg.portal = {
+        enable = true;
+        extraPortals = [
+          pkgs.xdg-desktop-portal-gtk
+        ];
+        # Use GTK portal for everything (no GNOME dependencies)
+        config.common.default = [ "gtk" ];
+      };
+    };
 
   flake.modules.homeManager.niri =
     {
