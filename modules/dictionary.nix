@@ -13,8 +13,16 @@ in
         pname = "moby-thesaurus";
         version = "1.0";
 
+        # No binary cache has this file, so a fresh install downloads it.
+        # gutenberg.org answers automated downloads with 503 at times, and
+        # curl then waits an hour before it retries, so a mirror comes first.
+        # Every URL serves the same file; fetchurl tries them in order.
         src = pkgs.fetchurl {
-          url = "https://www.gutenberg.org/files/3202/files/mthesaur.txt";
+          urls = [
+            "https://mirrors.xmission.com/gutenberg/3/2/0/3202/files/mthesaur.txt"
+            "https://gutenberg.pglaf.org/3/2/0/3202/files/mthesaur.txt"
+            "https://www.gutenberg.org/files/3202/files/mthesaur.txt"
+          ];
           sha256 = "sha256-fJdCse2UQ1qJPAcZtCZyXtuKUkL4xSanVGG9bO4t/TI=";
         };
 
