@@ -1,24 +1,5 @@
 {
   "nodes": {
-    "aoc-cli": {
-      "inputs": {
-        "nixpkgs": "nixpkgs",
-        "rust-overlay": "rust-overlay"
-      },
-      "locked": {
-        "lastModified": 1793985878,
-        "narHash": "sha256-3hZGqoFHXlSs+LI83+OGr1y2cntDJnMAYW44QU35h8U=",
-        "owner": "ahacop",
-        "repo": "aoc-cli",
-        "rev": "324cfd25d4af81108a291a275e6ffd946b6a6634",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ahacop",
-        "repo": "aoc-cli",
-        "type": "github"
-      }
-    },
     "base16": {
       "inputs": {
         "fromYaml": "fromYaml"
@@ -143,7 +124,7 @@
     },
     "epub-sync": {
       "inputs": {
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs"
       },
       "locked": {
         "lastModified": 1790883680,
@@ -161,7 +142,7 @@
     },
     "erwindb": {
       "inputs": {
-        "nixpkgs": "nixpkgs_3",
+        "nixpkgs": "nixpkgs_2",
         "rust-overlay": [
           "rust-overlay"
         ]
@@ -410,7 +391,7 @@
       "inputs": {
         "bun2nix": "bun2nix",
         "flake-parts": "flake-parts_2",
-        "nixpkgs": "nixpkgs_4",
+        "nixpkgs": "nixpkgs_3",
         "systems": "systems",
         "treefmt-nix": "treefmt-nix"
       },
@@ -452,7 +433,7 @@
     "mw-cli": {
       "inputs": {
         "flake-utils": "flake-utils_2",
-        "nixpkgs": "nixpkgs_5"
+        "nixpkgs": "nixpkgs_4"
       },
       "locked": {
         "lastModified": 1793349104,
@@ -528,11 +509,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1793726008,
-        "narHash": "sha256-jQp1wKvbwWdLBASTXkSi/VYmDJ5AbBi1WvcMt9HWJC8=",
+        "lastModified": 1790822859,
+        "narHash": "sha256-69xHQhAeMAD2wDXO7T2pcOZIF9Sga2W+JkmY2a11Ops=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "1d060086d60cb76a40cf37109f979d88a5bd6396",
+        "rev": "c59305bab2065cfecc4944690d9eedbb56f3a9fa",
         "type": "github"
       },
       "original": {
@@ -560,22 +541,6 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1790822859,
-        "narHash": "sha256-69xHQhAeMAD2wDXO7T2pcOZIF9Sga2W+JkmY2a11Ops=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "c59305bab2065cfecc4944690d9eedbb56f3a9fa",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_3": {
-      "locked": {
         "lastModified": 1790578696,
         "narHash": "sha256-ZoxIApko70jCdbH3l20HWXOBaT2HZd87orzd2yJ9dVE=",
         "owner": "NixOS",
@@ -590,7 +555,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_4": {
+    "nixpkgs_3": {
       "locked": {
         "lastModified": 1793977579,
         "narHash": "sha256-WrSODdZFVIs/Hh2NzC0bY+ROByi0bATg8WfePX8dPj8=",
@@ -606,7 +571,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_5": {
+    "nixpkgs_4": {
       "locked": {
         "lastModified": 1762844143,
         "narHash": "sha256-SlybxLZ1/e4T2lb1czEtWVzDCVSTvk9WLwGhmxFmBxI=",
@@ -622,7 +587,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_6": {
+    "nixpkgs_5": {
       "locked": {
         "lastModified": 1794537146,
         "narHash": "sha256-Wpz/7x/YWnDIBu7yj6ixe8j6fIMsidd9Y+o1PqPF3iM=",
@@ -638,7 +603,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_7": {
+    "nixpkgs_6": {
       "locked": {
         "lastModified": 1790578696,
         "narHash": "sha256-ZoxIApko70jCdbH3l20HWXOBaT2HZd87orzd2yJ9dVE=",
@@ -724,7 +689,7 @@
     },
     "opdsview": {
       "inputs": {
-        "nixpkgs": "nixpkgs_7",
+        "nixpkgs": "nixpkgs_6",
         "rust-overlay": [
           "rust-overlay"
         ]
@@ -745,7 +710,6 @@
     },
     "root": {
       "inputs": {
-        "aoc-cli": "aoc-cli",
         "clipway": "clipway",
         "epub-sync": "epub-sync",
         "erwindb": "erwindb",
@@ -756,39 +720,18 @@
         "macos-notifier-bridge": "macos-notifier-bridge",
         "mw-cli": "mw-cli",
         "niri": "niri",
-        "nixpkgs": "nixpkgs_6",
+        "nixpkgs": "nixpkgs_5",
         "nixpkgs-kernel": [
           "nixpkgs"
         ],
         "nixvim": "nixvim",
         "nur": "nur",
         "opdsview": "opdsview",
-        "rust-overlay": "rust-overlay_2",
+        "rust-overlay": "rust-overlay",
         "stylix": "stylix"
       }
     },
     "rust-overlay": {
-      "inputs": {
-        "nixpkgs": [
-          "aoc-cli",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1793956102,
-        "narHash": "sha256-dASUovwB3DUoTm6daga0hsNZZAFCCGlUS4FPBjK0OwA=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "74cebce67ef6671ea48fda353a5be2d229bd2920",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
-    "rust-overlay_2": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs"

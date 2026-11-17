@@ -62,9 +62,9 @@ SSH_OPTIONS := -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o Str
 SECRETS_SSH_OPTIONS := -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=ask
 
 # Binary caches that vm/install hands to nixos-install. The installer knows
-# only cache.nixos.org, and without these the LLM agent CLIs, aoc-cli and
-# epub-sync compile from source during the install. Keep them in step with
-# nix.settings in modules/base/configuration.nix.
+# only cache.nixos.org, and without these the LLM agent CLIs, epub-sync and
+# the other ahacop flakes compile from source during the install. Keep them
+# in step with nix.settings in modules/base/configuration.nix.
 INSTALL_SUBSTITUTERS := https://nix-community.cachix.org https://cache.numtide.com https://ahacop.cachix.org
 INSTALL_TRUSTED_KEYS := nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= \
 	niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= \

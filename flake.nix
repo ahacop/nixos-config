@@ -46,14 +46,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # aoc-cli keeps its own nixpkgs and rust-overlay. Its CI builds against
-    # aoc-cli's own lock and pushes the result to ahacop.cachix.org, so the
+    # mw-cli, erwindb and opdsview keep their own nixpkgs. Each one's CI builds
+    # against its own lock and pushes the result to ahacop.cachix.org, so the
     # store path here matches the cached one and nothing compiles locally.
-    aoc-cli.url = "github:ahacop/aoc-cli";
-
-    # mw-cli, erwindb and opdsview keep their own nixpkgs for the same reason
-    # as aoc-cli: their CI pushes builds of their own locks to
-    # ahacop.cachix.org. erwindb and opdsview use rust-overlay only in their
+    # erwindb and opdsview use rust-overlay only in their
     # dev shells, so the rust-overlay follows leave their package store paths
     # unchanged.
     mw-cli.url = "github:ahacop/mw-cli";
@@ -68,7 +64,7 @@
       inputs.rust-overlay.follows = "rust-overlay";
     };
 
-    # epub-sync keeps its own nixpkgs for the same reason as aoc-cli: its CI
+    # epub-sync keeps its own nixpkgs for the same reason as mw-cli: its CI
     # pushes builds of its own lock to ahacop.cachix.org.
     epub-sync.url = "github:ahacop/epub-sync";
 

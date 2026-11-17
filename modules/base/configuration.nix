@@ -147,14 +147,12 @@ in
           iproute2
           mesa-demos
           gnupg
-          heroku
           htop
           hunspell
           jpegoptim
           jq
           just
           killall
-          litemdview
           lsof
           man-pages
           man-pages-posix
@@ -188,16 +186,13 @@ in
           wl-clipboard
           wget
           xxd
-          yt-dlp
           zip
           chromium
           gum
 
-          asciinema
           dysk
           fzf
           nodejs
-          silicon
           tig
           tldr
           tree

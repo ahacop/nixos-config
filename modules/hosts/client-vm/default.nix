@@ -21,7 +21,6 @@ in
       nixos.printing
       nixos.vmware-guest
       nixos.theme
-      nixos.usb-drives
       nixos.networking
       nixos.mac-host
     ];
@@ -55,6 +54,7 @@ in
       homeManager.git
       homeManager.tmux
       homeManager.llm-agents
+      homeManager.ebook-reading
     ];
 
     # The release home-manager was first used with on this machine. Do not

@@ -56,7 +56,6 @@
         enable = true;
         defaultApplications = {
           "application/pdf" = [ "org.pwmt.zathura.desktop" ];
-          "application/epub+zip" = [ "com.github.johnfactotum.Foliate.desktop" ];
         };
       };
 
@@ -66,19 +65,12 @@
         };
 
         packages = with pkgs; [
-          (calibre.override { speechSupport = false; })
-          circumflex
           devenv
           duckdb
-          foliate
           glow
-          inputs.aoc-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
           inputs.erwindb.packages.${pkgs.stdenv.hostPlatform.system}.default
           inputs.mw-cli.packages.${pkgs.stdenv.hostPlatform.system}.default
-          inputs.opdsview.packages.${pkgs.stdenv.hostPlatform.system}.default
-          inputs.epub-sync.packages.${pkgs.stdenv.hostPlatform.system}.default
           mermaid-cli
-          pomodoro
           vale
           zathura
         ];
