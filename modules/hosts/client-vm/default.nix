@@ -25,6 +25,7 @@ in
       nixos.mac-host
       nixos.writing
       nixos.notes
+      nixos.nix-ld
     ];
 
     # The Makefile builds the configuration with this host's name, so the
