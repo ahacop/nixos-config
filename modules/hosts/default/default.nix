@@ -65,6 +65,10 @@ in
     # The release home-manager was first used with on this machine. Do not
     # change it on upgrades.
     home.stateVersion = "24.05";
+
+    git.signingKeys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBV/HHQ0w3gMEOnwVvGUCnFJa8qlUCCAuLn26sNzRzk8"
+    ];
   };
 
   flake.nixosConfigurations.default = inputs.nixpkgs.lib.nixosSystem {
