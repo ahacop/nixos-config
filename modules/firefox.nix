@@ -29,6 +29,7 @@
           ];
           settings = {
             "extensions.autoDisableScopes" = 0;
+            "browser.startup.page" = 3;
             "privacy.query_stripping.enabled" = true;
             "privacy.query_stripping.enabled.pbmode" = true;
             # Override inherited Wayland DPR (niri output scale = 1.5) so more
