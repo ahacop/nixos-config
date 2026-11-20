@@ -352,6 +352,29 @@
         "type": "gitlab"
       }
     },
+    "hex": {
+      "inputs": {
+        "home-manager": [
+          "home-manager"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795147081,
+        "narHash": "sha256-2wfWO3kwkuCqhN75VNn07PlUk0AF34iLsmD9zG1zgtE=",
+        "owner": "anomalyco",
+        "repo": "hex",
+        "rev": "36b26f2564e0bcc2668e73165c72c2b739daa7d5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anomalyco",
+        "repo": "hex",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -714,6 +737,7 @@
         "epub-sync": "epub-sync",
         "erwindb": "erwindb",
         "flake-parts": "flake-parts",
+        "hex": "hex",
         "home-manager": "home-manager",
         "import-tree": "import-tree",
         "llm-agents": "llm-agents",

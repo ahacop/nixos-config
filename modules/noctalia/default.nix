@@ -54,7 +54,6 @@
 
           plugins.enabled = [
             "ahacop/timezone-grid"
-            "goodroot/noctwhspr"
           ];
 
           bar = {
@@ -83,10 +82,6 @@
                 "disk"
                 "ram"
                 "cpu"
-                # hyprwhspr state: a red dot while it records, a microphone
-                # when it is ready. Left click toggles a recording, right click
-                # restarts the service.
-                "goodroot/noctwhspr:status"
                 "volume"
                 "tray"
                 "notifications"
@@ -147,7 +142,7 @@
               glyph = "terminal";
               global = true;
               command = "printf '%s\\n' 'Display: 1920x1080' 'Display: 7680x3200' 'Dictate: toggle'";
-              exec = ''case "{selection}" in "Display: 1920x1080") niri msg output Virtual-1 mode 1920x1080@60.000 ;; "Display: 7680x3200") niri msg output Virtual-1 mode 7680x3200@60.000 ;; "Dictate: toggle") hyprwhspr record toggle ;; esac'';
+              exec = ''case "{selection}" in "Display: 1920x1080") niri msg output Virtual-1 mode 1920x1080@60.000 ;; "Display: 7680x3200") niri msg output Virtual-1 mode 7680x3200@60.000 ;; "Dictate: toggle") hex dictation toggle ;; esac'';
             };
 
             # Removable drives to eject, reached with `/eject` or from the

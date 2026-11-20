@@ -85,6 +85,12 @@
     # past theirs.
     llm-agents.url = "github:numtide/llm-agents.nix";
 
+    hex = {
+      url = "github:anomalyco/hex";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
+
     # Patches open-vm-tools with a Wayland clipboard backend and runs the
     # vmtoolsd user daemon, so copy and paste works between the Mac and niri.
     # It patches our own open-vm-tools, so it follows our nixpkgs.
