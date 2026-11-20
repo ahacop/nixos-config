@@ -45,6 +45,11 @@ in
         };
       };
 
+      xdg.dataFile."hex/dot-scope.json".text = builtins.toJSON {
+        processing = "sweep";
+        processing_width = 60;
+      };
+
       programs.niri.settings.binds."Mod+Backslash" = {
         action = config.lib.niri.actions.spawn "hex" "dictation" "toggle";
         repeat = false;
