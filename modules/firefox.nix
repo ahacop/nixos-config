@@ -23,13 +23,14 @@
             force = true;
           };
           extensions.packages = with nur.repos.rycee.firefox-addons; [
-            clearurls
             facebook-container
             ublock-origin
             vimium
           ];
           settings = {
             "extensions.autoDisableScopes" = 0;
+            "privacy.query_stripping.enabled" = true;
+            "privacy.query_stripping.enabled.pbmode" = true;
             # Override inherited Wayland DPR (niri output scale = 1.5) so more
             # content fits at Firefox 100% zoom. Lower = smaller (1.0 ≈ standard DPI).
             "layout.css.devicePixelRatio" = "1.25";
