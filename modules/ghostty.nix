@@ -1,10 +1,37 @@
 # Ghostty, the terminal.
 {
   flake.modules.homeManager.ghostty =
-    { config, ... }:
+    {
+      config,
+      pkgs,
+      osConfig,
+      ...
+    }:
+    let
+      # Ghostty needs OpenGL 4.3. On a guest GPU without it (UTM's virgl),
+      # run Ghostty on Mesa's llvmpipe software renderer, which offers 4.6.
+      # The D-Bus service and desktop entry point at the wrapper, so every
+      # way of starting Ghostty gets the setting.
+      softwareGhostty = pkgs.symlinkJoin {
+        name = "ghostty-software-gl-${pkgs.ghostty.version}";
+        paths = [ pkgs.ghostty ];
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/ghostty --set LIBGL_ALWAYS_SOFTWARE 1
+          for f in $out/share/dbus-1/services/*.service $out/share/applications/*.desktop $out/share/systemd/user/*.service; do
+            [ -e "$f" ] || continue
+            target=$(readlink -f "$f")
+            rm "$f"
+            sed "s|${pkgs.ghostty}/bin/ghostty|$out/bin/ghostty|g" "$target" > "$f"
+          done
+        '';
+        inherit (pkgs.ghostty) version meta;
+      };
+    in
     {
       programs.ghostty = {
         enable = true;
+        package = if osConfig.guest.openGL43 then pkgs.ghostty else softwareGhostty;
         enableZshIntegration = true;
         # The systemd user service ghostty 1.3.1 ships exits immediately when it
         # can't become the primary instance (notify handshake never completes),

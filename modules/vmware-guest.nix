@@ -13,8 +13,14 @@
       # loaders look for them.
       hardware.graphics.enable = true;
 
-      # VMware gives the VM an emulated NIC that comes up as enp2s0.
-      networking.interfaces.enp2s0.useDHCP = true;
+      guest = {
+        # The emulated NIC comes up as enp2s0.
+        networkInterface = "enp2s0";
+        # VMware Fusion's virtual mouse.
+        mouseId = "0e0f:0003";
+        # The SVGA driver offers OpenGL 4.3, so Ghostty renders on the GPU.
+        openGL43 = true;
+      };
 
       environment.sessionVariables = {
         # Force Mesa to use the VMware SVGA driver for hardware acceleration

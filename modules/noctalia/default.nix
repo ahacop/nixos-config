@@ -1,6 +1,6 @@
 {
   flake.modules.homeManager.noctalia =
-    { pkgs, ... }:
+    { pkgs, osConfig, ... }:
     {
       # Noctalia is the whole shell layer: bar, launcher, notification daemon,
       # control center, clipboard history, OSDs and lock screen in one process.
@@ -108,17 +108,17 @@
               stat = "disk_used_pct";
               path = "/";
             };
-            # enp2s0 is the bridged VMware interface set up in configuration.nix.
+            # The emulator's network interface, which the guest feature names.
             netrx = {
               type = "sysmon";
               stat = "net_rx";
-              interface = "enp2s0";
+              interface = osConfig.guest.networkInterface;
               network_speed_compact = true;
             };
             nettx = {
               type = "sysmon";
               stat = "net_tx";
-              interface = "enp2s0";
+              interface = osConfig.guest.networkInterface;
               network_speed_compact = true;
             };
             clock = {

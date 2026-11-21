@@ -10,8 +10,16 @@
       # loader.
       hardware.graphics.enable = true;
 
-      # UTM gives the VM a virtio NIC that comes up as enp0s1.
-      networking.interfaces.enp0s1.useDHCP = true;
+      guest = {
+        # The virtio NIC comes up as enp0s1.
+        networkInterface = "enp0s1";
+        # QEMU's USB tablet and USB mouse share this ID. Only the mouse, which
+        # UTM uses while it captures input, has the thumb buttons.
+        mouseId = "0627:0001";
+        # virgl tops out at OpenGL 4.1 with UTM's Apple Core OpenGL backend
+        # and 2.1 with ANGLE, below the 4.3 Ghostty needs.
+        openGL43 = false;
+      };
 
       # Lets UTM shut the guest down cleanly and query its state.
       services.qemuGuest.enable = true;

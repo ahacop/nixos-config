@@ -11,6 +11,9 @@ in
       nixos.configuration
       inputs.home-manager.nixosModules.default
 
+      # The emulator facts. The host's guest feature sets them.
+      nixos.guest
+
       # Features with a NixOS part. A feature that also has a home-manager
       # part adds it to home-manager.sharedModules itself.
       nixos.dictation

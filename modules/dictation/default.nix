@@ -5,20 +5,20 @@ let
   inherit (config.flake.modules) homeManager;
 in
 {
-  flake.modules.nixos.dictation = {
+  flake.modules.nixos.dictation = nixosArgs: {
     home-manager.sharedModules = [ homeManager.dictation ];
 
     # Mouse thumb buttons for dictation. The top thumb button (BTN_EXTRA)
     # presses Mod+Backslash, which niri binds to `hex dictation toggle`.
     # The bottom thumb button (BTN_SIDE) presses Enter. Both buttons lose
-    # their browser forward and back jobs. 0e0f:0003 is the virtual mouse
-    # that VMware Fusion gives the VM; the m: prefix makes keyd treat it as
-    # a mouse. keyd marks mouse support as experimental, so if the pointer
-    # misbehaves, `sudo systemctl stop keyd` gives the mouse back.
+    # their browser forward and back jobs. guest.mouseId is the emulator's
+    # virtual mouse; the m: prefix makes keyd treat it as a mouse. keyd marks
+    # mouse support as experimental, so if the pointer misbehaves,
+    # `sudo systemctl stop keyd` gives the mouse back.
     services.keyd = {
       enable = true;
       keyboards.mouse = {
-        ids = [ "m:0e0f:0003" ];
+        ids = [ "m:${nixosArgs.config.guest.mouseId}" ];
         settings.main = {
           mouse2 = "M-backslash";
           mouse1 = "enter";
