@@ -13,6 +13,9 @@
       # loaders look for them.
       hardware.graphics.enable = true;
 
+      # VMware gives the VM an emulated NIC that comes up as enp2s0.
+      networking.interfaces.enp2s0.useDHCP = true;
+
       environment.sessionVariables = {
         # Force Mesa to use the VMware SVGA driver for hardware acceleration
         LIBGL_ALWAYS_SOFTWARE = "0";

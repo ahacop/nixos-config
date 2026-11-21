@@ -3,7 +3,7 @@
 {
   flake.modules.nixos.networking = {
     networking = {
-      # networkd runs DHCP only on enp2s0, set below.
+      # networkd runs DHCP only on the interfaces a guest feature names.
       useDHCP = false;
 
       # DHCP is done by systemd-networkd, not by dhcpcd, so that resolved below
@@ -21,9 +21,6 @@
       #
       # Setting this turns dhcpcd off on its own.
       useNetworkd = true;
-
-      # Interface is this on M1
-      interfaces.enp2s0.useDHCP = true;
 
       # The firewall is off so anything listening in the VM is reachable without
       # opening ports one at a time. The VM is bridged onto the local network, so
