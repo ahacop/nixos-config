@@ -18,6 +18,7 @@
         networkInterface = "enp2s0";
         # VMware Fusion's virtual mouse.
         mouseId = "0e0f:0003";
+        display.scale = 1.5;
         # The SVGA driver offers OpenGL 4.3, so Ghostty renders on the GPU.
         openGL43 = true;
       };

@@ -19,6 +19,31 @@
           description = "USB vendor:product of the emulator's virtual mouse, as keyd matches it.";
         };
 
+        display = {
+          scale = lib.mkOption {
+            type = lib.types.float;
+            example = 1.5;
+            description = "niri's scale for the emulator's display.";
+          };
+
+          mode = lib.mkOption {
+            type = lib.types.nullOr (
+              lib.types.submodule {
+                options = {
+                  width = lib.mkOption { type = lib.types.int; };
+                  height = lib.mkOption { type = lib.types.int; };
+                };
+              }
+            );
+            default = null;
+            description = ''
+              A fixed resolution for the display, for an emulator that can't
+              resize it to fit its window. Null lets niri take the preferred
+              mode, which follows the window when the emulator resizes it.
+            '';
+          };
+        };
+
         openGL43 = lib.mkOption {
           type = lib.types.bool;
           description = ''

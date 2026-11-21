@@ -40,6 +40,7 @@ in
       config,
       lib,
       pkgs,
+      osConfig,
       ...
     }:
     let
@@ -69,7 +70,7 @@ in
 
         # Output configuration
         outputs."Virtual-1" = {
-          scale = 1.5;
+          inherit (osConfig.guest.display) scale mode;
         };
 
         input = {
