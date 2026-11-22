@@ -99,6 +99,8 @@ in
         MaxRetentionSec = "3day";
       };
 
+      services.sysstat.enable = true;
+
       # The desktop modules turn speech-dispatcher on by default. Nothing here
       # uses it, and it pulls in espeak-ng and the mbrola voices, about 2.3G.
       services.speechd.enable = false;
