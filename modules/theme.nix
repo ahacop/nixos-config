@@ -160,5 +160,6 @@ in
     # `programs.rofi.font`, which home-manager renamed to
     # `programs.rofi.settings.font`, and that causes an evaluation warning.
     stylix.targets.rofi.enable = false;
+    stylix.targets.wayprompt.enable = false;
   };
 }
