@@ -39,6 +39,7 @@ in
         installModel = true;
         settings = {
           shortcut_mode = "toggle";
+          release_microphone_while_idle = true;
           sound_effects = false;
           paste_with_shift = true;
           transcription_device = "cpu";
