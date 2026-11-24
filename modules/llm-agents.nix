@@ -12,6 +12,7 @@ let
     "crit"
     "herdr"
     "hunk"
+    "opencode2"
     "pi"
     "plannotator"
   ];
