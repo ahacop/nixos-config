@@ -50,6 +50,24 @@
         };
       };
 
+      systemd.user = {
+        services.cargo-sweep = {
+          Unit.Description = "Remove Rust build output unused for 14 days under ~/code";
+          Service = {
+            Type = "oneshot";
+            ExecStart = "${pkgs.cargo-sweep}/bin/cargo-sweep sweep --recursive --time 14 %h/code";
+          };
+        };
+        timers.cargo-sweep = {
+          Unit.Description = "Weekly cargo-sweep of ~/code";
+          Timer = {
+            OnCalendar = "weekly";
+            Persistent = true;
+          };
+          Install.WantedBy = [ "timers.target" ];
+        };
+      };
+
       xdg.enable = true;
 
       xdg.mimeApps = {
@@ -62,6 +80,7 @@
       home = {
         packages = with pkgs; [
           inputs.erwindb.packages.${pkgs.stdenv.hostPlatform.system}.default
+          cargo-sweep
           zathura
         ];
         sessionVariables = {

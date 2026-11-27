@@ -52,8 +52,17 @@ in
         binfmt.emulatedSystems = [ "x86_64-linux" ];
       };
 
+      systemd.tmpfiles.rules = [ "q /tmp 1777 root root 10d" ];
+
       nix = {
         package = pkgs.nixVersions.latest;
+
+        gc = {
+          automatic = true;
+          dates = "weekly";
+          options = "--delete-older-than 14d";
+        };
+        optimise.automatic = true;
 
         settings = {
           experimental-features = [
